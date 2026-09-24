@@ -1,0 +1,285 @@
+/**
+ * @file board_init.cpp
+ *
+ */
+/* Copyright (C) 2025-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+#if !defined(_TIME_STAMP_DAY_)
+#define _TIME_STAMP_DAY_ 0
+#endif // _TIME_STAMP_DAY_
+#if !defined(_TIME_STAMP_MONTH_)
+#define _TIME_STAMP_MONTH_ 1
+#endif // _TIME_STAMP_MONTH_
+#if !defined(_TIME_STAMP_YEAR_)
+#define _TIME_STAMP_YEAR_ (2026 - 1900)
+#endif // _TIME_STAMP_YEAR_
+
+#if (defined(GD32F4XX) || defined(GD32H7XX)) && defined(GPIO_INIT)
+#error
+#endif // (defined(GD32F4XX) || defined(GD32H7XX)) && defined(GPIO_INIT)
+
+#if (defined(GD32F4XX) || defined(GD32H7XX)) && !defined(MCU_HAVE_GPIO_TG)
+#error
+#endif // (defined(GD32F4XX) || defined(GD32H7XX)) && !defined(MCU_HAVE_GPIO_TG)
+
+#include <cstddef>
+#include <cstring>
+#include <cstdio>
+#include <cassert>
+#include <ctime>
+#include <sys/time.h>
+
+#include "gd32.h"
+#include "gd32_i2c.h"
+#if defined(CONFIG_CLIB_USE_UART0)
+#include "uart0.h"
+#elif defined(CONFIG_CLIB_USE_NULL)
+#else
+#error
+#endif // CONFIG_CLIB_USE_UART0
+#if defined(CONFIG_NET_ENABLE_PTP)
+#include "gd32_ptp.h"
+#endif // CONFIG_NET_ENABLE_PTP
+#if defined(ENABLE_USB_HOST)
+#include "device/usb.h"
+#endif // ENABLE_USB_HOST
+#include "board_statusled.h"
+#include "panelled.h"
+#include "logic_analyzer.h"
+#include "gd32_timers.h"
+#include "firmware/debug/debug_i2cdetect.h"
+#include "firmware/debug/debug_stack.h"
+
+void Gd32AdcInit();
+
+#ifdef GD32H7XX
+void CacheEnable();
+void MpuConfig();
+#endif // GD32H7XX
+
+#ifndef DISABLE_RTC
+#include "hwclock.h"
+namespace {
+HwClock hw_clock;
+}
+#endif // DISABLE_RTC
+
+extern unsigned char _sdmx;      // NOLINT
+extern unsigned char _edmx;      // NOLINT
+extern unsigned char _slightset; // NOLINT
+extern unsigned char _elightset; // NOLINT
+extern unsigned char _snetwork;  // NOLINT
+extern unsigned char _enetwork;  // NOLINT
+extern unsigned char _spixel;    // NOLINT
+extern unsigned char _epixel;    // NOLINT
+
+namespace board {
+void Init() {
+    // GD32H7xx Cache and Memory Protection Unit
+#ifdef GD32H7XX
+    CacheEnable();
+    MpuConfig();
+#endif // GD32H7XX
+
+#ifdef CONFIG_CLIB_USE_UART0
+    uart0::Init();
+#endif // CONFIG_CLIB_USE_UART0
+    // From here we console output
+#ifdef BOARD_DEBUG
+    putchar('\n');
+#endif // BOARD_DEBUG
+
+    // See https://www.gd32-dmx.org/memory.html
+#ifndef ENABLE_TFTP_SERVER
+#if defined(GD32F207RG) || defined(GD32F4XX) || defined(GD32H7XX)
+#ifndef GD32H7XX
+    {
+        // Clear section .dmx
+        const auto kSize = static_cast<size_t>(&_edmx - &_sdmx);
+        memset(&_sdmx, 0, kSize);
+#ifdef BOARD_DEBUG
+        printf("Cleared .dmx at %p, size %u\n", &_sdmx, kSize);
+#endif // BOARD_DEBUG
+    }
+#endif // GD32H7XX
+#if defined(GD32F450VI) || defined(GD32H7XX)
+    {
+        // Clear section .lightset
+        const auto kSize = static_cast<size_t>(&_elightset - &_slightset);
+        memset(&_slightset, 0, kSize);
+#if defined(BOARD_DEBUG)
+        printf("Cleared .lightset at %p, size %u\n", &_slightset, kSize);
+#endif // BOARD_DEBUG
+    }
+#endif // defined(GD32F450VI) || defined(GD32H7XX)
+    {
+        // Clear section .network
+        const auto kSize = static_cast<size_t>(&_enetwork - &_snetwork);
+        memset(&_snetwork, 0, kSize);
+#ifdef BOARD_DEBUG
+        printf("Cleared .network at %p, size %u\n", &_snetwork, kSize);
+#endif // BOARD_DEBUG
+    }
+#if !defined(GD32F450VE) && !defined(GD32H7XX)
+    {
+        // Clear section .pixel
+        const auto kSize = static_cast<size_t>(&_epixel - &_spixel);
+        memset(&_spixel, 0, kSize);
+#ifdef BOARD_DEBUG
+        printf("Cleared .pixel at %p, size %u\n", &_spixel, kSize);
+#endif // BOARD_DEBUG
+    }
+#endif // !defined(GD32F450VE) && !defined(GD32H7XX)
+#endif // defined(GD32F207RG) || defined(GD32F4XX) || defined(GD32H7XX)
+#else
+#if defined(GD32F20X) || defined(GD32F4XX) || defined(GD32H7XX)
+    {
+        // clear section .network
+        const auto kSize = static_cast<size_t>(&_enetwork - &_snetwork);
+        memset(&_snetwork, 0, kSize);
+#if defined(BOARD_DEBUG)
+        printf("Cleared .network at %p, size %u\n", &_snetwork, kSize);
+#endif // BOARD_DEBUG
+    }
+#endif // defined(GD32F20X) || defined(GD32F4XX) || defined(GD32H7XX)
+#endif // ENABLE_TFTP_SERVER
+
+#ifdef BOARD_DEBUG
+    // Show the AHB and APBx busses frequency
+    const auto kSys = rcu_clock_freq_get(CK_SYS);
+    const auto kAhb = rcu_clock_freq_get(CK_AHB);
+    const auto kApb1 = rcu_clock_freq_get(CK_APB1);
+    const auto kApb2 = rcu_clock_freq_get(CK_APB2);
+    printf("CK_SYS=%u\nCK_AHB=%u\nCK_APB1=%u\nCK_APB2=%u\n", static_cast<unsigned>(kSys), static_cast<unsigned>(kAhb), static_cast<unsigned>(kApb1), static_cast<unsigned>(kApb2));
+    assert(kSys == MCU_CLOCK_FREQ);
+    assert(kAhb == AHB_CLOCK_FREQ);
+    assert(kApb1 == APB1_CLOCK_FREQ);
+    assert(kApb2 == APB2_CLOCK_FREQ);
+#ifdef GD32H7XX
+    const auto kApb3 = rcu_clock_freq_get(CK_APB3);
+    const auto kApb4 = rcu_clock_freq_get(CK_APB4);
+    printf("nCK_APB3=%u\nCK_APB4=%u\n", static_cast<unsigned>(nAPB3), static_cast<unsigned>(nAPB4));
+    assert(kApb3 == APB3_CLOCK_FREQ);
+    assert(kApb4 == APB4_CLOCK_FREQ);
+#endif // GD32H7XX
+#endif // BOARD_DEBUG
+
+    gd32::timers::Start();
+
+    Gd32AdcInit();
+    Gd32I2cBegin();
+
+#ifdef GD32H7XX
+    rcu_periph_clock_enable(RCU_PMU);
+    rcu_periph_clock_enable(RCU_BKPSRAM);
+    pmu_backup_write_enable();
+#elifdef GD32F4XX
+    rcu_periph_clock_enable(RCU_RTC);
+    rcu_periph_clock_enable(RCU_PMU);
+    pmu_backup_ldo_config(PMU_BLDOON_ON);
+    rcu_periph_clock_enable(RCU_BKPSRAM);
+    pmu_backup_write_enable();
+#else
+    rcu_periph_clock_enable(RCU_BKPI);
+    rcu_periph_clock_enable(RCU_PMU);
+    pmu_backup_write_enable();
+#endif // GD32H7XX
+    bkp_data_write(BKP_DATA_1, 0x0);
+
+    // Initialize status led
+    rcu_periph_clock_enable(LED_BLINK_GPIO_CLK);
+#ifdef GPIO_INIT
+    gpio_init(LED_BLINK_GPIO_PORT, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, LED_BLINK_PIN);
+#else
+    gpio_mode_set(LED1_GPIOx, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED1_GPIO_PINx);
+    gpio_output_options_set(LED1_GPIOx, GPIO_OTYPE_PP, GPIO_OSPEED, LED1_GPIO_PINx);
+
+    gpio_mode_set(LED2_GPIOx, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED2_GPIO_PINx);
+    gpio_output_options_set(LED2_GPIOx, GPIO_OTYPE_PP, GPIO_OSPEED, LED2_GPIO_PINx);
+#ifdef LED3_GPIOx
+    gpio_mode_set(LED3_GPIOx, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED3_GPIO_PINx);
+    gpio_output_options_set(LED3_GPIOx, GPIO_OTYPE_PP, GPIO_OSPEED, LED3_GPIO_PINx);
+#endif // LED3_GPIOx
+#endif // GPIO_INIT
+    GPIO_BOP(LED1_GPIOx) = LED1_GPIO_PINx;
+    GPIO_BOP(LED2_GPIOx) = LED2_GPIO_PINx;
+#ifdef LED3_GPIOx
+    GPIO_BOP(LED3_GPIOx) = LED3_GPIO_PINx;
+#endif // LED3_GPIOx
+
+#ifdef PANELLED_595_CS_GPIOx
+    rcu_periph_clock_enable(PANELLED_595_CS_RCU_GPIOx);
+#if defined(GPIO_INIT)
+    gpio_init(PANELLED_595_CS_GPIOx, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, PANELLED_595_CS_GPIO_PINx);
+#else
+    gpio_mode_set(PANELLED_595_CS_GPIOx, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, PANELLED_595_CS_GPIO_PINx);
+    gpio_output_options_set(PANELLED_595_CS_GPIOx, GPIO_OTYPE_PP, GPIO_OSPEED, PANELLED_595_CS_GPIO_PINx);
+#endif // GPIO_INIT
+    GPIO_BOP(PANELLED_595_CS_GPIOx) = PANELLED_595_CS_GPIO_PINx;
+#endif // PANELLED_595_CS_GPIOx
+
+    panelled::Init();
+
+#ifdef ENABLE_USB_HOST
+    usb::Init();
+#endif // ENABLE_USB_HOST
+
+    logic_analyzer::Init();
+
+#ifndef CONFIG_NET_ENABLE_PTP
+#if defined(CONFIG_TIME_USE_TIMER) || defined(CONFIG_TIME_USE_SYSTICK)
+    struct tm tmbuf;
+    memset(&tmbuf, 0, sizeof(struct tm));
+    tmbuf.tm_mday = _TIME_STAMP_DAY_;         // The day of the month, in the range 1 to 31.
+    tmbuf.tm_mon = _TIME_STAMP_MONTH_ - 1;    // The number of months since January, in the range 0 to 11.
+    tmbuf.tm_year = _TIME_STAMP_YEAR_ - 1900; // The number of years since 1900.
+
+    const auto kSeconds = mktime(&tmbuf);
+    const struct timeval kTv = {.tv_sec = kSeconds, .tv_usec = 0};
+
+    settimeofday(&kTv, nullptr);
+#endif // defined(CONFIG_TIME_USE_TIMER) || defined(CONFIG_TIME_USE_SYSTICK)
+#endif // CONFIG_NET_ENABLE_PTP
+
+#ifndef DISABLE_RTC
+    HwClock::Get()->RtcProbe();
+    HwClock::Get()->Print();
+#ifndef CONFIG_NET_ENABLE_PTP
+    // Set the System Clock from the Hardware Clock
+    HwClock::Get()->HcToSys();
+#endif // CONFIG_NET_ENABLE_PTP
+#endif // DISABLE_RTC
+
+    debug::i2c::Detect();
+
+    GPIO_BC(LED1_GPIOx) = LED1_GPIO_PINx;
+    GPIO_BC(LED2_GPIOx) = LED2_GPIO_PINx;
+#ifdef LED3_GPIOx
+    GPIO_BC(LED3_GPIOx) = LED3_GPIO_PINx;
+#endif // LED3_GPIOx
+#ifndef USE_FREE_RTOS
+    board::statusled::SetFrequency(1);
+#endif // USE_FREE_RTOS
+
+    debug::stack::Print();
+}
+} // namespace board

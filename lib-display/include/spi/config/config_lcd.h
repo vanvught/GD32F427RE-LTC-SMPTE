@@ -1,0 +1,82 @@
+/**
+ * @file config_lcd.h
+ *
+ */
+/* Copyright (C) 2022-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+#ifndef SPI_CONFIG_H_
+#define SPI_CONFIG_H_
+
+#include <cstdint>
+
+namespace config::lcd {
+#ifdef SPI_LCD_240X240
+inline constexpr uint32_t kWidth = 240;
+inline constexpr uint32_t kHeight = 240;
+#elif defined(SPI_LCD_240X320)
+inline constexpr uint32_t kWidth = 240;
+inline constexpr uint32_t kHeight = 320;
+#elif defined(SPI_LCD_128X128)
+inline constexpr uint32_t kWidth = 128;
+inline constexpr uint32_t kHeight = 128;
+#elif defined(SPI_LCD_160X80)
+inline constexpr uint32_t kWidth = 80;
+inline constexpr uint32_t kHeight = 160;
+#else
+#error lib-display spi config
+#endif // SPI_LCD_240X240
+} // namespace config::lcd
+
+#ifdef H3
+#define SPI_LCD_RST_GPIO GPIO_EXT_7 // GPIO6
+#define SPI_LCD_DC_GPIO GPIO_EXT_26 // GPIO10
+#define SPI_LCD_BL_GPIO GPIO_EXT_22 // GPIO2
+#ifdef SPI_LCD_HAVE_CS_GPIO
+#define SPI_LCD_CS_GPIO GPIO_EXT_24 // GPIO13 / SPI CS0
+#endif // SPI_LCD_HAVE_CS_GPIO
+#elif defined(GD32)                 // See board file
+#elif defined(RASPPI)
+#include "gpio_rasppi.h"
+#define SPI_LCD_RST_GPIO GPIO_EXT_7 // GPIO4
+#define SPI_LCD_DC_GPIO GPIO_EXT_31 // GPIO6
+#define SPI_LCD_BL_GPIO GPIO_EXT_29 // GPIO5
+#ifdef SPI_LCD_HAVE_CS_GPIO
+#define SPI_LCD_CS_GPIO GPIO_EXT_22 // GPIO25
+#endif // SPI_LCD_HAVE_CS_GPIO
+#elif defined(ODROID)
+#include "gpio_odroid.h"
+#define SPI_LCD_RST_GPIO GPIO_EXT_7 // GPIO4
+#define SPI_LCD_DC_GPIO GPIO_EXT_31 // GPIO6
+#define SPI_LCD_BL_GPIO GPIO_EXT_29 // GPIO5
+#ifdef SPI_LCD_HAVE_CS_GPIO
+#define SPI_LCD_CS_GPIO GPIO_EXT_22 // GPIO25
+#endif // SPI_LCD_HAVE_CS_GPIO
+#else
+#define SPI_LCD_RST_GPIO 0
+#define SPI_LCD_DC_GPIO 0
+#define SPI_LCD_BL_GPIO 0
+#ifdef SPI_LCD_HAVE_CS_GPIO
+#define SPI_LCD_CS_GPIO 0
+#endif // SPI_LCD_HAVE_CS_GPIO
+#endif // H3
+
+#endif // SPI_CONFIG_H_

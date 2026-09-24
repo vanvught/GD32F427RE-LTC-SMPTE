@@ -1,0 +1,1224 @@
+Archive member included to satisfy reference by file (symbol)
+
+../lib-remoteconfig/lib_gd32/libremoteconfig.a(remoteconfig.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (RemoteConfig::RemoteConfig(remoteconfig::Output, unsigned long))
+../lib-remoteconfig/lib_gd32/libremoteconfig.a(remoteconfig.o)
+                              remoteconfig.o (symbol from plugin) (RemoteConfig::PlatformHandleTftpSet())
+../lib-remoteconfig/lib_gd32/libremoteconfig.a(tftpfileserver.o)
+                              remoteconfig.o (symbol from plugin) (vtable for TFTPFileServer)
+../lib-remoteconfig/lib_gd32/libremoteconfig.a(tftpfileserver.o)
+                              tftpfileserver.o (symbol from plugin) (tftpfileserver::is_valid(void const*))
+../lib-flashcodeinstall/lib_gd32/libflashcodeinstall.a(flashcodeinstall.o)
+                              remoteconfig.o (symbol from plugin) (FlashCodeInstall::WriteFirmware(std::span<unsigned char const, 4294967295u>))
+../lib-flashcodeinstall/lib_gd32/libflashcodeinstall.a(flashcodeinstall.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (FlashCodeInstall::FlashCodeInstall())
+../lib-configstore/lib_gd32/libconfigstore.a(storedevice.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (StoreDevice::StoreDevice())
+../lib-display/lib_gd32/libdisplay.a(display.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (Display::Display(unsigned long))
+../lib-display/lib_gd32/libdisplay.a(ssd1306.o)
+                              display.o (symbol from plugin) (Ssd1306::Ssd1306(OledPanel))
+../lib-display/lib_gd32/libdisplay.a(ssd1311.o)
+                              display.o (symbol from plugin) (Ssd1311::Ssd1311())
+../lib-display/lib_gd32/libdisplay.a(display.o)
+                              remoteconfig.o (symbol from plugin) (Display::SetSleepTimer(bool))
+../lib-flashcode/lib_gd32/libflashcode.a(flashcode.o)
+                              flashcodeinstall.o (symbol from plugin) (FlashCode::FlashCode())
+../lib-flash/lib_gd32/libflash.a(spi_flash.o)
+                              storedevice.o (symbol from plugin) (spi::flash::Probe())
+../lib-flash/lib_gd32/libflash.a(winbond.o)
+                              spi_flash.o (symbol from plugin) (spi::flash::ProbeWinbond(spi::flash::Info*, unsigned char const*))
+../lib-flash/lib_gd32/libflash.a(spi_flash.o)
+                              spi_flash.o (symbol from plugin) (spi::flash::Init())
+../lib-network/lib_gd32/libnetwork.a(network_ptp.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (network::ptp::Run())
+../lib-network/lib_gd32/libnetwork.a(emac_eth.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (emac::eth::Recv(unsigned char**))
+../lib-network/lib_gd32/libnetwork.a(netif.o)
+                              remoteconfig.o (symbol from plugin) (netif::global::netif_default)
+../lib-network/lib_gd32/libnetwork.a(udp.o)
+                              remoteconfig.o (symbol from plugin) (network::udp::Begin(unsigned short, void (*)(unsigned char const*, unsigned long, unsigned long, unsigned short)))
+../lib-network/lib_gd32/libnetwork.a(ethernet.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (network::iface::EthernetInput(unsigned char const*, unsigned long))
+../lib-network/lib_gd32/libnetwork.a(iface.o)
+                              remoteconfig.o (symbol from plugin) (network::iface::CopyMacAddressTo(unsigned char*))
+../lib-network/lib_gd32/libnetwork.a(acd.o)
+                              netif.o (symbol from plugin) (network::acd::NetworkChangedLinkDown())
+../lib-network/lib_gd32/libnetwork.a(arp.o)
+                              ethernet.o (symbol from plugin) (network::arp::Input(network::arp::Header const*))
+../lib-network/lib_gd32/libnetwork.a(autoip.o)
+                              iface.o (symbol from plugin) (network::autoip::Start())
+../lib-network/lib_gd32/libnetwork.a(dhcp.o)
+                              iface.o (symbol from plugin) (network::dhcp::Start())
+../lib-network/lib_gd32/libnetwork.a(icmp.o)
+                              ethernet.o (symbol from plugin) (network::icmp::Input(network::icmp::Header*))
+../lib-network/lib_gd32/libnetwork.a(igmp.o)
+                              ethernet.o (symbol from plugin) (network::igmp::Input(network::igmp::Header const*))
+../lib-network/lib_gd32/libnetwork.a(tftpdaemon.o)
+                              remoteconfig.o (symbol from plugin) (TFTPDaemon::~TFTPDaemon())
+../lib-network/lib_gd32/libnetwork.a(network.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (network::Init())
+../lib-network/lib_gd32/libnetwork.a(emac_phy.o)
+                              network.o (symbol from plugin) (emac::phy::GetLink(unsigned short))
+../lib-network/lib_gd32/libnetwork.a(emac_phy.o)
+                              network.o (symbol from plugin) (emac::phy::CustomizedLed())
+../lib-network/lib_gd32/libnetwork.a(network_display.o)
+                              network.o (symbol from plugin) (emac::display::Config())
+../lib-network/lib_gd32/libnetwork.a(network_event.o)
+                              network.o (symbol from plugin) (network::event::Ipv4AddressChanged())
+../lib-network/lib_gd32/libnetwork.a(network_store.o)
+                              network.o (symbol from plugin) (network::store::SaveIp(unsigned long))
+../lib-network/lib_gd32/libnetwork.a(emac_phy.o)
+                              emac_phy.o (symbol from plugin) (emac::phy::Read(unsigned short, unsigned short, unsigned short&))
+../lib-network/lib_gd32/libnetwork.a(emac.o)
+                              network.o (symbol from plugin) (emac::Config())
+../lib-network/lib_gd32/libnetwork.a(network_memory.o)
+                              arp.o (symbol from plugin) (network::memory::pool)
+../lib-superloop/lib_gd32/libsuperloop.a(softwaretimers.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (SoftwareTimerAdd(unsigned long, void (*)(long)))
+../lib-board/lib_gd32/libboard.a(board_statusled.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (board::statusled::SetMode(board::statusled::Mode))
+../lib-board/lib_gd32/libboard.a(board_init.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (board::Init())
+../lib-board/lib_gd32/libboard.a(board_reboot.o)
+                              remoteconfig.o (symbol from plugin) (board::Reboot())
+../lib-board/lib_gd32/libboard.a(board_statusled.o)
+                              board_statusled.o (symbol from plugin) (board::statusled::SetFrequency(unsigned long))
+../lib-gd32/lib_gd32/libgd32.a(system_gd32f4xx.o)
+                              build_gd32/startup_gd32f407.o (SystemInit)
+../lib-gd32/lib_gd32/libgd32.a(board.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (board::BoardName(unsigned char&))
+../lib-gd32/lib_gd32/libgd32.a(gd32_bkp.o)
+                              board_init.o (symbol from plugin) (bkp_data_write(bkp_data_register_enum, unsigned short))
+../lib-gd32/lib_gd32/libgd32.a(gd32_timers.o)
+                              board_init.o (symbol from plugin) (gd32::timers::Start())
+../lib-gd32/lib_gd32/libgd32.a(macaddress.o)
+                              emac.o (symbol from plugin) (MacAddress(unsigned char*))
+../lib-gd32/lib_gd32/libgd32.a(watchdog.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (watchdog::global::watchdog)
+../lib-gd32/lib_gd32/libgd32.a(gd32_adc.o)
+                              board_init.o (symbol from plugin) (Gd32AdcInit())
+../lib-gd32/lib_gd32/libgd32.a(gd32_i2c.o)
+                              board_init.o (symbol from plugin) (Gd32I2cBegin())
+../lib-gd32/lib_gd32/libgd32.a(gd32_spi.o)
+                              spi_flash.o (symbol from plugin) (Gd32SpiBegin())
+../lib-gd32/lib_gd32/libgd32.a(enet_gpio_config.o)
+                              emac.o (symbol from plugin) (EnetGpioConfig())
+../lib-gd32/lib_gd32/libgd32.a(uart0.o)
+                              board_init.o (symbol from plugin) (uart0::Init())
+../lib-gd32/lib_gd32/libgd32.a(gd32_fmc.o)
+                              flashcode.o (symbol from plugin) (gd32::fmc::Read(unsigned long, std::span<unsigned char, 4294967295u>))
+../lib-gd32/lib_gd32/libgd32.a(gd32_ptp.o)
+                              emac.o (symbol from plugin) (Gd32PtpStart())
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_adc.o)
+                              gd32_adc.o (symbol from plugin) (adc_clock_config)
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_enet.o)
+                              emac_eth.o (symbol from plugin) (dma_current_txdesc)
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_exti.o)
+                              emac_phy.o (symbol from plugin) (exti_init)
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_fwdgt.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (fwdgt_enable)
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_fmc.o)
+                              gd32_fmc.o (symbol from plugin) (fmc_unlock)
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_gpio.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (gpio_mode_set)
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_i2c.o)
+                              gd32_i2c.o (symbol from plugin) (i2c_clock_config)
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_pmu.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (pmu_backup_ldo_config)
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_rcu.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (rcu_periph_clock_enable)
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_spi.o)
+                              gd32_spi.o (symbol from plugin) (spi_i2s_deinit)
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_syscfg.o)
+                              emac_phy.o (symbol from plugin) (syscfg_exti_line_config)
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_timer.o)
+                              gd32_timers.o (symbol from plugin) (timer_deinit)
+../lib-gd32/lib_gd32/libgd32.a(gd32_uart.o)
+                              uart0.o (symbol from plugin) (gd32::UartBegin(unsigned long, unsigned long, unsigned long, unsigned long, unsigned long))
+../lib-gd32/lib_gd32/libgd32.a(gd32f4xx_usart.o)
+                              gd32_uart.o (symbol from plugin) (usart_deinit)
+../lib-clib/lib_gd32/libclib.a(printf.o)
+                              build_gd32/hardfault_handler.o (symbol from plugin) (printf)
+../lib-clib/lib_gd32/libclib.a(putchar.o)
+                              flashcodeinstall.o (symbol from plugin) (putchar)
+../lib-clib/lib_gd32/libclib.a(puts.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (puts)
+../lib-clib/lib_gd32/libclib.a(rand.o)
+                              acd.o (symbol from plugin) (rand)
+../lib-clib/lib_gd32/libclib.a(time.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (global::g_utc_offset)
+../lib-clib/lib_gd32/libclib.a(delete.o)
+                              remoteconfig.o (symbol from plugin) (operator delete(void*, unsigned int))
+../lib-clib/lib_gd32/libclib.a(new.o)
+                              remoteconfig.o (symbol from plugin) (operator new(unsigned int))
+../lib-clib/lib_gd32/libclib.a(malloc.o)
+                              new.o (symbol from plugin) (malloc)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isdigit.o)
+                              printf.o (symbol from plugin) (isdigit)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isprint.o)
+                              iface.o (symbol from plugin) (isprint)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcmp.o)
+                              build_gd32/firmware/main.o (symbol from plugin) (memcmp)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+                              (memset)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncmp.o)
+                              tftpfileserver.o (symbol from plugin) (strncmp)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncpy.o)
+                              iface.o (symbol from plugin) (strncpy)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+                              (memcpy)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+                              remoteconfig.o (symbol from plugin) (strlen)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-ctype_.o)
+                              /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isdigit.o) (_ctype_)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+                              /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o (__aeabi_uldivmod)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_popcountsi2.o)
+                              /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o (__popcountsi2)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+                              /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o) (__udivmoddi4)
+/Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+                              /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o) (__aeabi_ldiv0)
+
+Discarded input sections
+
+ .text          0x00000000       0x14 build_gd32/startup_gd32f407.o
+ .data          0x00000000        0x0 build_gd32/startup_gd32f407.o
+ .bss           0x00000000        0x0 build_gd32/startup_gd32f407.o
+ .ARM.attributes
+                0x00000000       0x21 build_gd32/startup_gd32f407.o
+ .text          0x00000000        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .data          0x00000000        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss           0x00000000        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN5netifL15DefaultCallbackEtPKNS_25netif_ext_callback_args_tE
+                0x00000000        0x2 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .comment       0x00000000       0x39 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .ARM.attributes
+                0x00000000       0x32 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isdigit.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isdigit.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isdigit.o)
+ .comment       0x00000000       0x39 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isdigit.o)
+ .ARM.attributes
+                0x00000000       0x34 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isdigit.o)
+ .text          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isprint.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isprint.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isprint.o)
+ .text.isgraph  0x00000000       0x10 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isprint.o)
+ .comment       0x00000000       0x39 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isprint.o)
+ .ARM.attributes
+                0x00000000       0x34 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isprint.o)
+ .text          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcmp.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcmp.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcmp.o)
+ .comment       0x00000000       0x39 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcmp.o)
+ .ARM.attributes
+                0x00000000       0x34 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcmp.o)
+ .text          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .comment       0x00000000       0x39 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .ARM.attributes
+                0x00000000       0x34 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .text          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncmp.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncmp.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncmp.o)
+ .comment       0x00000000       0x39 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncmp.o)
+ .ARM.attributes
+                0x00000000       0x34 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncmp.o)
+ .text          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncpy.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncpy.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncpy.o)
+ .comment       0x00000000       0x39 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncpy.o)
+ .ARM.attributes
+                0x00000000       0x34 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncpy.o)
+ .text          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+ .comment       0x00000000       0x39 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+ .ARM.attributes
+                0x00000000       0x34 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+ .ARM.extab     0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+ .ARM.exidx     0x00000000        0x8 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+ .ARM.attributes
+                0x00000000       0x17 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+ .text          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-ctype_.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-ctype_.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-ctype_.o)
+ .comment       0x00000000       0x39 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-ctype_.o)
+ .ARM.attributes
+                0x00000000       0x34 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-ctype_.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .ARM.attributes
+                0x00000000       0x22 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .text          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_popcountsi2.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_popcountsi2.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_popcountsi2.o)
+ .comment       0x00000000       0x39 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_popcountsi2.o)
+ .ARM.attributes
+                0x00000000       0x34 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_popcountsi2.o)
+ .text          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .ARM.extab.text.__udivmoddi4
+                0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .ARM.exidx.text.__udivmoddi4
+                0x00000000        0x8 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .comment       0x00000000       0x39 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .ARM.attributes
+                0x00000000       0x34 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .data          0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+ .bss           0x00000000        0x0 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+ .ARM.attributes
+                0x00000000       0x22 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00008000         xr
+TCMSRAM          0x10000000         0x00010000         rw
+RAM              0x20000000         0x00020000         xrw
+RAMADD           0x20030000         0x00000000         xrw
+BKPSRAM          0x40024000         0x00001000         rw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD build_gd32/startup_gd32f407.o
+LOAD build_gd32/hardfault_handler.o
+LOAD /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+LOAD build_gd32/stack_debug_init.o
+LOAD build_gd32/firmware/main.o
+START GROUP
+LOAD ../lib-remoteconfig/lib_gd32/libremoteconfig.a
+LOAD ../lib-flashcodeinstall/lib_gd32/libflashcodeinstall.a
+LOAD ../lib-configstore/lib_gd32/libconfigstore.a
+LOAD ../lib-display/lib_gd32/libdisplay.a
+LOAD ../lib-flashcode/lib_gd32/libflashcode.a
+LOAD ../lib-flash/lib_gd32/libflash.a
+LOAD ../lib-remoteconfig/lib_gd32/libremoteconfig.a
+LOAD ../lib-device/lib_gd32/libdevice.a
+LOAD ../lib-midi/lib_gd32/libmidi.a
+LOAD ../lib-network/lib_gd32/libnetwork.a
+LOAD ../lib-configstore/lib_gd32/libconfigstore.a
+LOAD ../lib-flash/lib_gd32/libflash.a
+LOAD ../lib-display/lib_gd32/libdisplay.a
+LOAD ../lib-superloop/lib_gd32/libsuperloop.a
+LOAD ../lib-board/lib_gd32/libboard.a
+LOAD ../lib-hwclock/lib_gd32/libhwclock.a
+LOAD ../lib-gd32/lib_gd32/libgd32.a
+LOAD ../lib-clib/lib_gd32/libclib.a
+END GROUP
+LOAD /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+LOAD /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a
+START GROUP
+LOAD /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+END GROUP
+START GROUP
+LOAD /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+END GROUP
+                0x00001000                        __heap_size = DEFINED (__heap_size)?__heap_size:0x1000
+                0x00001000                        __stack_size = DEFINED (__stack_size)?__stack_size:0x1000
+
+.vectors        0x08000000      0x188
+                0x08000000                        . = ALIGN (0x4)
+ *(.vectors)
+ .vectors       0x08000000      0x188 build_gd32/startup_gd32f407.o
+                0x08000000                __gVectors
+                0x08000188                        . = ALIGN (0x4)
+                0x08000188                        __Vectors_End = .
+                0x08000188                        __Vectors_Size = (__Vectors_End - __gVectors)
+
+.text           0x08000188     0x5d44
+                0x08000188                        . = ALIGN (0x4)
+ *(.text.unlikely*)
+ .text.unlikely.enet_ptp_normal_descriptors_chain_init
+                0x08000188       0x84 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.unlikely._ZN12_GLOBAL__N_1L10IsleapyearEi
+                0x0800020c       0x2c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *(.text.hot*)
+ *(.text)
+ .text          0x08000238       0x10 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strlen.o)
+                0x08000238                strlen
+ .text          0x08000248       0x30 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+                0x08000248                __aeabi_uldivmod
+ .text          0x08000278        0x4 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+                0x08000278                __aeabi_ldiv0
+                0x08000278                __aeabi_idiv0
+ *(.text*)
+ .text.Reset_Handler
+                0x0800027c       0x48 build_gd32/startup_gd32f407.o
+                0x0800027c                Reset_Handler
+ .text.Default_Handler
+                0x080002c4        0x2 build_gd32/startup_gd32f407.o
+                0x080002c4                USBHS_EP1_Out_IRQHandler
+                0x080002c4                EXTI2_IRQHandler
+                0x080002c4                TIMER2_IRQHandler
+                0x080002c4                DebugMon_Handler
+                0x080002c4                LVD_IRQHandler
+                0x080002c4                CAN1_EWMC_IRQHandler
+                0x080002c4                TIMER7_UP_TIMER12_IRQHandler
+                0x080002c4                SysTick_Handler
+                0x080002c4                SDIO_IRQHandler
+                0x080002c4                PendSV_Handler
+                0x080002c4                NMI_Handler
+                0x080002c4                EXTI3_IRQHandler
+                0x080002c4                DCI_IRQHandler
+                0x080002c4                USBFS_WKUP_IRQHandler
+                0x080002c4                USBHS_IRQHandler
+                0x080002c4                TIMER5_DAC_IRQHandler
+                0x080002c4                TIMER0_TRG_CMT_TIMER10_IRQHandler
+                0x080002c4                USBFS_IRQHandler
+                0x080002c4                TIMER3_IRQHandler
+                0x080002c4                DMA0_Channel6_IRQHandler
+                0x080002c4                I2C0_EV_IRQHandler
+                0x080002c4                I2C2_EV_IRQHandler
+                0x080002c4                CAN1_RX0_IRQHandler
+                0x080002c4                FPU_IRQHandler
+                0x080002c4                TIMER7_TRG_CMT_TIMER13_IRQHandler
+                0x080002c4                UsageFault_Handler
+                0x080002c4                TIMER4_IRQHandler
+                0x080002c4                SPI1_IRQHandler
+                0x080002c4                DMA0_Channel0_IRQHandler
+                0x080002c4                USART5_IRQHandler
+                0x080002c4                TIMER0_BRK_TIMER8_IRQHandler
+                0x080002c4                DMA1_Channel0_IRQHandler
+                0x080002c4                TIMER7_BRK_TIMER11_IRQHandler
+                0x080002c4                DMA1_Channel4_IRQHandler
+                0x080002c4                DMA0_Channel3_IRQHandler
+                0x080002c4                I2C0_ER_IRQHandler
+                0x080002c4                TIMER0_UP_TIMER9_IRQHandler
+                0x080002c4                DMA1_Channel7_IRQHandler
+                0x080002c4                CAN1_RX1_IRQHandler
+                0x080002c4                DMA0_Channel2_IRQHandler
+                0x080002c4                TIMER1_IRQHandler
+                0x080002c4                I2C1_EV_IRQHandler
+                0x080002c4                DMA1_Channel6_IRQHandler
+                0x080002c4                UART4_IRQHandler
+                0x080002c4                EXTI10_15_IRQHandler
+                0x080002c4                DMA1_Channel1_IRQHandler
+                0x080002c4                Default_Handler
+                0x080002c4                TIMER7_Channel_IRQHandler
+                0x080002c4                DMA0_Channel7_IRQHandler
+                0x080002c4                ADC_IRQHandler
+                0x080002c4                CAN0_TX_IRQHandler
+                0x080002c4                WWDGT_IRQHandler
+                0x080002c4                EXMC_IRQHandler
+                0x080002c4                TAMPER_STAMP_IRQHandler
+                0x080002c4                RTC_WKUP_IRQHandler
+                0x080002c4                SPI2_IRQHandler
+                0x080002c4                MemManage_Handler
+                0x080002c4                CAN1_TX_IRQHandler
+                0x080002c4                SVC_Handler
+                0x080002c4                RCU_CTC_IRQHandler
+                0x080002c4                DMA1_Channel5_IRQHandler
+                0x080002c4                EXTI4_IRQHandler
+                0x080002c4                CAN0_RX1_IRQHandler
+                0x080002c4                DMA0_Channel5_IRQHandler
+                0x080002c4                DMA1_Channel3_IRQHandler
+                0x080002c4                EXTI5_9_IRQHandler
+                0x080002c4                DMA0_Channel1_IRQHandler
+                0x080002c4                TIMER0_Channel_IRQHandler
+                0x080002c4                EXTI1_IRQHandler
+                0x080002c4                ENET_WKUP_IRQHandler
+                0x080002c4                USBHS_EP1_In_IRQHandler
+                0x080002c4                SPI0_IRQHandler
+                0x080002c4                USART2_IRQHandler
+                0x080002c4                CAN0_EWMC_IRQHandler
+                0x080002c4                CAN0_RX0_IRQHandler
+                0x080002c4                I2C2_ER_IRQHandler
+                0x080002c4                DMA1_Channel2_IRQHandler
+                0x080002c4                BusFault_Handler
+                0x080002c4                USART1_IRQHandler
+                0x080002c4                UART3_IRQHandler
+                0x080002c4                I2C1_ER_IRQHandler
+                0x080002c4                FMC_IRQHandler
+                0x080002c4                USBHS_WKUP_IRQHandler
+                0x080002c4                DMA0_Channel4_IRQHandler
+                0x080002c4                TRNG_IRQHandler
+                0x080002c4                ENET_IRQHandler
+                0x080002c4                RTC_Alarm_IRQHandler
+ *fill*         0x080002c6        0x2 
+ .text._ZN12_GLOBAL__N_1L8LedblinkEl
+                0x080002c8       0x10 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Display7PutCharEi.isra.0
+                0x080002d8        0xa /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Display5WriteEmPKc.isra.0
+                0x080002e2       0x22 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Display12SetCursorPosEmm.isra.0
+                0x08000304        0xa /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN14TFTPFileServer8FileOpenEPKcN4tftp4ModeE
+                0x0800030e        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN14TFTPFileServer8FileReadEPvjj
+                0x08000312        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd1306D2Ev
+                0x08000316        0x2 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd13069SetCursorEm
+                0x08000318        0x2 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN10DisplaySet17SetFlipVerticallyEb
+                0x0800031a        0x2 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd1311D2Ev
+                0x0800031c        0x2 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x0800031e        0x2 
+ .text._ZN4gd324enet24ClearDmaTxFlagsAndResumeEv
+                0x08000320       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4emac3eth4RecvEPPh
+                0x08000340       0x44 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4emac3eth7FreePktEv
+                0x08000384       0x50 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4emac3ethL16PtpFrameTransmitILb0EEEvm
+                0x080003d4       0x38 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN5netifL20NetifDoUpdateGlobalsEv
+                0x0800040c       0x28 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network8MemcpyIpEPhm
+                0x08000434       0x18 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network8MemcpyIpEPKh
+                0x0800044c       0x18 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network6memory9Allocator4FreeEPv
+                0x08000464       0x2c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network3arpL10FindRecordEmNS0_5FlagsE
+                0x08000490       0x5c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network4dhcpL9HandleAckEPKNS0_7MessageE
+                0x080004ec       0x40 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Display9ClearLineEm.constprop.0.isra.0
+                0x0800052c        0xc /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Display9PutStringEPKc.isra.0
+                0x08000538        0xa /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08000542        0x2 
+ .text._ZN4emac7display6StatusEb
+                0x08000544       0x3c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4emac3phy4ReadEttRt.constprop.0
+                0x08000580       0x3c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4emac3phy12_GLOBAL__N_1L8ReadBmsrEtRt.constprop.0
+                0x080005bc       0x18 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4emac3phy12_GLOBAL__N_1L10ReadStatusEtRNS0_6StatusE.constprop.0
+                0x080005d4       0x7c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4emac3phy4link11PinRecoveryEv
+                0x08000650       0x16 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08000666        0x2 
+ .text._ZN4emac3phy5WriteEttt.constprop.0
+                0x08000668       0x3c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4emac3phy10WritePagedEtttt.constprop.0
+                0x080006a4       0x3c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4gd326timers3dwt7DelayUsEmm.constprop.0
+                0x080006e0       0x38 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4gd326timers6timer66MillisEv
+                0x08000718       0x38 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12_GLOBAL__N_1L8SendStopILm1073763328EEElv.isra.0
+                0x08000750       0x24 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._Z12Gd32I2cWritePKcm
+                0x08000774       0xb0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12_GLOBAL__N_1L18ReadImplementationILm1073763328EEEhPcm
+                0x08000824      0x128 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12_GLOBAL__N_1L9SetCsHighEv
+                0x0800094c       0x18 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12_GLOBAL__N_1L12SpiWriteReadEh
+                0x08000964       0x24 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._Z17Gd32SpiTransfernbPKcPcm
+                0x08000988       0x38 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._Z14Gd32SpiWritenbPKcm
+                0x080009c0       0x34 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN5uart07PutCharEi
+                0x080009f4       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN5uart04PutsEPKc
+                0x08000a14       0x1a /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08000a2e        0x2 
+ .text.fwdgt_config.constprop.0
+                0x08000a30       0x5c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN8watchdog4InitEv
+                0x08000a8c       0x28 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.fmc_lock
+                0x08000ab4       0x14 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.fmc_ready_wait.constprop.0
+                0x08000ac8       0x54 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.fmc_word_program
+                0x08000b1c       0x4c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.gpio_mode_set
+                0x08000b68       0x44 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.gpio_output_options_set
+                0x08000bac       0x42 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.gpio_af_set
+                0x08000bee       0x72 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.rcu_periph_clock_enable
+                0x08000c60       0x1a /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08000c7a        0x2 
+ .text.rcu_clock_freq_get
+                0x08000c7c       0xd8 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.i2c_clock_config.constprop.0
+                0x08000d54       0xcc /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._Z18Gd32I2cIsConnectedhm
+                0x08000e20       0x40 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZNK3I2c5SetupEv
+                0x08000e60       0x14 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN3I2c5WriteEPKcm
+                0x08000e74       0x16 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08000e8a        0x2 
+ .text._ZN7Ssd13067PutCharEi
+                0x08000e8c       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd13069PutStringEPKc
+                0x08000eac       0x32 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08000ede        0x2 
+ .text._ZN7Ssd13119PutStringEPKc
+                0x08000ee0       0x4c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd131111SendCommandEh
+                0x08000f2c       0x1e /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd13113ClsEv
+                0x08000f4a        0x6 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd13118SetSleepEb
+                0x08000f50       0x14 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd131111SetContrastEh
+                0x08000f64       0x48 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd130611SendCommandEh
+                0x08000fac       0x1e /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08000fca        0x2 
+ .text._ZN7Ssd13063ClsEv
+                0x08000fcc       0x64 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd13065StartEv
+                0x08001030      0x10c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd13068SetSleepEb
+                0x0800113c        0xc /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd130611SetContrastEh
+                0x08001148       0x18 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd130617SetFlipVerticallyEb
+                0x08001160       0x22 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08001182        0x2 
+ .text._ZN7Ssd13115StartEv
+                0x08001184      0x13c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd13117PutCharEi
+                0x080012c0       0x22 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x080012e2        0x2 
+ .text._Z12Gd32I2cBeginv
+                0x080012e4       0x84 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZL7PutCharP7Contexti
+                0x08001368       0x2c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZL9FormatHexP7Contextj
+                0x08001394       0xba /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZL9FormatIntP7Contextm
+                0x0800144e       0xbc /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x0800150a        0x2 
+ .text.rand     0x0800150c       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN5netifL17NetifIssueReportsEv
+                0x0800152c       0x54 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.free     0x08001580       0x34 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd1306D0Ev
+                0x080015b4        0xc /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd1311D0Ev
+                0x080015c0        0xc /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12_GLOBAL__N_1L17SpiFlashReadWriteEPKhmS1_Phm
+                0x080015cc       0x5c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12_GLOBAL__N_1L20SpiFlashCmdWaitReadyEm
+                0x08001628       0x60 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12_GLOBAL__N_1L19SpiFlashWriteCommonEPKhmS1_mb.constprop.0
+                0x08001688       0x60 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd130612SetCursorPosEmm
+                0x080016e8       0x4a /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08001732        0x2 
+ .text._ZN7Ssd13069ClearLineEm
+                0x08001734       0x38 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd13068TextLineEmPKcm
+                0x0800176c       0x4e /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd131112SetCursorPosEmm
+                0x080017ba       0x18 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x080017d2        0x2 
+ .text._ZN7Ssd13119ClearLineEm
+                0x080017d4       0x34 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network6ChksumEPKvm
+                0x08001808       0x3a /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08001842        0x2 
+ .text._ZN14TFTPFileServer9FileWriteEPKvjj
+                0x08001844       0x70 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4emac3eth4SendEPvm
+                0x080018b4       0x3c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network3arp19AcdSendAnnouncementENS_7ip_addrE
+                0x080018f0       0x2c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network4igmpL5TimerEl
+                0x0800191c       0xbc /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd13118TextLineEmPKcm
+                0x080019d8       0x60 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network6MemsetILh255ELj6EEEvPv
+                0x08001a38        0x8 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network6memory9Allocator8InstanceEv
+                0x08001a40       0x28 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network3arpL5TimerEl
+                0x08001a68       0x94 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network4dhcp12_GLOBAL__N_1L11MessageInitEv
+                0x08001afc       0x40 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZL7VprintfiPKcSt9__va_list
+                0x08001b3c      0x24c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Display6PrintfEmPKcz
+                0x08001d88       0x4c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network5event18Ipv4AddressChangedEv
+                0x08001dd4       0x68 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.printf   0x08001e3c       0x1e /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08001e5a        0x2 
+ .text._ZN5debug5stack14implementation5PrintEv
+                0x08001e5c       0x88 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7networkL16NetifExtCallbackEtPKN5netif25netif_ext_callback_args_tE
+                0x08001ee4       0xd0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Display10TextStatusEPKcN4ansi7Colours6ColourE
+                0x08001fb4       0x64 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN14TFTPFileServer10FileCreateEPKcN4tftp4ModeE
+                0x08002018       0x38 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN14TFTPFileServer9FileCloseEv
+                0x08002050       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN6common5print5ErrorEPKcS2_
+                0x08002070       0x24 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.malloc   0x08002094       0x74 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network3udp5BeginEtPFvPKhmmtE
+                0x08002108       0x44 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network3udp3EndEt.isra.0
+                0x0800214c       0x48 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN14TFTPFileServerD2Ev
+                0x08002194       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN14TFTPFileServerD0Ev
+                0x080021b4       0x12 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x080021c6        0x2 
+ .text._ZN10TFTPDaemon4InitEv
+                0x080021c8       0x30 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._Z16SoftwareTimerAddmPFvlE
+                0x080021f8       0x58 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN11ConfigStore16SetStatusChangedEv.isra.0
+                0x08002250       0x28 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network3acd5StartEPNS0_3AcdENS_7ip_addrE
+                0x08002278       0x30 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd13069PrintInfoEv
+                0x080022a8       0x28 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Ssd13119PrintInfoEv
+                0x080022d0       0x10 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network3udpL18SendImplementationILNS_3arp7EthSendE0EEEviPKhmmt
+                0x080022e0      0x250 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12RemoteConfig22StaticCallbackFunctionEPKhmmt
+                0x08002530       0xe8 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network4dhcp12_GLOBAL__N_1L11SendRequestEv
+                0x08002618       0xd0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network4dhcpL6RebootEv
+                0x080026e8       0x50 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network4dhcpL6SelectEv
+                0x08002738       0x4c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network4dhcpL8DiscoverEv
+                0x08002784       0xb0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network4dhcp5StartEv.isra.0
+                0x08002834       0x78 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN10TFTPDaemon9SendErrorEtPKc
+                0x080028ac       0x34 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN10TFTPDaemon6DoReadEv
+                0x080028e0       0x6a /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN10TFTPDaemon10DoWriteAckEv
+                0x0800294a       0x42 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN10TFTPDaemon22StaticCallbackFunctionEPKhmmt
+                0x0800298c      0x190 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN4emac10AdjustLinkENS_3phy6StatusE.isra.0
+                0x08002b1c      0x26c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._Z19SoftwareTimerDeleteRl.isra.0
+                0x08002d88       0x80 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network3acd4StopEPNS0_3AcdE
+                0x08002e08       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN5netifL16NetifDoSetIpaddrEN7network7ip_addrERS1_
+                0x08002e28       0x68 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN5netif7SetAddrEN7network7ip_addrES1_S1_
+                0x08002e90       0x9c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network4dhcpL4BindEv
+                0x08002f2c       0xd0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network4dhcp5InputEPKhmmt
+                0x08002ffc      0x16c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network4dhcpL7FineTmrEl
+                0x08003168      0x120 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7networkL25PrimaryIpConflictCallbackENS_3acd8CallbackE
+                0x08003288       0xd8 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN5netif11SetLinkDownEv
+                0x08003360       0x54 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network3acdL5TimerEl
+                0x080033b4       0xe0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7network3acdL7RestartEPNS0_3AcdE
+                0x08003494       0x32 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x080034c6        0x2 
+ .text._Z19SoftwareTimerChangelm.isra.0
+                0x080034c8       0x64 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN11ConfigStore5FlashEv.isra.0
+                0x0800352c      0x118 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN11ConfigStore5TimerEl
+                0x08003644       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN7Display8SetSleepEb
+                0x08003664       0x48 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZL10SleepTimerl
+                0x080036ac       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12RemoteConfig16HandleDisplaySetEv
+                0x080036cc       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12RemoteConfig13HandleTftpSetEv
+                0x080036ec      0x328 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN14TFTPFileServer4ExitEv
+                0x08003a14       0x18 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN5board6RebootEv.isra.0
+                0x08003a2c      0x138 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12RemoteConfig13HandleFactoryEv
+                0x08003b64       0x1c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12RemoteConfig12HandleRebootEv
+                0x08003b80        0x6 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08003b86        0x2 
+ .text.snprintf
+                0x08003b88       0x30 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12RemoteConfig13HandleVersionEv
+                0x08003bb8       0x30 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12RemoteConfig10HandleListEv
+                0x08003be8       0xbc /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12RemoteConfig16HandleDisplayGetEv
+                0x08003ca4       0x48 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text._ZN12RemoteConfig13HandleTftpGetEv
+                0x08003cec       0x40 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.HardFault_Handler
+                0x08003d2c       0x16 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                0x08003d2c                HardFault_Handler
+ *fill*         0x08003d42        0x2 
+ .text.HardfaultHandler
+                0x08003d44      0x110 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                0x08003d44                HardfaultHandler
+ .text.stack_debug_init
+                0x08003e54       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                0x08003e54                stack_debug_init
+ .text.startup.main
+                0x08003e74     0x1918 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                0x08003e74                main
+ .text.EXTI0_IRQHandler
+                0x0800578c       0xd0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                0x0800578c                EXTI0_IRQHandler
+ .text.SystemInit
+                0x0800585c      0x22c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                0x0800585c                SystemInit
+ .text.TIMER6_IRQHandler
+                0x08005a88       0x28 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                0x08005a88                TIMER6_IRQHandler
+ .text.startup._GLOBAL__sub_I__ZN4gd323fmc4ReadEmSt4spanIhLj4294967295EE
+                0x08005ab0       0x1c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .text.isdigit  0x08005acc       0x10 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isdigit.o)
+                0x08005acc                isdigit
+ .text.isprint  0x08005adc       0x10 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-isprint.o)
+                0x08005adc                isprint
+ .text.memcmp   0x08005aec       0x20 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcmp.o)
+                0x08005aec                memcmp
+ .text.memset   0x08005b0c       0x10 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+                0x08005b0c                memset
+ .text.strncmp  0x08005b1c       0x24 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncmp.o)
+                0x08005b1c                strncmp
+ .text.strncpy  0x08005b40       0x26 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-strncpy.o)
+                0x08005b40                strncpy
+ .text.memcpy   0x08005b66       0x1c /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memcpy-stub.o)
+                0x08005b66                memcpy
+ *fill*         0x08005b82        0x2 
+ .text.__popcountsi2
+                0x08005b84       0x28 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_popcountsi2.o)
+                0x08005b84                __popcountsi2
+ .text.__udivmoddi4
+                0x08005bac      0x320 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+                0x08005bac                __udivmoddi4
+ *(.glue_7)
+ .glue_7        0x08005ecc        0x0 linker stubs
+ *(.glue_7t)
+ .glue_7t       0x08005ecc        0x0 linker stubs
+ *(.eh_frame)
+ *(.init)
+ *(.fini)
+                0x08005ecc                        . = ALIGN (0x4)
+                0x08005ecc                        _etext = .
+
+.vfp11_veneer   0x08005ecc        0x0
+ .vfp11_veneer  0x08005ecc        0x0 linker stubs
+
+.v4_bx          0x08005ecc        0x0
+ .v4_bx         0x08005ecc        0x0 linker stubs
+
+.iplt           0x08005ecc        0x0
+ .iplt          0x08005ecc        0x0 build_gd32/startup_gd32f407.o
+
+.rodata         0x08005ecc      0xe9c
+                0x08005ecc                        . = ALIGN (0x4)
+ *(.rodata)
+ .rodata        0x08005ecc       0x18 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *(.rodata*)
+ .rodata._ZN4emac7display6StatusEb.str1.1
+                0x08005ee4      0x7c6 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x17 (size before relaxing)
+ .rodata._ZN7Ssd13065StartEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                  0x6 (size before relaxing)
+ .rodata._ZN7Ssd13115StartEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                  0x6 (size before relaxing)
+ .rodata._ZN7network5event18Ipv4AddressChangedEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x12 (size before relaxing)
+ .rodata._ZN5debug5stack14implementation5PrintEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x3e (size before relaxing)
+ .rodata._ZN7networkL16NetifExtCallbackEtPKN5netif25netif_ext_callback_args_tE.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x65 (size before relaxing)
+ .rodata._ZN7Display10TextStatusEPKcN4ansi7Colours6ColourE.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                  0x8 (size before relaxing)
+ .rodata._ZN14TFTPFileServer10FileCreateEPKcN4tftp4ModeE.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                  0xd (size before relaxing)
+ .rodata._ZN14TFTPFileServer9FileCloseEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                  0xb (size before relaxing)
+ .rodata._ZN6common5print5ErrorEPKcS2_.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                  0xc (size before relaxing)
+ .rodata.malloc.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x16 (size before relaxing)
+ .rodata._ZN7network3udp5BeginEtPFvPKhmmtE.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x1a (size before relaxing)
+ .rodata._ZN7network3udp3EndEt.isra.0.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x14 (size before relaxing)
+ .rodata._Z16SoftwareTimerAddmPFvlE.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x29 (size before relaxing)
+ .rodata._ZN7Ssd13069PrintInfoEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x1b (size before relaxing)
+ .rodata._ZN7Ssd13119PrintInfoEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x11 (size before relaxing)
+ .rodata._ZN7network3udpL18SendImplementationILNS_3arp7EthSendE0EEEviPKhmmt.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x17 (size before relaxing)
+ .rodata._ZN12RemoteConfig22StaticCallbackFunctionEPKhmmt.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x12 (size before relaxing)
+ .rodata._ZN7network4dhcp5StartEv.isra.0.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                  0x6 (size before relaxing)
+ .rodata._ZN10TFTPDaemon22StaticCallbackFunctionEPKhmmt.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x60 (size before relaxing)
+ .rodata._ZN4emac10AdjustLinkENS_3phy6StatusE.isra.0.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x23 (size before relaxing)
+ .rodata._Z19SoftwareTimerDeleteRl.isra.0.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x36 (size before relaxing)
+ .rodata._ZN7networkL25PrimaryIpConflictCallbackENS_3acd8CallbackE.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                  0x7 (size before relaxing)
+ .rodata._Z19SoftwareTimerChangelm.isra.0.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x14 (size before relaxing)
+ .rodata._ZN12RemoteConfig13HandleTftpSetEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x98 (size before relaxing)
+ .rodata._ZN5board6RebootEv.isra.0.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x2f (size before relaxing)
+ .rodata._ZN12RemoteConfig13HandleVersionEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                  0xc (size before relaxing)
+ .rodata._ZN12RemoteConfig10HandleListEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x3f (size before relaxing)
+ .rodata._ZN12RemoteConfig16HandleDisplayGetEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x13 (size before relaxing)
+ .rodata._ZN12RemoteConfig13HandleTftpGetEv.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                  0x9 (size before relaxing)
+ .rodata.HardfaultHandler.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0xe6 (size before relaxing)
+ .rodata.main.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                0x26e (size before relaxing)
+ .rodata.EXTI0_IRQHandler.str1.1
+                0x080066aa        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x17 (size before relaxing)
+ .rodata._ZN4ansi7Colours2Fg6kWhiteE
+                0x080066aa        0x6 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZN4ansi7Colours2Fg7kYellowE
+                0x080066b0        0x6 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZN4ansi7Colours2Fg6kGreenE
+                0x080066b6        0x6 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZN4ansi7Colours2Fg6kBlackE
+                0x080066bc        0x6 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZN7network4dhcpL9kNoHandleE
+                0x080066c2        0xa /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZL12kOledFont8x6
+                0x080066cc      0x2a0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZL15kOled128x32Init
+                0x0800696c       0x18 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZL15kOled128x64Init
+                0x08006984       0x18 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZN4ansi7Colours2Fg4kRedE
+                0x0800699c        0x6 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZZN7Display8ProgressEvE8kSymbols
+                0x080069a2        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZN8firmware9kFileNameE
+                0x080069a6        0xd /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x080069b3        0x1 
+ .rodata.CSWTCH.9
+                0x080069b4       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZN4ansi7Colours2Fg8kDefaultE
+                0x080069d4        0x6 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x080069da        0x2 
+ .rodata._ZTV10TFTPDaemon
+                0x080069dc       0x28 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZTV14TFTPFileServer
+                0x08006a04       0x28 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZL7kOutput
+                0x08006a2c       0x9c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata.str1.1
+                0x08006ac8        0x0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                                 0x95 (size before relaxing)
+ .rodata._ZN12RemoteConfig4kSetE
+                0x08006ac8       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZN12RemoteConfig4kGetE
+                0x08006ae8       0x60 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZTV7Ssd1306
+                0x08006b48       0x40 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZTV7Ssd1311
+                0x08006b88       0x40 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZN11ConfigStore8kVersionE
+                0x08006bc8        0x2 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZN11ConfigStore12kMagicNumberE
+                0x08006bca        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x08006bce        0x2 
+ .rodata._ZN12_GLOBAL__N_1L21kWinbondSpiFlashTableE
+                0x08006bd0       0x60 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZN12_GLOBAL__N_1L12kDaysOfMonthE
+                0x08006c30       0x30 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ZL16kSoftwareVersion
+                0x08006c60        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .rodata._ctype_
+                0x08006c64      0x101 /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-ctype_.o)
+                0x08006c64                _ctype_
+                0x08006d68                        . = ALIGN (0x4)
+ *fill*         0x08006d65        0x3 
+
+.rel.dyn        0x08006d68        0x0
+ .rel.iplt      0x08006d68        0x0 build_gd32/startup_gd32f407.o
+
+.preinit_array  0x08006d68        0x0
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array*)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x08006d68        0x4
+                [!provide]                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_NAME(.init_array.*))
+ *(.init_array*)
+ .init_array    0x08006d68        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                [!provide]                        PROVIDE (__init_array_end = .)
+
+.fini_array     0x08006d6c        0x0
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(.fini_array*)
+ *(SORT_BY_NAME(.fini_array.*))
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.stack          0x10000000     0x1000
+                0x10000000                        . = ALIGN (0x4)
+                0x10000000                        PROVIDE (stack_low = .)
+                0x10001000                        . = (. + __stack_size)
+ *fill*         0x10000000     0x1000 
+                0x10001000                        PROVIDE (_sp = .)
+                0x10001000                        . = ALIGN (0x4)
+
+.tcmsram        0x10001000     0x5be0
+                0x10001000                        . = ALIGN (0x4)
+ *(.tcmsram)
+ *(.tcmsram*)
+                0x10001000                        . = ALIGN (0x4)
+                0x10001000                        _snetwork = .
+ *(.network*)
+ .network       0x10001000     0x5be0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                0x10006be0                        . = ALIGN (0x4)
+                0x10006be0                        _enetwork = .
+
+.heap           0x10006be0     0x1000
+                0x10006be0                        . = ALIGN (0x4)
+                0x10006be0                        heap_low = .
+                0x10007be0                        . = (. + __heap_size)
+ *fill*         0x10006be0     0x1000 
+                0x10007be0                        heap_top = .
+                0x10007be0                        . = ALIGN (0x4)
+                0x08006d6c                        _sidata = LOADADDR (.data)
+
+.data           0x20000000       0x88 load address 0x08006d6c
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data)
+ *(.data*)
+ .data._ZL10next_block
+                0x20000000        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .data._ZL14s_block_bucket
+                0x20000004       0x68 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .data._ZN12_GLOBAL__N_1L4lfsrE
+                0x2000006c        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .data._ZL10s_timer_id.lto_priv.0
+                0x20000070        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .data._ZN12_GLOBAL__N_1L7s_flashE
+                0x20000074        0xc /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .data._ZN12_GLOBAL__N_1L10s_timer_idE
+                0x20000080        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .data._ZN11ConfigStore10s_timer_idE
+                0x20000084        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+                0x20000088                        . = ALIGN (0x4)
+                0x20000088                        _edata = .
+
+.igot.plt       0x20000088        0x0 load address 0x08006df4
+ .igot.plt      0x20000088        0x0 build_gd32/startup_gd32f407.o
+                0x20000088                        . = ALIGN (0x4)
+
+.bss            0x20000088    0x1fb80 load address 0x08006df4
+                0x20000088                        _sbss = .
+                0x20000088                        __bss_start__ = _sbss
+ *(.bss)
+ *(.bss*)
+ .bss.rx_buff   0x20000088      0xbe8 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss.tx_buff   0x20000c70      0xbe8 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss.rxdesc_tab
+                0x20001858       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN12_GLOBAL__N_1L9s_next_idE
+                0x20001878        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZZN7network6memory9Allocator8InstanceEvE8instance
+                0x2000187c       0x1c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZZN7network6memory9Allocator8InstanceEvE6inited
+                0x20001898        0x1 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x20001899        0x3 
+ .bss._ZN7network3acdL10s_timer_idE
+                0x2000189c        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN7network6global15on_network_maskE
+                0x200018a0        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN7network6global14broadcast_maskE
+                0x200018a4        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss.dma_current_ptp_rxdesc
+                0x200018a8        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss.dma_current_rxdesc
+                0x200018ac        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZL11text_buffer
+                0x200018b0       0x15 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x200018c5        0x3 
+ .bss._ZL12clear_buffer
+                0x200018c8       0x15 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x200018dd        0x3 
+ .bss._ZL14s_clear_buffer
+                0x200018e0       0x86 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN12_GLOBAL__N_1L9s_addressE
+                0x20001966        0x1 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x20001967        0x1 
+ .bss._ZZN7Display8ProgressEvE15s_symbols_index
+                0x20001968        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN10TFTPDaemon6s_thisE
+                0x2000196c        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN12_GLOBAL__N_1L11kEndAddressE
+                0x20001970        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZL13s_tftp_buffer
+                0x20001974    0x1d000 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss.gv_seconds
+                0x2001e974        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN12_GLOBAL__N_1L4s_csE
+                0x2001e978        0x1 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x2001e979        0x3 
+ .bss.enet_initpara
+                0x2001e97c       0x3c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN4emac3eth7globals7counterE
+                0x2001e9b8        0xc /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss.txdesc_tab
+                0x2001e9c4       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss.ptp_rxdesc_tab
+                0x2001e9e4       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss.ptp_txdesc_tab
+                0x2001ea04       0x20 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN7network5ifaceL10s_hostnameE
+                0x2001ea24       0x40 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN5netifL11callback_fnE
+                0x2001ea64        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN7networkL5s_acdE
+                0x2001ea68       0x10 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN7network6global10link_stateE
+                0x2001ea78        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN15FirmwareVersion18s_firmware_versionE
+                0x2001ea7c       0x16 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x2001ea92        0x2 
+ .bss._ZN7Display6s_thisE
+                0x2001ea94        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN16FlashCodeInstall6s_thisE
+                0x2001ea98        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN15FirmwareVersion7s_printE
+                0x2001ea9c       0x40 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN12RemoteConfig6s_listE
+                0x2001eadc        0x8 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN12RemoteConfig6s_thisE
+                0x2001eae4        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN5board9statusled6global17g_status_led_modeE
+                0x2001eae8        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss.dma_current_ptp_txdesc
+                0x2001eaec        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss.dma_current_txdesc
+                0x2001eaf0        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN5netif6global13netif_defaultE
+                0x2001eaf4       0x2c /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN12_GLOBAL__N_1L8s_timersE
+                0x2001eb20       0xc0 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN12_GLOBAL__N_1L15s_timer_currentE
+                0x2001ebe0        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN12_GLOBAL__N_1L14s_timers_countE
+                0x2001ebe4        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZZN5debug5stack14implementation3RunEvE17s_millis_previous
+                0x2001ebe8        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN11ConfigStore7s_storeE
+                0x2001ebec     0x1000 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN11ConfigStore15s_start_addressE
+                0x2001fbec        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN11ConfigStore13s_have_deviceE
+                0x2001fbf0        0x1 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x2001fbf1        0x3 
+ .bss._ZN11ConfigStore6s_thisE
+                0x2001fbf4        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN11ConfigStore7s_stateE
+                0x2001fbf8        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZL6outptr
+                0x2001fbfc        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ .bss._ZN8watchdog6global8watchdogE
+                0x2001fc00        0x1 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *fill*         0x2001fc01        0x3 
+ .bss._ZZN5debug5stack14implementation5PrintEvE21s_used_bytes_previous
+                0x2001fc04        0x4 /var/folders/h9/chptfhc14rj9vz87bx3sjmq00000gn/T//ccF6omjG.ltrans0.ltrans.o
+ *(COMMON)
+                0x2001fc08                        . = ALIGN (0x4)
+                0x2001fc08                        _ebss = .
+                0x2001fc08                        __bss_end__ = _ebss
+                0x2001fc08                        . = ALIGN (0x8)
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_end = _ebss)
+
+.ramadd         0x20030000        0x0
+                0x20030000                        _sramadd = .
+                0x20030000                        . = ALIGN (0x4)
+ *(.ramadd)
+ *(.ramadd*)
+                0x20030000                        . = ALIGN (0x4)
+                0x20030000                        _eramadd = .
+
+.bkpsram        0x40024000        0x0
+                0x40024000                        . = ALIGN (0x4)
+ *(.bkpsram)
+ *(.bkpsram*)
+ *(.configstore*)
+
+/DISCARD/
+ *(*.ARM.*)
+ *(*.comment)
+ *(*.debug*)
+START GROUP
+LOAD /Users/arjanvanvught/Library/xPacks/@xpack-dev-tools/arm-none-eabi-gcc/15.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m+fp/hard/libgcc.a
+END GROUP
+OUTPUT(build_gd32/main.elf elf32-littlearm)
+LOAD linker stubs

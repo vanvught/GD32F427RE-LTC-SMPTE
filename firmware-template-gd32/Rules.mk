@@ -1,0 +1,224 @@
+$(info "Rules.mk")
+
+PREFIX ?= arm-none-eabi-
+
+CC      = $(PREFIX)gcc
+CPP     = $(PREFIX)g++
+AS      = $(CC)
+LD      = $(PREFIX)gcc
+AR      = $(PREFIX)gcc-ar
+RANLIB  = $(PREFIX)gcc-ranlib
+NM      = $(PREFIX)gcc-nm
+
+BOARD?=
+ENET_PHY?=
+MCU?=
+
+TARGET=$(FAMILY).bin
+LIST=$(FAMILY).list
+MAP=$(FAMILY).map
+SIZE=$(FAMILY).size
+BUILD=build_gd32/
+FIRMWARE_DIR=./../firmware-template-gd32/
+
+PROJECT=$(notdir $(patsubst %/,%,$(CURDIR)))
+$(info $$PROJECT [${PROJECT}])
+
+DEFINES:=$(addprefix -D,$(DEFINES))
+DEFINES+=-DPHY_TYPE=$(ENET_PHY)
+DEFINES+=-DCONFIG_CLIB_USE_UART0
+
+include ../common/make/gd32/Board.mk
+include ../common/make/gd32/Mcu.mk
+include ../firmware-template/libs.mk
+include ../common/make/DmxNodeNodeType.mk
+include ../common/make/DmxNodeOutputType.mk
+include ../common/make/gd32/Includes.mk
+include ../common/make/Artnet.mk
+include ../common/make/Timestamp.mk
+include ../common/make/gd32/Validate.mk
+
+ifeq ($(findstring USE_USB_FS,$(DEFINES)),USE_USB_FS)
+	LIBS+=fatfs
+endif
+
+LIBS+=gd32 clib
+
+ifeq ($(findstring NODE_SHOWFILE,$(DEFINES)),NODE_SHOWFILE)
+	LIBS+=showfile
+endif
+
+# The variable for the libraries include directory
+LIBINCDIRS:=$(addprefix -I../lib-,$(LIBS))
+LIBINCDIRS+=$(addsuffix /include, $(LIBINCDIRS))
+
+# The variables for the ld -L flag
+LIBGD32=$(addprefix -L../lib-,$(LIBS))
+LIBGD32:=$(addsuffix /lib_gd32, $(LIBGD32))
+
+ifdef USEMBEDTLS
+ MBEDTLSLIBS=-lmbedcrypto
+endif
+
+# The variable for the ld -l flag
+LDLIBS:=$(MBEDTLSLIBS) $(addprefix -l,$(LIBS))
+
+# The variables for the dependency check
+LIBDEP=$(addprefix ../lib-,$(LIBS))
+
+ifdef USEMBEDTLS
+  LIBGD32+=-L../mbedtls/lib/gd32/$(strip $(FAMILY))
+endif
+
+ifdef USEFREERTOS
+  LIBGD32+=-L../FreeRTOS/lib_gd32
+  LDLIBS+=-lFreeRTOS
+	LIBDEP+=../FreeRTOS
+endif
+
+COPS=-DGD32 -D$(FAMILY_UCA) -D$(LINE_UC) -D$(MCU) -D$(BOARD)
+COPS+=$(strip $(DEFINES) $(MAKE_FLAGS))
+COPS+=$(strip $(INCLUDES) $(LIBINCDIRS))
+COPS+=$(strip $(ARMOPS) $(CMSISOPS))
+COPS+=-Os -nostartfiles -fno-builtin -D_GNU_SOURCE	
+COPS+=-fstack-usage
+COPS+=-ffunction-sections -fdata-sections
+COPS+=-Wall -Werror -Wpedantic -Wextra -Wunused -Wsign-conversion -Wconversion -Wduplicated-cond -Wlogical-op
+COPS+=--specs=nano.specs
+COPS+=-flto=auto
+
+include ../common/make/CppOps.mk
+include ../common/make/LdOps.mk
+
+C_OBJECTS=$(foreach sdir,$(SRCDIR),$(patsubst $(sdir)/%.c,$(BUILD)$(sdir)/%.o,$(wildcard $(sdir)/*.c)))
+CPP_OBJECTS+=$(foreach sdir,$(SRCDIR),$(patsubst $(sdir)/%.cpp,$(BUILD)$(sdir)/%.o,$(wildcard $(sdir)/*.cpp)))
+ASM_OBJECTS=$(foreach sdir,$(SRCDIR),$(patsubst $(sdir)/%.S,$(BUILD)$(sdir)/%.o,$(wildcard $(sdir)/*.S)))
+
+BUILD_DIRS:=$(addprefix $(BUILD),$(SRCDIR))
+
+OBJECTS:=$(strip $(ASM_OBJECTS) $(C_OBJECTS) $(CPP_OBJECTS))
+
+define compile-objects
+$(BUILD)$1/%.o: $1/%.cpp
+	$(CPP) $(COPS) $(CPPOPS) -c $$< -o $$@
+
+$(BUILD)$1/%.o: $1/%.c
+	$(CC) $(COPS) -c $$< -o $$@
+
+$(BUILD)$1/%.o: $1/%.S
+	$(CC) $(COPS) -D__ASSEMBLY__ -c $$< -o $$@
+endef
+
+#
+# Top-level targets
+#
+
+.PHONY: all clean builddirs libdep
+
+# Build all dependent libraries, create the output directories,
+# and finally build the firmware image.
+all: libdep | builddirs
+all: $(TARGET)
+
+#
+# Build directories
+#
+
+# Create all required output directories. 'mkdir -p' is safe to call
+# even if the directories already exist.
+builddirs:
+	mkdir -p $(BUILD_DIRS)
+
+#
+# Cleaning
+#
+
+# Clean all dependent libraries first, then remove this project's output.
+clean: libdep
+	rm -rf $(BUILD)
+	rm -f $(TARGET) $(MAP) $(LIST)
+
+#
+# Libraries
+#
+
+# Aggregate target for all library dependencies.
+libdep: $(LIBDEP)
+
+# Each entry in LIBDEP is a library directory. Forward the current
+# top-level make goal (all, clean, etc.) together with the current
+# board configuration.
+.PHONY: $(LIBDEP)
+
+$(LIBDEP):
+	$(MAKE) -f Makefile.GD32 $(MAKECMDGOALS) 'PROJECT=${PROJECT}' 'FAMILY=${FAMILY}' 'MCU=${MCU}' 'BOARD=${BOARD}' 'ENET_PHY=${ENET_PHY}' 'MAKE_FLAGS=$(DEFINES)' -C $@
+
+#
+# Startup and support objects
+#
+
+# Assemble the MCU startup code.
+$(BUILD)startup_$(LINE).o : $(FIRMWARE_DIR)/startup_$(LINE).S
+	$(AS) $(COPS) -D__ASSEMBLY__ -c $(FIRMWARE_DIR)/startup_$(LINE).S -o $(BUILD)startup_$(LINE).o
+
+# Compile the common HardFault handler.
+$(BUILD)hardfault_handler.o : $(FIRMWARE_DIR)/hardfault_handler.cpp	
+	$(CPP) $(COPS) $(CPPOPS) -c $(FIRMWARE_DIR)/hardfault_handler.cpp -o $(BUILD)hardfault_handler.o
+
+# Compile the common debug Stack handler.
+$(BUILD)stack_debug_init.o : $(FIRMWARE_DIR)/stack_debug_init.cpp	
+	$(CPP) $(COPS) $(CPPOPS) -c $(FIRMWARE_DIR)/stack_debug_init.cpp -o $(BUILD)stack_debug_init.o
+
+#
+# Link the ELF image
+#	
+	
+# Link all object files together with the dependent libraries.
+# A linker map and a demangled disassembly listing are generated
+# for debugging and analysis.
+$(BUILD)main.elf: \
+		Makefile.GD32 \
+		$(LINKER) \
+		$(BUILD)startup_$(LINE).o \
+		$(BUILD)hardfault_handler.o \
+		$(BUILD)stack_debug_init.o \
+		$(OBJECTS) \
+		$(LIBDEP) \
+		| builddirs
+	  $(LD) \
+		$(BUILD)startup_$(LINE).o \
+		$(BUILD)hardfault_handler.o \
+		$(BUILD)stack_debug_init.o \
+		$(OBJECTS) \
+		-T $(LINKER) \
+		$(LDOPS) \
+		-o $@ \
+		$(LIBGD32) \
+		$(LDLIBS) \
+		-lc -lgcc
+
+	# Generate a demangled disassembly listing.
+	$(PREFIX)objdump -D $@ | $(PREFIX)c++filt > $(LIST)
+
+	# Display the memory usage by section.
+	$(PREFIX)size -A -x $@
+
+#
+# Create the binary firmware image
+#
+
+# Convert the ELF image into a binary image. RAM-only sections are
+# removed because they are initialized at runtime rather than stored
+# in flash.
+$(TARGET): $(BUILD)main.elf
+	$(PREFIX)objcopy $< \
+		-O binary \
+		$@ \
+		--remove-section=.tcmsram* \
+		--remove-section=.ram* \
+		--remove-section=.sram1* \
+		--remove-section=.sram2* \
+		--remove-section=.ramadd* \
+		--remove-section=.bkpsram*
+
+$(foreach bdir,$(SRCDIR),$(eval $(call compile-objects,$(bdir))))

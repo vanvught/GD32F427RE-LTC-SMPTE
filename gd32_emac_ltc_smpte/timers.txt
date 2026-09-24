@@ -1,0 +1,18 @@
+System
+Timer 5 Delay micros
+
+LTC Input
+Timer 2
+
+LTC Output
+Timer 6 is updates per second
+Timer 3 is Master -> TIMERO_TRGO
+Timer 0 is Slave -> ITI3 => UP:DMA1 CH5
+Timer 10 is MIDI QF message
+
+Pixel output
+Timer 4 is Master -> TIMER4_TRGO
+Timer 7 is Slave -> ITI3  CH0:DMA0 CH2, CH2:DMA0 CH0, CH3:DMA0 CH1
+
+MIDI
+Timer 13 is BPM
