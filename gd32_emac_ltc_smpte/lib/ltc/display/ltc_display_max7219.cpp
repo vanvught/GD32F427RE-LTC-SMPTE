@@ -24,7 +24,6 @@
 */
 
 #include <cstdint>
-#include <cstring>
 
 #include "ltc_display_max7219.h"
 #include "max72197segment.h"

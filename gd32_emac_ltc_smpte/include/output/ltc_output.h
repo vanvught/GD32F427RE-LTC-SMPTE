@@ -36,6 +36,7 @@
 #include "firmware/utc.h"
 #include "ltc_display_pixel.h"
 #include "ltc_display_max7219.h"
+#include "ltc_display_oled.h"
 #include "output/ltc_output_applemidi.h"
 #include "output/ltc_output_artnet.h"
 #include "output/ltc_output_etc.h"
@@ -126,8 +127,8 @@ constexpr auto MakeCommandTable() {
     };
 
     table[::ltc::Output::kDisplayOled] = {
-        .start = Nothing,
-        .stop = Nothing,
+        .start = ::ltc::display::oled::Start,
+        .stop = ::ltc::display::oled::Stop,
     };
 
     table[::ltc::Output::kMaX7219] = {
