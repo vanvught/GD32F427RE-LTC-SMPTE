@@ -137,6 +137,23 @@ inline constexpr Output kOutputs[] = {
     Output::kPixel,       //
 };
 
+inline constexpr const char* kOutputPretty[] = {
+    kInputPretty[0],   //
+    kInputPretty[1],   //
+    kInputPretty[2],   //
+    kInputPretty[3],   //
+    kInputPretty[4],   //
+    kInputPretty[5],   //
+    kInputPretty[6],   //
+    kInputPretty[7],   //
+    "NTP Server",      //
+    "Display OLED",    //
+    "Display MAX7219", //
+    "Display Pixel",   //
+};
+
+static_assert((sizeof(kOutputs) / sizeof(kOutputs[0])) == (sizeof(kOutputPretty) / sizeof(kOutputPretty[0])));
+
 template <uint32_t kN>
 consteval bool AreUniqueOutputBits(const Output (&values)[kN]) {
     uint32_t used{0};
@@ -187,6 +204,20 @@ inline Input InputFromName(std::string_view name) {
 [[nodiscard]] constexpr const char* InputToNamePretty(Input input) {
     if (input < Input::kUndefined) {
         return kInputPretty[static_cast<uint32_t>(input)];
+    }
+
+    return common::kUndefined;
+}
+
+inline constexpr uint32_t kOutputCount = sizeof(kOutputs) / sizeof(kOutputs[0]);
+
+static_assert(kOutputCount == (sizeof(kOutputPretty) / sizeof(kOutputPretty[0])));
+
+[[nodiscard]] constexpr const char* OutputToNamePretty(Output output) {
+    for (uint32_t i = 0; i < kOutputCount; ++i) {
+        if (output == kOutputs[i]) {
+            return kOutputPretty[i];
+        }
     }
 
     return common::kUndefined;

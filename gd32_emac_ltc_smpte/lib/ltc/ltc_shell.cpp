@@ -24,6 +24,7 @@
  */
 
 #include <cstdint>
+#include <cstdio>
 
 #include "gnss.h"
 #include "shell.h"
@@ -134,6 +135,18 @@ void UtcOffset(Arguments args) {
 }
 
 void Enable(Arguments args) {
+    if (args.size() == 1) {
+        uint32_t index{0};
+        for (const auto kOutput : ::ltc::kOutputs) {
+            if (::ltc::output::Destination::Instance().IsEnabled(kOutput)) {
+                printf("%s\n", ::ltc::kOutputPretty[index]);
+            }
+        }
+        
+        std::putchar('\n');
+        return;
+    }
+
     if (args.size() != 2) {
         uart0::Puts(common::kUnknown);
         return;
@@ -150,6 +163,18 @@ void Enable(Arguments args) {
 }
 
 void Disable(Arguments args) {
+    if (args.size() == 1) {
+        uint32_t index{0};
+        for (const auto kOutput : ::ltc::kOutputs) {
+            if (::ltc::output::Destination::Instance().IsDisabled(kOutput)) {
+                printf("%s\n", ::ltc::kOutputPretty[index]);
+            }
+        }
+        
+        std::putchar('\n');
+        return;
+    }
+
     if (args.size() != 2) {
         uart0::Puts(common::kUnknown);
         return;
