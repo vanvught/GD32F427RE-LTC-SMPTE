@@ -54,7 +54,7 @@ DEFINES+=DEBUG_PIXEL_OUTPUT
 
 #DEFINES+=NDEBUG
 
-SRCDIR=firmware lib lib/gps lib/pixel lib/ltc lib/ltc/display lib/ltc/systime lib/ltc/network lib/shell
+SRCDIR=firmware lib lib/gps lib/pixel lib/midi/net lib/ltc lib/ltc/display lib/ltc/systime lib/ltc/network lib/shell
 
 LIBS=
 

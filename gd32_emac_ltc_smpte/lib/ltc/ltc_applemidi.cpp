@@ -28,6 +28,10 @@
 #include "net/rtpmidi.h"
 #include "ltc_debug.h"
 
+namespace ltc::global {
+extern volatile bool timecode_available;
+} // namespace ltc::global
+
 namespace ltc {
 namespace {
 RtpMidi apple_midi;
@@ -91,3 +95,39 @@ void Restart() {
 }
 } // namespace output::applemidi
 } // namespace ltc
+
+namespace rtpmidi {
+namespace {
+struct ltc::TimeCode timecode;
+
+void HandleMtc(const struct midi::Message* message) {
+    const auto* const kSystemExclusive = message->system_exclusive;
+
+    timecode.frames = kSystemExclusive[8];
+    timecode.seconds = kSystemExclusive[7];
+    timecode.minutes = kSystemExclusive[6];
+    timecode.hours = kSystemExclusive[5] & 0x1F;
+    timecode.type = static_cast<uint8_t>(kSystemExclusive[5] >> 5);
+
+    ltc::output::Destination::Instance().Distribute(&timecode);
+
+    ltc::global::timecode_available = false;
+}
+} // namespace
+
+void MidiMessage(const struct midi::Message* message) {
+    switch (static_cast<midi::Type>(message->type)) {
+        case midi::Type::kTimeCodeQuarterFrame:
+            break;
+        case midi::Type::kSystemExclusive: {
+            const auto* const kSystemExclusive = message->system_exclusive;
+            if ((kSystemExclusive[1] == 0x7F) && (kSystemExclusive[2] == 0x7F) && (kSystemExclusive[3] == 0x01)) {
+                HandleMtc(message);
+            }
+        } break;
+        case midi::Type::kClock:
+        default:
+            break;
+    }
+}
+} // namespace rtpmidi

@@ -34,7 +34,6 @@
 #include <cassert>
 
 #include "net/applemidi.h"
-#include "net/rtpmidihandler.h"
 #include "midi.h"
 #include "midi_debug.h"
 
@@ -49,6 +48,8 @@ struct Header {
 } __attribute__((packed));
 
 inline constexpr auto kCommandOffset = sizeof(struct Header);
+
+void MidiMessage(const struct midi::Message* message);
 } // namespace rtpmidi
 
 class RtpMidi final : public AppleMidi {
@@ -91,7 +92,7 @@ class RtpMidi final : public AppleMidi {
         Send(1);
     }
 
-    void TransmitRaw(midi::Types type) { TransmitRaw(static_cast<uint8_t>(type)); }
+    void TransmitRaw(midi::Type type) { TransmitRaw(static_cast<uint8_t>(type)); }
 
     void SendTimeCode(const midi::Timecode* timecode) {
         auto* data = &send_buffer_[rtpmidi::kCommandOffset + 1];
@@ -119,45 +120,6 @@ class RtpMidi final : public AppleMidi {
         Send(2);
     }
 
-    void SendQf(const struct midi::Timecode* timecode, uint32_t& quarter_frame_piece) {
-        auto data = static_cast<uint8_t>(quarter_frame_piece << 4);
-
-        switch (quarter_frame_piece) {
-            case 0:
-                data = data | (timecode->frames & 0x0F);
-                break;
-            case 1:
-                data = data | static_cast<uint8_t>((timecode->frames & 0x10) >> 4);
-                break;
-            case 2:
-                data = data | (timecode->seconds & 0x0F);
-                break;
-            case 3:
-                data = data | static_cast<uint8_t>((timecode->seconds & 0x30) >> 4);
-                break;
-            case 4:
-                data = data | (timecode->minutes & 0x0F);
-                break;
-            case 5:
-                data = data | static_cast<uint8_t>((timecode->minutes & 0x30) >> 4);
-                break;
-            case 6:
-                data = data | (timecode->hours & 0x0F);
-                break;
-            case 7:
-                data = static_cast<uint8_t>(data | (timecode->type << 1) | ((timecode->hours & 0x10) >> 4));
-                break;
-            default:
-                break;
-        }
-
-        SendQf(data);
-
-        quarter_frame_piece = (quarter_frame_piece + 1) & 0x07;
-    }
-
-    void SetHandler(RtpMidiHandler* handler) { handler_ = handler; }
-
     void Print() { AppleMidi::Print(); }
 
     static RtpMidi* Get() { return s_this; }
@@ -169,16 +131,16 @@ class RtpMidi final : public AppleMidi {
 
     int32_t DecodeMidi(uint32_t command_length, uint32_t offset);
 
-    midi::Types GetTypeFromStatusByte(uint8_t status_byte) {
+    midi::Type GetTypeFromStatusByte(uint8_t status_byte) {
         if ((status_byte < 0x80) || (status_byte == 0xf4) || (status_byte == 0xf5) || (status_byte == 0xf9) || (status_byte == 0xfD)) {
-            return midi::Types::INVALIDE_TYPE;
+            return midi::Type::kInvalideType;
         }
 
         if (status_byte < 0xF0) {
-            return static_cast<midi::Types>(status_byte & 0xF0);
+            return static_cast<midi::Type>(status_byte & 0xF0);
         }
 
-        return static_cast<midi::Types>(status_byte);
+        return static_cast<midi::Type>(status_byte);
     }
 
     uint8_t GetChannelFromStatusByte(uint8_t status_byte) { return static_cast<uint8_t>((status_byte & 0x0F) + 1); }
@@ -195,7 +157,6 @@ class RtpMidi final : public AppleMidi {
     }
 
     midi::Message message_;
-    RtpMidiHandler* handler_{nullptr}; ///< Pointer to the RTP-MIDI handler.
     uint8_t* receive_buffer_{nullptr}; ///< Receive buffer pointer.
     uint8_t* send_buffer_{nullptr};    ///< Send buffer pointer.
     uint16_t sequence_number_{0};      ///< Sequence number for outgoing messages.

@@ -1,9 +1,0 @@
-DEFINES	=NDEBUG
-
-EXTRA_INCLUDES=../lib-properties/include ../lib-network/include ../lib-hal/include
-
-EXTRA_SRCDIR=src/arm src/gd32
-
-include Rules.mk
-include ../firmware-template-gd32/lib/Rules.mk
-

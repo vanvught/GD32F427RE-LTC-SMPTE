@@ -29,6 +29,7 @@
 namespace ltc::input::midi {
 void Start();
 void Stop();
+void Run();
 } // namespace ltc::input::midi
 
 #endif // INPUT_LTC_INPUT_MIDI_H_

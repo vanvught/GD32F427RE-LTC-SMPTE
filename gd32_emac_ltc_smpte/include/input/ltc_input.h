@@ -156,8 +156,12 @@ class Source : public output::Destination {
         switch (input_) {
             case Input::kLtc:
             case Input::kArtnet:
+                break;
             case Input::kMidi:
+                input::midi::Run();
+                break;
             case Input::kTcnet:
+                break;
             case Input::kInternal:
                 input::internal::Run();
                 break;

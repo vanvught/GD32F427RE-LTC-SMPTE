@@ -22,18 +22,11 @@
  * THE SOFTWARE.
  */
 
-#include "firmware/debug/debug_dump.h"
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC push_options
-#pragma GCC optimize("O2")
-#pragma GCC optimize("no-tree-loop-distribute-patterns")
-#endif // defined(__GNUC__) && !defined(__clang__)
-
 #include <cstdint>
 
 #include "net/rtpmidi.h"
-#include "net/rtpmidihandler.h"
 #include "midi_debug.h"
+#include "firmware/debug/debug_dump.h"
 
 #define RTP_MIDI_COMMAND_STATUS_FLAG 0x80
 
@@ -82,39 +75,39 @@ int32_t RtpMidi::DecodeMidi(uint32_t command_length, uint32_t offset) {
     message_.data1 = 0;
     message_.data2 = 0;
 
-    switch (static_cast<midi::Types>(kType)) {
-        case midi::Types::ACTIVE_SENSING:
-        case midi::Types::START:
-        case midi::Types::STOP:
-        case midi::Types::CONTINUE:
-        case midi::Types::CLOCK:
-        case midi::Types::TUNE_REQUEST:
-        case midi::Types::SYSTEM_RESET:
+    switch (static_cast<midi::Type>(kType)) {
+        case midi::Type::kActiveSensing:
+        case midi::Type::kStart:
+        case midi::Type::kStop:
+        case midi::Type::kContinue:
+        case midi::Type::kClock:
+        case midi::Type::kTuneRequest:
+        case midi::Type::kSystemReset:
             message_.bytes_count = 1;
             size = 1;
             break;
-        case midi::Types::PROGRAM_CHANGE:
-        case midi::Types::AFTER_TOUCH_CHANNEL:
-        case midi::Types::TIME_CODE_QUARTER_FRAME:
-        case midi::Types::SONG_SELECT:
+        case midi::Type::kProgramChange:
+        case midi::Type::kAfterTouchChannel:
+        case midi::Type::kTimeCodeQuarterFrame:
+        case midi::Type::kSongSelect:
             message_.channel = GetChannelFromStatusByte(kStatusByte);
             message_.data1 = receive_buffer_[++offset];
             message_.bytes_count = 2;
             size = 2;
             break;
-        case midi::Types::NOTE_ON:
-        case midi::Types::NOTE_OFF:
-        case midi::Types::CONTROL_CHANGE:
-        case midi::Types::PITCH_BEND:
-        case midi::Types::AFTER_TOUCH_POLY:
-        case midi::Types::SONG_POSITION:
+        case midi::Type::kNoteOn:
+        case midi::Type::kNoteOff:
+        case midi::Type::kControlChange:
+        case midi::Type::kPitchBend:
+        case midi::Type::kAfterTouchPoly:
+        case midi::Type::kSongPosition:
             message_.channel = GetChannelFromStatusByte(kStatusByte);
             message_.data1 = receive_buffer_[++offset];
             message_.data2 = receive_buffer_[++offset];
             message_.bytes_count = 3;
             size = 3;
             break;
-        case midi::Types::SYSTEM_EXCLUSIVE: {
+        case midi::Type::kSystemExclusive: {
             for (size = 0; (static_cast<uint32_t>(size) < command_length) && (static_cast<uint32_t>(size) < MIDI_SYSTEM_EXCLUSIVE_INDEX_ENTRIES); size++) {
                 message_.system_exclusive[size] = receive_buffer_[offset++];
                 if (message_.system_exclusive[size] == 0xF7) {
@@ -132,11 +125,9 @@ int32_t RtpMidi::DecodeMidi(uint32_t command_length, uint32_t offset) {
 
     RTPMIDI_DEBUG_PRINTF("size=%d", static_cast<unsigned>(size));
 
-    if (handler_ != nullptr) {
-        handler_->MidiMessage(&message_);
-        RTPMIDI_DEBUG_PUTS("");
-    }
 
+    rtpmidi::MidiMessage(&message_);
+    
     RTPMIDI_DEBUG_EXIT();
     return size;
 }

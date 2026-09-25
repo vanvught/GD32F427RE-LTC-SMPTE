@@ -64,15 +64,18 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="lib/shell|lib/ltc|ltc/systime|firmware|src/network|lib" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/midi/net|lib/shell|lib/ltc|ltc/systime|firmware|src/network|lib" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="firmware"/>
-						<entry excluding="pixel|shell|ltc|network|gps" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="lib"/>
+						<entry excluding="midi|pixel|shell|ltc|network|gps" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="lib"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/gps"/>
 						<entry excluding="network|display|json|systime" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="lib/ltc"/>
 						<entry excluding="pixel" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/ltc/display"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/ltc/json"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/ltc/network"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/ltc/systime"/>
+						<entry excluding="usbd|net" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/midi"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/midi/net"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/midi/usbd"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/pixel"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="lib/shell"/>
 					</sourceEntries>

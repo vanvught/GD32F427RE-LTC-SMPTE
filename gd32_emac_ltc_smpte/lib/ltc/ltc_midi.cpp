@@ -27,14 +27,19 @@
 #include <utility>
 
 #include "gd32f4xx.h"
-#include "ltc_midi.h"
+#include "midi.h"
 #include "gd32_uart.h"
+#include "ltc_timecode.h"
 #include "output/ltc_output.h"
 #include "ltc_gpio_config.h"
 #include "ltc_debug.h"
 
+namespace ltc::global {
+extern volatile bool timecode_available;
+} // namespace ltc::global
+
 namespace {
-constexpr uint32_t kBaudrateDefault = 31250;
+constexpr uint32_t kBaudrateDefault = midi::defaults::kBaudrate;
 constexpr auto kUart = MIDI_UARTx;
 
 enum class State { kIdle = 0, kMtcQf = 1, kSysex = 3 };
@@ -42,7 +47,7 @@ State state{State::kIdle};
 
 uint8_t mtc_assembly[8];
 
-struct ltc::TimeCode timecode;
+struct ltc::TimeCode timecode_input;
 
 uint32_t sysex_count{0};
 constexpr uint32_t kSysexBufferSize = 8;
@@ -77,17 +82,35 @@ void Start() {
 
     NVIC_EnableIRQ(MIDI_UARTx_IRQn);
 
+    timer_interrupt_disable(TIMER3, TIMER_INT_UP);
+
     LTC_INPUT_DEBUG_EXIT();
 }
 
 void Stop() {
     LTC_INPUT_DEBUG_ENTRY();
 
+    timer_interrupt_enable(TIMER3, TIMER_INT_UP);
+
     NVIC_DisableIRQ(MIDI_UARTx_IRQn);
 
     usart_interrupt_disable(kUart, USART_INT_RBNE);
 
     LTC_INPUT_DEBUG_EXIT();
+}
+
+void Run() {
+    if (!ltc::global::timecode_available) {
+        return;
+    }
+
+    ltc::global::timecode_available = false;
+
+    ltc::timecode::Increment();
+
+    ltc::output::Destination::Instance().Distribute(&ltc::global::timecode_running);
+
+    timer_interrupt_disable(TIMER3, TIMER_INT_UP);
 }
 } // namespace input::midi
 
@@ -120,7 +143,7 @@ void OutputTimeCode(const struct ::midi::Timecode* timecode) {
 void OutputQf(uint8_t value) {
     uint8_t data[2];
 
-    data[0] = 0xF1;
+    data[0] = std::to_underlying(::midi::Type::kTimeCodeQuarterFrame);
     data[1] = value;
 
     TransmitRaw(data, 2);
@@ -138,26 +161,36 @@ void HanleMtcQf(uint8_t byte) {
     switch (kPiece) {
         case 0:
         case 1:
-            timecode.frames = (mtc_assembly[1] << 4) | mtc_assembly[0];
+            timecode_input.frames = (mtc_assembly[1] << 4) | mtc_assembly[0];
             break;
 
         case 2:
         case 3:
-            timecode.seconds = (mtc_assembly[3] << 4) | mtc_assembly[2];
+            timecode_input.seconds = (mtc_assembly[3] << 4) | mtc_assembly[2];
             break;
 
         case 4:
         case 5:
-            timecode.minutes = (mtc_assembly[5] << 4) | mtc_assembly[4];
+            timecode_input.minutes = (mtc_assembly[5] << 4) | mtc_assembly[4];
             break;
 
         case 6:
         case 7:
-            timecode.hours = ((mtc_assembly[7] & 0x01) << 4) | mtc_assembly[6];
-            timecode.type = (mtc_assembly[7] >> 1) & 0x03;
+            timecode_input.hours = ((mtc_assembly[7] & 0x01) << 4) | mtc_assembly[6];
+            timecode_input.type = (mtc_assembly[7] >> 1) & 0x03;
 
             if (kPiece == 7) {
-                // TODO (AvV) Handle full MTC
+                memcpy(&ltc::global::timecode_running, &::timecode_input, sizeof(midi::Timecode));
+                ltc::output::Destination::Instance().Distribute(&::timecode_input);
+
+                TIMER_CTL0(TIMER3) &= ~TIMER_CTL0_CEN;
+                TIMER_CNT(TIMER3) = 0;
+                TIMER_CTL0(TIMER3) |= TIMER_CTL0_CEN;
+
+                timer_interrupt_flag_clear(TIMER3, UINT32_MAX);
+                timer_interrupt_enable(TIMER3, TIMER_INT_UP);
+
+                ltc::global::timecode_available = false;
             }
             break;
 
@@ -172,13 +205,15 @@ void HandleMtc() {
     }
 
     if ((sysex[0] == 0x7F) && (sysex[1] == 0x7F) && (sysex[2] == 0x01)) {
-        timecode.hours = sysex[4] & 0x1F;
-        timecode.minutes = sysex[5];
-        timecode.seconds = sysex[6];
-        timecode.frames = sysex[7];
-        timecode.type = static_cast<uint8_t>(sysex[4] >> 5);
+        timecode_input.hours = sysex[4] & 0x1F;
+        timecode_input.minutes = sysex[5];
+        timecode_input.seconds = sysex[6];
+        timecode_input.frames = sysex[7];
+        timecode_input.type = static_cast<uint8_t>(sysex[4] >> 5);
 
-        ltc::output::Destination::Instance().Distribute(&timecode);
+        ltc::output::Destination::Instance().Distribute(&timecode_input);
+
+        ltc::global::timecode_available = false;
     }
 }
 
