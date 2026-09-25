@@ -14,8 +14,7 @@ Pixel output
 Timer 4 is Master -> TIMER4_TRGO
 Timer 7 is Slave -> ITI3  CH0:DMA0 CH2, CH2:DMA0 CH0, CH3:DMA0 CH1
 
-MIDI
-Timer 13 is BPM
-
 MIDI Input
+Timer 8 Active Sense
 Timer 9 is Timecode available
+Timer 13 is BPM
