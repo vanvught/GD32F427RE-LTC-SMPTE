@@ -1,0 +1,97 @@
+/**
+ * @file time.cpp
+ *
+ */
+/* Copyright (C) 2024-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+#if !defined(CONFIG_NET_ENABLE_PTP)
+#error
+#endif // CONFIG_NET_ENABLE_PTP
+
+#pragma GCC push_options
+#pragma GCC optimize("O2")
+
+#include <cstdint>
+#include <ctime>
+#include <sys/time.h>
+#include <cassert>
+
+#include "gd32_ptp.h"
+
+#if defined(GD32H7XX)
+#define enet_ptp_timestamp_function_config(x) enet_ptp_timestamp_function_config(ENETx, x)
+#define enet_ptp_timestamp_update_config(x, y, z) enet_ptp_timestamp_update_config(ENETx, x, y, z)
+#define enet_ptp_system_time_get(x) enet_ptp_system_time_get(ENETx, x)
+#endif // GD32H7XX
+
+extern "C" {
+// number of seconds and microseconds since the Epoch,
+//     1970-01-01 00:00:00 +0000 (UTC).
+int gettimeofday(struct timeval* __restrict __p, [[maybe_unused]] void* __restrict __tz) { // NOLINT
+    assert(time_val != nullptr);
+
+    enet_ptp_systime_struct systime;
+    enet_ptp_system_time_get(&systime);
+
+    __p->tv_sec = static_cast<time_t>(systime.second);
+
+#ifndef GD32F4XX
+    const auto kNanoSecond = systime.nanosecond;
+#else
+    const auto kNanoSecond = gd32::PtpSubsecond2Nanosecond(systime.subsecond);
+#endif // GD32F4XX
+
+    __p->tv_usec = static_cast<suseconds_t>(kNanoSecond / 1000U);
+
+    return 0;
+}
+
+int settimeofday(const struct timeval* time_val, [[maybe_unused]] const struct timezone* time_zone) { // NOLINT
+    assert(time_val != nullptr);
+
+    const uint32_t kSign = ENET_PTP_ADD_TO_TIME;
+    const auto kSecond = static_cast<uint32_t>(time_val->tv_sec);
+    const uint32_t kNanoSecond = static_cast<uint32_t>(time_val->tv_usec) * 1000U;
+    const auto kSubSecond = gd32::PtpNanosecond2Subsecond(kNanoSecond);
+
+    enet_ptp_timestamp_update_config(kSign, kSecond, kSubSecond);
+
+    if (SUCCESS == enet_ptp_timestamp_function_config(ENET_PTP_SYSTIME_INIT)) {
+        return 0;
+    }
+
+    return -1;
+}
+
+// time() returns the time as the number of seconds since the Epoch,
+//     1970-01-01 00:00:00 +0000 (UTC).
+time_t time(time_t* __timer) { // NOLINT
+    struct timeval tv;
+    gettimeofday(&tv, nullptr);
+
+    if (__timer != nullptr) {
+        *__timer = tv.tv_sec;
+    }
+
+    return tv.tv_sec;
+}
+}
