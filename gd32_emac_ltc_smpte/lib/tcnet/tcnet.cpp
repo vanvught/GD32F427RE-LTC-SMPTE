@@ -231,7 +231,6 @@ void Stop() {
 }
 
 void Print() {
-    puts("TCNet");
     printf(" Node : %.8s\n", packet_opt_in.management_header.node_name);
     printf(" L%c", tcnet::LayerToChar(layer_));
     if (use_time_code) {
@@ -244,7 +243,7 @@ void Print() {
 }
 
 void SetNodeName(const char* node_name) {
-    strncpy(reinterpret_cast<char*>(packet_opt_in.management_header.node_name), node_name, sizeof packet_opt_in.management_header.node_name - 1);
+    strncpy(reinterpret_cast<char*>(packet_opt_in.management_header.node_name), node_name, sizeof(packet_opt_in.management_header.node_name) - 1);
     packet_opt_in.management_header.node_name[sizeof packet_opt_in.management_header.node_name - 1] = '\0';
 }
 
