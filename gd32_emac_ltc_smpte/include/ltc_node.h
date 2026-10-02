@@ -31,7 +31,7 @@
 #include "display.h"
 #include "ltc_debug.h"
 #include "input/ltc_input.h"
-#include "ltc_ntpserver.h"
+#include "ltc_network_ntpserver.h"
 #include "output/ltc_output.h"
 #include "input/ltc_input_internal.h"
 #include "gnss.h"
@@ -44,7 +44,7 @@ class Node : input::Source {
 
         Display::Get()->Cls();
         // NTP Server
-        ntpserver::Init(static_cast<uint32_t>(_TIME_STAMP_YEAR_), static_cast<uint32_t>(_TIME_STAMP_MONTH_), static_cast<uint32_t>(_TIME_STAMP_DAY_));
+        network::ntpserver::Init(static_cast<uint32_t>(_TIME_STAMP_YEAR_), static_cast<uint32_t>(_TIME_STAMP_MONTH_), static_cast<uint32_t>(_TIME_STAMP_DAY_));
         // GPS
         gnss::Receiver::Instance().SetDate(static_cast<uint32_t>(_TIME_STAMP_YEAR_), static_cast<uint32_t>(_TIME_STAMP_MONTH_), static_cast<uint32_t>(_TIME_STAMP_DAY_));
         gnss::Receiver::Instance().SetModule(gnss::Module::kUbloxNeo);

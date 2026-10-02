@@ -32,7 +32,6 @@
 #include <ctime>
 #include <cassert>
 
-#include "ltc_ntp.h"
 #include "ltc.h"
 #include "network_config.h"
 #include "network_udp.h"
@@ -40,12 +39,12 @@
 #include "core/protocol/iana.h"
 #include "ltc_debug.h"
 
-namespace ltc::ntpserver {
+namespace ltc::network::ntpserver {
 namespace {
 time_t time{0};
 time_t time_date{0};
 uint32_t fraction{0};
-int32_t handle{-1};
+int32_t handle{};
 ::ntp::Packet reply;
 
 void Input(const uint8_t* buffer, uint32_t size, uint32_t from_ip, uint16_t from_port) {
@@ -59,16 +58,16 @@ void Input(const uint8_t* buffer, uint32_t size, uint32_t from_ip, uint16_t from
         return;
     }
 
-    reply.reference_id = network::GetPrimaryIp();
+    reply.reference_id = ::network::GetPrimaryIp();
     reply.origin_timestamp_s = request->transmit_timestamp_s;
     reply.origin_timestamp_f = request->transmit_timestamp_f;
 
-    network::udp::Send(handle, reinterpret_cast<const uint8_t*>(&reply), sizeof(struct ::ntp::Packet), from_ip, from_port);
+    ::network::udp::Send(handle, reinterpret_cast<const uint8_t*>(&reply), sizeof(struct ::ntp::Packet), from_ip, from_port);
 }
 
 void Print() {
     printf("NTP v%u Server\n", static_cast<unsigned>(::ntp::kVersion >> 3));
-    printf(" Port : %u\n", static_cast<unsigned>(network::iana::Ports::kPortNtp));
+    printf(" Port : %u\n", static_cast<unsigned>(::network::iana::Ports::kPortNtp));
     printf(" Stratum : %u\n", static_cast<unsigned>(::ntp::kStratum));
 
     const auto kTime = static_cast<time_t>(static_cast<uint32_t>(time) - ::ntp::kJan1970);
@@ -78,8 +77,8 @@ void Print() {
 } // namespace
 
 void Init(uint32_t year, uint32_t month, uint32_t day) {
-    LTC_NTP_DEBUG_ENTRY();
-    LTC_NTP_DEBUG_PRINTF("year=%u, month=%u, day=%u", static_cast<unsigned>(year), static_cast<unsigned>(month), static_cast<unsigned>(day));
+    LTC_NETWORK_NTPSERVER_DEBUG_ENTRY();
+    LTC_NETWORK_NTPSERVER_DEBUG_PRINTF("year=%u, month=%u, day=%u", static_cast<unsigned>(year), static_cast<unsigned>(month), static_cast<unsigned>(day));
 
     struct tm time_date;
 
@@ -91,20 +90,22 @@ void Init(uint32_t year, uint32_t month, uint32_t day) {
     time = mktime(&time_date);
     assert(time != -1);
 
-    LTC_NTP_DEBUG_PRINTF("time_=%.8x %u", static_cast<unsigned>(time), static_cast<unsigned>(time));
+    LTC_NETWORK_NTPSERVER_DEBUG_PRINTF("time_=%.8x %u", static_cast<unsigned>(time), static_cast<unsigned>(time));
 
     time += static_cast<time_t>(::ntp::kJan1970);
+    handle = -1;
 
-    LTC_NTP_DEBUG_PRINTF("time_=%.8x %u", static_cast<unsigned>(time), static_cast<unsigned>(time));
-    LTC_NTP_DEBUG_EXIT();
+    LTC_NETWORK_NTPSERVER_DEBUG_PRINTF("time_=%.8x %u", static_cast<unsigned>(time), static_cast<unsigned>(time));
+    LTC_NETWORK_NTPSERVER_DEBUG_EXIT();
 }
 
 void Start() {
-    LTC_NTP_DEBUG_ENTRY();
+    LTC_NETWORK_NTPSERVER_DEBUG_ENTRY();
 
-    ltc::ntp::Start();
-
-    handle = network::udp::Begin(network::iana::Ports::kPortNtp, Input);
+    if (handle != -1) {
+        ::network::udp::End(::network::iana::Ports::kPortNtp);
+    }
+    handle = ::network::udp::Begin(::network::iana::Ports::kPortNtp, Input);
     assert(handle != -1);
 
     reply.li_vn_mode = ::ntp::kVersion | ::ntp::kModeServer;
@@ -116,18 +117,18 @@ void Start() {
 
     Print();
 
-    LTC_NTP_DEBUG_EXIT();
+    LTC_NETWORK_NTPSERVER_DEBUG_EXIT();
 }
 
 void Stop() {
-    LTC_NTP_DEBUG_ENTRY();
+    LTC_NETWORK_NTPSERVER_DEBUG_ENTRY();
 
-    network::udp::End(network::iana::Ports::kPortNtp);
-    handle = -1;
+    if (handle != -1) {
+        ::network::udp::End(::network::iana::Ports::kPortNtp);
+        handle = -1;
+    }
 
-    ltc::ntp::Stop();
-
-    LTC_NTP_DEBUG_EXIT();
+    LTC_NETWORK_NTPSERVER_DEBUG_EXIT();
 }
 
 void SetTimeCode(const struct ltc::TimeCode* timecode) {
@@ -157,4 +158,4 @@ void SetTimeCode(const struct ltc::TimeCode* timecode) {
     reply.transmit_timestamp_s = __builtin_bswap32(static_cast<uint32_t>(time_date));
     reply.transmit_timestamp_f = __builtin_bswap32(fraction);
 }
-} // namespace ltc::ntpserver
+} // namespace ltc::network::ntpserver

@@ -1,5 +1,5 @@
 /**
- * @file ltc_ntp.cpp
+ * @file ltc_network_ntpserver.h
  *
  */
 /* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
@@ -23,37 +23,18 @@
 * THE SOFTWARE.
 */
 
-#include "ltc_debug.h"
-#include "apps/ntpclient.h"
-#include "network_ptp_pps.h"
+#ifndef LTC_NETWORK_NTPSERVER_H_
+#define LTC_NETWORK_NTPSERVER_H_
 
-namespace ltc::ntp {
-void Start() {
-    LTC_NTP_DEBUG_ENTRY();
+#include <cstdint>
 
-#ifdef CONFIG_NET_ENABLE_NTP_CLIENT
-    network::apps::ntpclient::Stop(true);
-#endif // CONFIG_NET_ENABLE_NTP_CLIENT
-#ifdef CONFIG_NET_ENABLE_PTP_NTP_CLIENT
-    network::apps::ntpclient::ptp::Stop(true);
-#endif // CONFIG_NET_ENABLE_PTP_NTP_CLIENT
+#include "ltc.h"
 
-    LTC_NTP_DEBUG_EXIT();
-}
+namespace ltc::network::ntpserver {
+void Init(uint32_t year, uint32_t month, uint32_t day);
+void Start();
+void Stop();
+void SetTimeCode(const struct ltc::TimeCode* timecode);
+} // namespace ltc::network::ntpserver
 
-void Stop() {
-    LTC_NTP_DEBUG_ENTRY();
-
-#ifdef CONFIG_NET_ENABLE_NTP_CLIENT
-    network::apps::ntpclient::Stop(false);
-    network::apps::ntpclient::Start();
-#endif // CONFIG_NET_ENABLE_NTP_CLIENT
-#ifdef CONFIG_NET_ENABLE_PTP_NTP_CLIENT
-    network::apps::ntpclient::ptp::Stop(false);
-    network::apps::ntpclient::ptp::Start();
-    network::ptp::pps::Start();
-#endif // CONFIG_NET_ENABLE_PTP_NTP_CLIENT
-
-    LTC_NTP_DEBUG_EXIT();
-}
-} // namespace ltc::ntp
+#endif // LTC_NETWORK_NTPSERVER_H_

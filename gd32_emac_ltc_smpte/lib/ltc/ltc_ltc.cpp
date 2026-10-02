@@ -31,8 +31,7 @@
 #include "output/ltc_output_midi.h"
 #include "output/ltc_output.h"
 #include "ltc_debug.h"
-#include "ltc_ntpserver.h"
-#include "net/rtpmidi.h"
+#include "ltc_network_ntpserver.h"
 #include "midi.h"
 #include "timecodeconst.h"
 #include "ltc_display_max7219.h"
@@ -491,7 +490,7 @@ void Destination::DistributeInternal(const ::ltc::TimeCode* timecode) {
     midi_quarter_frame_piece_running = IsEnabled(::ltc::Output::kMidi) || IsEnabled(::ltc::Output::kApplemidi) || IsEnabled(::ltc::Output::kUsbmidi);
 
     if (IsEnabled(::ltc::Output::kNtpServer)) {
-        ntpserver::SetTimeCode(timecode);
+        network::ntpserver::SetTimeCode(timecode);
     }
 
     ConvertToString(timecode, timecode_);

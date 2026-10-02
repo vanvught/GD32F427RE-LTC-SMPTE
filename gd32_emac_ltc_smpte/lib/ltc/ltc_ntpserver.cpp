@@ -1,5 +1,5 @@
 /**
- * @file ltc_ntp.h
+ * @file ltc_ntpserver.cpp
  *
  */
 /* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
@@ -23,12 +23,42 @@
 * THE SOFTWARE.
 */
 
-#ifndef LTC_NTP_H_
-#define LTC_NTP_H_
+#include "ltc_debug.h"
+#include "apps/ntpclient.h"
+#include "network_ptp_pps.h"
+#include "ltc_network_ntpserver.h"
 
-namespace ltc::ntp {
-void Start();
-void Stop();
-} // namespace ltc::ntp
+namespace ltc::ntpserver {
+void Start() {
+    LTC_NTPSERVER_DEBUG_ENTRY();
 
-#endif // LTC_NTP_H_
+#ifdef CONFIG_NET_ENABLE_NTP_CLIENT
+    ::network::apps::ntpclient::Stop(true);
+#endif // CONFIG_NET_ENABLE_NTP_CLIENT
+#ifdef CONFIG_NET_ENABLE_PTP_NTP_CLIENT
+    ::network::apps::ntpclient::ptp::Stop(true);
+#endif // CONFIG_NET_ENABLE_PTP_NTP_CLIENT
+
+    ltc::network::ntpserver::Start();
+
+    LTC_NTPSERVER_DEBUG_EXIT();
+}
+
+void Stop() {
+    LTC_NTPSERVER_DEBUG_ENTRY();
+
+    ltc::network::ntpserver::Stop();
+
+#ifdef CONFIG_NET_ENABLE_NTP_CLIENT
+    ::network::apps::ntpclient::Stop(false);
+    ::network::apps::ntpclient::Start();
+#endif // CONFIG_NET_ENABLE_NTP_CLIENT
+#ifdef CONFIG_NET_ENABLE_PTP_NTP_CLIENT
+    ::network::apps::ntpclient::ptp::Stop(false);
+    ::network::apps::ntpclient::ptp::Start();
+    ::network::ptp::pps::Start();
+#endif // CONFIG_NET_ENABLE_PTP_NTP_CLIENT
+
+    LTC_NTPSERVER_DEBUG_EXIT();
+}
+} // namespace ltc::ntpserver

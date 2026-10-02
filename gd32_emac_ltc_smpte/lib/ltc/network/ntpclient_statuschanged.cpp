@@ -32,16 +32,25 @@ void StatusChanged(::ntp::Status status) {
         case ::ntp::Status::kStopped:
             Display::Get()->TextStatus("No NTP Client");
             break;
+
         case ::ntp::Status::kIdle:
             Display::Get()->TextStatus("NTP Client");
             break;
+
         case ::ntp::Status::kLocked:
             Display::Get()->TextStatus("NTP Client LOCKED");
             break;
+
         case ::ntp::Status::kFailed:
-            Display::Get()->TextStatus("Error: NTP");
+            Display::Get()->TextStatus("NTP Client Error");
             break;
-        default:
+
+        case ntp::Status::kWaiting:
+            Display::Get()->TextStatus("NTP Client Waiting");
+            break;
+
+        case ntp::Status::kDisabled:
+            Display::Get()->TextStatus("NTP Client Disabled");
             break;
     }
 }

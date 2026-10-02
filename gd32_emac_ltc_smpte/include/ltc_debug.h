@@ -148,24 +148,44 @@
     } while (false)
 #endif // DEBUG_LTC_PTP
 
-#ifdef DEBUG_LTC_NTP
-#define LTC_NTP_DEBUG_ENTRY() DEBUG_ENTRY()
-#define LTC_NTP_DEBUG_EXIT() DEBUG_EXIT()
-#define LTC_NTP_DEBUG_PRINTF(...) DEBUG_PRINTF(__VA_ARGS__)
-#define LTC_NTP_DEBUG_PUTS(...) DEBUG_PUTS(__VA_ARGS__)
+#ifdef DEBUG_LTC_NETWORK_NTPSERVER
+#define LTC_NETWORK_NTPSERVER_DEBUG_ENTRY() DEBUG_ENTRY()
+#define LTC_NETWORK_NTPSERVER_DEBUG_EXIT() DEBUG_EXIT()
+#define LTC_NETWORK_NTPSERVER_DEBUG_PRINTF(...) DEBUG_PRINTF(__VA_ARGS__)
+#define LTC_NETWORK_NTPSERVER_DEBUG_PUTS(...) DEBUG_PUTS(__VA_ARGS__)
 #else
-#define LTC_NTP_DEBUG_ENTRY() \
+#define LTC_NETWORK_NTPSERVER_DEBUG_ENTRY() \
     do {                      \
     } while (false)
-#define LTC_NTP_DEBUG_EXIT() \
+#define LTC_NETWORK_NTPSERVER_DEBUG_EXIT() \
     do {                     \
     } while (false)
-#define LTC_NTP_DEBUG_PRINTF(...) \
+#define LTC_NETWORK_NTPSERVER_DEBUG_PRINTF(...) \
     do {                          \
     } while (false)
-#define LTC_NTP_DEBUG_PUTS(...) \
+#define LTC_NETWORK_NTPSERVER_DEBUG_PUTS(...) \
     do {                        \
     } while (false)
-#endif // DEBUG_LTC_NTP
+#endif // DEBUG_LTC_NETWORK_NTPSERVER
+
+#ifdef DEBUG_LTC_NTPSERVER
+#define LTC_NTPSERVER_DEBUG_ENTRY() DEBUG_ENTRY()
+#define LTC_NTPSERVER_DEBUG_EXIT() DEBUG_EXIT()
+#define LTC_NTPSERVER_DEBUG_PRINTF(...) DEBUG_PRINTF(__VA_ARGS__)
+#define LTC_NTPSERVER_DEBUG_PUTS(...) DEBUG_PUTS(__VA_ARGS__)
+#else
+#define LTC_NTPSERVER_DEBUG_ENTRY() \
+    do {                      \
+    } while (false)
+#define LTC_NTPSERVER_DEBUG_EXIT() \
+    do {                     \
+    } while (false)
+#define LTC_NTPSERVER_DEBUG_PRINTF(...) \
+    do {                          \
+    } while (false)
+#define LTC_NTPSERVER_DEBUG_PUTS(...) \
+    do {                        \
+    } while (false)
+#endif // DEBUG_LTC_NTPSERVER
 
 #endif // LTC_DEBUG_H_

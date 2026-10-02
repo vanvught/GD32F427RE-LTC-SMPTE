@@ -26,15 +26,9 @@
 #ifndef LTC_NTPSERVER_H_
 #define LTC_NTPSERVER_H_
 
-#include <cstdint>
-
-#include "ltc.h"
-
 namespace ltc::ntpserver {
-void Init(uint32_t year, uint32_t month, uint32_t day);
 void Start();
 void Stop();
-void SetTimeCode(const struct ltc::TimeCode* timecode);
-} // namespace ltc::ntpserver
+} // namespace ltc::ntp
 
 #endif // LTC_NTPSERVER_H_

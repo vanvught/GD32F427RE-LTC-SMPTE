@@ -23,16 +23,78 @@
 * THE SOFTWARE.
 */
 
+#include "common/utils/utils_string.h"
 #include "shell.h"
 #include "tcnet.h"
 
 namespace shell::ltc {
+namespace {
+constexpr int32_t kMaxType = 30;
+}
+
 void TCNet(Arguments args) {
     if (args.size() == 1) {
         ::tcnet::Print();
         return;
     }
 
+    if (args.size() == 3) {
+        if (args[1] == "layer") {
+            if (args[2].size() == 1) {
+                const auto kLayer = tcnet::LayerFromChar(args[2].front());
+                if (kLayer != tcnet::Layer::kLayerUndefined) {
+                    tcnet::SetLayer(kLayer);
+                    return;
+                }
+            }
+
+            uart0::Puts(common::kUnknown);
+            return;
+        }
+
+        if (args[1] == "type") {
+            const auto kValue = shell::GetValue(args[2], kMaxType);
+
+            if (!kValue) {
+                uart0::Puts(common::kUnknown);
+                return;
+            }
+
+            switch (*kValue) {
+                case 24:
+                    tcnet::SetTimeCodeType(tcnet::TimeCodeType::kFilm);
+                    return;
+
+                case 25:
+                    tcnet::SetTimeCodeType(tcnet::TimeCodeType::kEbu25Fps);
+                    return;
+
+                case 29:
+                    tcnet::SetTimeCodeType(tcnet::TimeCodeType::kDf);
+                    return;
+
+                case 30:
+                    tcnet::SetTimeCodeType(tcnet::TimeCodeType::kSmpte30Fps);
+                    return;
+
+                default:
+                    uart0::Puts(common::kUnknown);
+                    return;
+            }
+
+            uart0::Puts(common::kUnknown);
+            return;
+        }
+
+        if (args[1] == "use_timecode") {
+            if (args[2].size() == 1) {
+                const auto kUse = args[2].front() == 'y';
+                tcnet::SetUseTimeCode(kUse);
+                return;
+            }
+        }
+    }
+
     uart0::Puts(common::kUnknown);
 }
-} // namespace shell::tcnet
+} // namespace shell::ltc
