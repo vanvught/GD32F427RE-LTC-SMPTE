@@ -34,6 +34,7 @@
 #include "shell.h"
 #include "software_version.h"
 #include "watchdog.h"
+#include "tcnet.h"
 
 namespace usb {
 void Init();
@@ -58,6 +59,9 @@ int main() { // NOLINT
     node.SetUtcOffset(2, 0);
     network::apps::ntpclient::ptp::SetServerIp(network::ConvertToUint(45, 138, 55, 61));
 
+	tcnet::SetUseTimeCode(true);
+    tcnet::Print();
+        
     usb::Init();
 
     watchdog::Init();

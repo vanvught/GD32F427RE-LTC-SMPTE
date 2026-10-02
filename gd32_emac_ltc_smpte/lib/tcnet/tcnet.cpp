@@ -25,6 +25,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <cstdio>
 #include <cstring>
 #include <utility>
 
@@ -78,7 +79,7 @@ void InputPort60000(const uint8_t* buffer, [[maybe_unused]] uint32_t size, [[may
     const auto* packet = reinterpret_cast<const packet::ManagementHeader*>(buffer);
     const auto kMessageType = static_cast<packet::MessageType>(packet->message_type);
 
-    DEBUG_PRINTF("kMessageType=%u", static_cast<unsigned>(kMessageType));
+    TCNET_DEBUG_PRINTF("kMessageType=%u", static_cast<unsigned>(kMessageType));
 
     if (kMessageType == packet::MessageType::kMessageTypeOptin) {
 #ifdef DEBUG_TCNET
@@ -101,13 +102,13 @@ void InputPort60001(const uint8_t* buffer, [[maybe_unused]] uint32_t size, [[may
         tcnet::Timecode timecode;
 
         if (use_time_code) {
-            const auto* tc = reinterpret_cast<const packet::TimeCode*>(buffer + lx_time_code_offset);
-            timecode.frames = tc->frames;
-            timecode.seconds = tc->seconds;
-            timecode.minutes = tc->minutes;
-            timecode.hours = tc->hours;
+            const auto* lx_tc = reinterpret_cast<const packet::TimeCode*>(buffer + lx_time_code_offset);
+            timecode.frames = lx_tc->frames;
+            timecode.seconds = lx_tc->seconds;
+            timecode.minutes = lx_tc->minutes;
+            timecode.hours = lx_tc->hours;
 
-            auto smpte_mode = tc->smpte_mode;
+            auto smpte_mode = lx_tc->smpte_mode;
 
             if (smpte_mode < 24) {
                 smpte_mode = packet_time.SMPTEMode;

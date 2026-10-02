@@ -23,6 +23,7 @@
 * THE SOFTWARE.
 */
 
+#include "ltc.h"
 #include "output/ltc_output.h"
 #include "ltc_debug.h"
 #include "tcnet.h"
@@ -67,6 +68,6 @@ void Stop() {
 
 namespace tcnet {
 void Handle([[maybe_unused]] const tcnet::Timecode* timecode) {
-		
+		ltc::output::Destination::Instance().Distribute(reinterpret_cast<const ::ltc::TimeCode*>(timecode));
 }
 } // namespace tcnet
