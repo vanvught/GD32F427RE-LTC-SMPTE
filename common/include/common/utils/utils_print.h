@@ -26,13 +26,34 @@
 #ifndef COMMON_UTILS_UTILS_PRINT_H_
 #define COMMON_UTILS_UTILS_PRINT_H_
 
+#include <cstdint>
 #include <cstdio>
+#include <string_view>
 
 #include "firmware/ansi_colour.h"
 
 namespace common::print {
 inline void Error(const char* func, const char* string) {
     printf("%s%s: %s%s\n", ansi::Colours::Fg::kRed, func, string, ansi::Colours::Fg::kDefault);
+}
+
+inline void Error(const char* func, std::string_view string) {
+    printf("%s%s: %.*s%s\n", ansi::Colours::Fg::kRed, func, static_cast<int>(string.size()), string.data(), ansi::Colours::Fg::kDefault);
+}
+
+inline void Size(uint64_t size, std::string_view suffix = {}) {
+    constexpr uint64_t kKiB{1024};
+    constexpr uint64_t kMiB{1024 * kKiB};
+
+    if (size >= kMiB) {
+        printf("%u MiB", static_cast<uint32_t>(size / kMiB));
+    } else if (size >= kKiB) {
+        printf("%u KiB", static_cast<uint32_t>(size / kKiB));
+    } else {
+        printf("%u Bytes", static_cast<uint32_t>(size));
+    }
+
+    printf("%.*s", static_cast<int>(suffix.size()), suffix.data());
 }
 } // namespace common::print
 
