@@ -41,16 +41,16 @@ inline void Error(const char* func, std::string_view string) {
     printf("%s%s: %.*s%s\n", ansi::Colours::Fg::kRed, func, static_cast<int>(string.size()), string.data(), ansi::Colours::Fg::kDefault);
 }
 
-inline void Size(uint64_t size, std::string_view suffix = {}) {
-    constexpr uint64_t kKiB{1024};
-    constexpr uint64_t kMiB{1024 * kKiB};
+inline void Size(uint32_t size, std::string_view suffix = {}) {
+    constexpr uint32_t kKiB{1024};
+    constexpr uint32_t kMiB{1024 * kKiB};
 
     if (size >= kMiB) {
-        printf("%u MiB", static_cast<uint32_t>(size / kMiB));
+        printf("%u MiB", static_cast<unsigned>(size / kMiB));
     } else if (size >= kKiB) {
-        printf("%u KiB", static_cast<uint32_t>(size / kKiB));
+        printf("%u KiB", static_cast<unsigned>(size / kKiB));
     } else {
-        printf("%u Bytes", static_cast<uint32_t>(size));
+        printf("%u Bytes", static_cast<unsigned>(size));
     }
 
     printf("%.*s", static_cast<int>(suffix.size()), suffix.data());
