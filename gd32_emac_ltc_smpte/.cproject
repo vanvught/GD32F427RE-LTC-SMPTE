@@ -163,6 +163,7 @@
 						<entry excluding="usbd|net" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/midi"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/midi/net"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/midi/usbd"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/network"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/pixel"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="lib/shell"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib/tcnet"/>

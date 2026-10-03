@@ -26,36 +26,26 @@
 #ifndef LTC_COMMANDS_H_
 #define LTC_COMMANDS_H_
 
-#include <cstdint>
-#include "common/utils/utils_string.h"
+#include <string_view>
 
 namespace ltc::commands {
-struct Cmd {
-    const char* name;
-    uint8_t length;
-};
-
-#define MAKE_CMD(id, str) constexpr Cmd k##id = {.name = str, .length = common::ConstStrLen(str)}
-
 // Generic
-MAKE_CMD(Start, "start");
-MAKE_CMD(Stop, "stop");
-MAKE_CMD(Resume, "resume");
-MAKE_CMD(Rate, "rate#");
+inline constexpr std::string_view kStart{"start"};
+inline constexpr std::string_view kStop{"stop"};
+inline constexpr std::string_view kResume{"resume"};
+inline constexpr std::string_view kRate{"rate#"};
 // Internal
-MAKE_CMD(Direction, "direction#");
-MAKE_CMD(Pitch, "pitch#");
-MAKE_CMD(Forward, "forward#");
-MAKE_CMD(Backward, "backward#");
+inline constexpr std::string_view kDirection{"direction#"};
+inline constexpr std::string_view kPitch{"pitch#"};
+inline constexpr std::string_view kForward{"forward#"};
+inline constexpr std::string_view kBackward{"backward#"};
 // MIDI
-MAKE_CMD(Bpm, "bpm#");
-MAKE_CMD(Continue, "continue");
+inline constexpr std::string_view kBpm{"bpm#"};
+inline constexpr std::string_view kContinue{"continue"};
 // TCNet
-MAKE_CMD(Layer, "layer#");
-MAKE_CMD(Type, "type#");
-MAKE_CMD(Timecode, "timecode#");
-
-#undef MAKE_CMD
+inline constexpr std::string_view kLayer{"layer#"};
+inline constexpr std::string_view kType{"type#"};
+inline constexpr std::string_view kTimecode{"timecode#"};
 } // namespace ltc::commands
 
 #endif // LTC_COMMANDS_H_
