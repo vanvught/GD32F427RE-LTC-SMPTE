@@ -42,6 +42,7 @@
 namespace shell::ltc {
 
 using ::ltc::input::Source;
+using ::ltc::output::Destination;
 
 namespace {
 
@@ -85,19 +86,19 @@ void Type(Arguments args) {
 
     switch (*kValue) {
         case 24:
-            ::ltc::output::Destination::Instance().SetType(::ltc::Type::kFilm);
+            Destination::Instance().SetType(::ltc::Type::kFilm);
             return;
 
         case 25:
-            ::ltc::output::Destination::Instance().SetType(::ltc::Type::kEbu);
+            Destination::Instance().SetType(::ltc::Type::kEbu);
             return;
 
         case 29:
-            ::ltc::output::Destination::Instance().SetType(::ltc::Type::kDf);
+            Destination::Instance().SetType(::ltc::Type::kDf);
             return;
 
         case 30:
-            ::ltc::output::Destination::Instance().SetType(::ltc::Type::kSmpte);
+            Destination::Instance().SetType(::ltc::Type::kSmpte);
             return;
 
         default:
@@ -108,7 +109,7 @@ void Type(Arguments args) {
 
 void UtcOffset(Arguments args) {
     if (args.size() == 1) {
-        const auto kSeconds = ::ltc::output::Destination::Instance().UtcOffset();
+        const auto kSeconds = Destination::Instance().UtcOffset();
 
         int32_t hours;
         uint32_t minutes;
@@ -123,7 +124,7 @@ void UtcOffset(Arguments args) {
         uint32_t minutes;
 
         if (utc::ParseOffset(args[1].data(), args[1].size(), hours, minutes)) {
-            ::ltc::output::Destination::Instance().SetUtcOffset(hours, minutes);
+            Destination::Instance().SetUtcOffset(hours, minutes);
         } else {
             uart0::Puts(common::kUndefined);
         }
@@ -138,7 +139,7 @@ void Enable(Arguments args) {
     if (args.size() == 1) {
         uint32_t index{0};
         for (const auto kOutput : ::ltc::kOutputs) {
-            if (::ltc::output::Destination::Instance().IsEnabled(kOutput)) {
+            if (Destination::Instance().IsEnabled(kOutput)) {
                 printf("[%.2u] %s\n", static_cast<unsigned>(index), ::ltc::kOutputPretty[index]);
             }
             index++;
@@ -160,7 +161,7 @@ void Enable(Arguments args) {
         return;
     }
 
-    ::ltc::output::Destination::Instance().Enable(static_cast<::ltc::Output>(1U << *kValue));
+    Destination::Instance().Enable(static_cast<::ltc::Output>(1U << *kValue));
     uart0::Printf("Enabled: %s\n\n", ::ltc::kOutputPretty[*kValue]);
 }
 
@@ -168,7 +169,7 @@ void Disable(Arguments args) {
     if (args.size() == 1) {
         uint32_t index{0};
         for (const auto kOutput : ::ltc::kOutputs) {
-            if (::ltc::output::Destination::Instance().IsDisabled(kOutput)) {
+            if (Destination::Instance().IsDisabled(kOutput)) {
                 printf("[%.2u] %s\n", static_cast<unsigned>(index), ::ltc::kOutputPretty[index]);
             }
             index++;
@@ -190,7 +191,7 @@ void Disable(Arguments args) {
         return;
     }
 
-    ::ltc::output::Destination::Instance().Disable(static_cast<::ltc::Output>(1U << *kValue));
+    Destination::Instance().Disable(static_cast<::ltc::Output>(1U << *kValue));
     uart0::Printf("Disabled: %s\n\n", ::ltc::kOutputPretty[*kValue]);
 }
 

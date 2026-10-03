@@ -60,7 +60,7 @@ DEFINES+=DEBUG_LTC_TIMER3
 
 #DEFINES+=NDEBUG
 
-SRCDIR=firmware lib lib/gps lib/pixel lib/midi/net lib/midi/usbd lib/ltc lib/ltc/display lib/ltc/systime lib/tcnet lib/ltc/network lib/shell
+SRCDIR=firmware lib lib/gps lib/pixel lib/midi/net lib/midi/usbd lib/ltc lib/ltc/display lib/ltc/systime lib/tcnet lib/network lib/ltc/network lib/shell
 
 LIBS=
 
