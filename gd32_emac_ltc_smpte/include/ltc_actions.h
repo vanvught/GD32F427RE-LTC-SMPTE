@@ -30,6 +30,10 @@
 
 namespace ltc::actions {
 void HandleAction(std::string_view action);
+bool SetType(std::string_view type);
+void SetStart(std::string_view start);
+void SetStop(std::string_view stop);
+void SetDirection(std::string_view direction);
 
 namespace udp {
 void Start();

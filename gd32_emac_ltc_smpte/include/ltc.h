@@ -218,7 +218,10 @@ static_assert(AreUniqueOutputBits(kOutputs), "Output contains overlapping values
 inline Input InputFromName(std::string_view name) {
     uint32_t index = 0;
 
+    	printf("%.*s [%d]\n", static_cast<int>(name.size()), name.data(),  static_cast<int>(name.size()));
+
     for (const auto* input : kInput) {
+        puts(input);
         if (name == input) {
             return static_cast<Input>(index);
         }

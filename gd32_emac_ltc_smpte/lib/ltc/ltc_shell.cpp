@@ -26,6 +26,7 @@
 #include <cstdint>
 
 #include "gnss.h"
+#include "ltc_commands.h"
 #include "shell.h"
 #include "common/utils/utils_string.h"
 #include "input/ltc_input.h"
@@ -104,12 +105,12 @@ void Intensity(Arguments args) {
 
 void Gps(Arguments args) {
     if (args.size() == 2) {
-        if (args[1] == "start") {
+        if (args[1] == ::ltc::commands::kStart) {
             ::ltc::gps::Start();
             return;
         }
 
-        if (args[1] == "stop") {
+        if (args[1] == ::ltc::commands::kStop) {
             ::ltc::gps::Stop();
             return;
         }

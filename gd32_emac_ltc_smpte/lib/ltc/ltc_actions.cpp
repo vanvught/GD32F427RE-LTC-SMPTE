@@ -41,20 +41,7 @@ using ::ltc::output::Destination;
 
 namespace ltc::actions {
 namespace {
-void SetEnable(std::string_view enable) {
-    const auto kEnable = ltc::OutputFromName(enable);
-    Destination::Instance().Enable(kEnable);
-}
-
-void SetDisable(std::string_view disable) {
-    const auto kDisable = ltc::OutputFromName(disable);
-    Destination::Instance().Disable(kDisable);
-}
-
-void SetSource(std::string_view source) {
-    const auto kInput = ::ltc::InputFromName(source);
-    ::ltc::input::Source::Instance().Select(kInput);
-}
+} // namespace
 
 bool SetType(std::string_view type) {
     const auto kValue = common::Atoi(type.data(), type.size());
@@ -98,7 +85,10 @@ void SetStart(std::string_view start) {
                 break;
             case Input::kApplemidi:
             case Input::kUsbmidi:
+                break;
             case Input::kSystime:
+                input::systime::Start();
+                break;
             case Input::kEtc:
             case Input::kUndefined:
                 break;
@@ -129,6 +119,8 @@ void SetStop(std::string_view stop) {
             case Input::kApplemidi:
             case Input::kUsbmidi:
             case Input::kSystime:
+                input::systime::Stop();
+                break;
             case Input::kEtc:
             case Input::kUndefined:
                 break;
@@ -158,14 +150,14 @@ void SetDirection(std::string_view direction) {
 
     LTC_DEBUG_EXIT();
 }
-} // namespace
 
 void HandleAction(std::string_view action) {
     if (action.starts_with(ltc::commands::kSource)) {
         action.remove_prefix(ltc::commands::kSource.size());
 
         if (!action.empty()) {
-            SetSource(action);
+            const auto kInput = ::ltc::InputFromName(action);
+            ::ltc::input::Source::Instance().Select(kInput);
         }
         return;
     }
@@ -179,6 +171,15 @@ void HandleAction(std::string_view action) {
         return;
     }
 
+	if (action.starts_with(ltc::commands::kType)) {
+	    action.remove_prefix(ltc::commands::kType.size());
+
+	    if (action.size() == 2) {
+	        SetType(action);
+	    }
+	    return;
+	}
+    
     if (action.starts_with(ltc::commands::kStart)) {
         action.remove_prefix(ltc::commands::kStart.size());
         SetStart(action);
@@ -199,20 +200,22 @@ void HandleAction(std::string_view action) {
 
     if (action.starts_with(ltc::commands::kEnable)) {
         action.remove_prefix(ltc::commands::kEnable.size());
-        SetEnable(action);
+        const auto kEnable = ltc::OutputFromName(action);
+        Destination::Instance().Enable(kEnable);
         return;
     }
 
     if (action.starts_with(ltc::commands::kDisable)) {
         action.remove_prefix(ltc::commands::kDisable.size());
-        SetDisable(action);
+        const auto kDisable = ltc::OutputFromName(action);
+        Destination::Instance().Disable(kDisable);
         return;
     }
 }
 
 namespace udp {
 namespace {
-int32_t handle = -1;
+int32_t handle{-1};
 
 void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_ip, [[maybe_unused]] uint16_t from_port) {
     assert(buffer != nullptr);
