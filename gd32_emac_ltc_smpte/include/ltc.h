@@ -219,7 +219,6 @@ inline Input InputFromName(std::string_view name) {
     uint32_t index = 0;
 
     for (const auto* input : kInput) {
-        puts(input);
         if (name == input) {
             return static_cast<Input>(index);
         }
