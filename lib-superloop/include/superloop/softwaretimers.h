@@ -1,0 +1,49 @@
+/**
+ * @file softwaretimers.h
+ *
+ */
+/* Copyright (C) 2024-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+#ifndef SUPERLOOP_SOFTWARETIMERS_H_
+#define SUPERLOOP_SOFTWARETIMERS_H_
+
+#include <cstdint>
+
+static constexpr uint32_t kSoftwareTimersMax =
+#if defined(CONFIG_HAL_TIMERS_COUNT)
+    CONFIG_HAL_TIMERS_COUNT;
+#else
+    12;
+#endif
+
+using TimerHandle_t = int32_t;
+using TimerCallbackFunction_t = void (*)(TimerHandle_t);
+
+inline constexpr TimerHandle_t kTimerIdNone = -1;
+
+TimerHandle_t SoftwareTimerAdd(uint32_t interval_millis, TimerCallbackFunction_t k_callback_function);
+bool SoftwareTimerDelete(TimerHandle_t& handle);
+bool SoftwareTimerChange(TimerHandle_t handle, uint32_t interval_millis);
+
+void SoftwareTimerRun();
+
+#endif  // SUPERLOOP_SOFTWARETIMERS_H_

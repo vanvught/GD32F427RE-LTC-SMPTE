@@ -1,0 +1,86 @@
+{
+  "0414": {
+    "identifiers": {
+      "3RCB": {
+        "series": "GD32F103",
+        "flash": {
+          "256": "GD32F103XCXX"
+        }
+      },
+      "3RCF": {
+        "series": "GD32F303",
+        "flash": {
+          "256": "GD32F303XCXX"
+        }
+      },
+      "3VCF": {
+        "series": "GD32F303",
+        "flash": {
+          "256": "GD32F303XCXX"
+        }
+      },
+      "3VEF": {
+        "series": "GD32F303",
+        "flash": {
+          "512": "GD32F303XEXX"
+        }
+      }
+    }
+  },
+  "0418": {
+    "identifiers": {
+      "7RCB": {
+        "series": "GD32F107",
+        "flash": {
+          "256": "GD32F107XCXX"
+        }
+      },
+      "7VCC": {
+        "series": "GD32F207",
+        "flash": {
+          "256": "GD32F207XCXX"
+        }
+      },
+      "7RGC": {
+        "series": "GD32F207",
+        "flash": {
+          "1024": "GD32F207XGXX"
+        }
+      }
+    }
+  },
+  "0419": {
+    "identifiers": {
+      "7REE": {
+        "series": "GD32F407",
+        "flash": {
+          "512": "GD32F407XEXX"
+        }
+      },
+      "9VEE": {
+        "series": "GD32F450",
+        "flash": {
+          "512": "GD32F450XEXX"
+        }
+      },
+      "9VGE": {
+        "series": "GD32F450",
+        "flash": {
+          "1024": "GD32F450XGXX"
+        }
+      },
+      "9VIE": {
+        "series": "GD32F450",
+        "flash": {
+          "2048": "GD32F450XIXX"
+        }
+      },
+      "0VGN": {
+        "series": "GD32F470",
+        "flash": {
+          "1024": "GD32F470VGXX"
+        }
+      }
+    }
+  }
+}

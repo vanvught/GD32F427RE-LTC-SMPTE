@@ -1,0 +1,68 @@
+/**
+ * @file emac_phy.cpp
+ *
+ */
+/* Copyright (C) 2023-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+ 
+ #ifndef ENET_LINK_CHECK_REG_POLL
+ #error Register poll must be enabled 
+ #endif // ENET_LINK_CHECK_REG_POLL
+ 
+ #if defined(ENET_LINK_CHECK_USE_INT) || defined(ENET_LINK_CHECK_USE_PIN_POLL)
+ #error Not supported with the standard external PHY board
+ #endif // defined(ENET_LINK_CHECK_USE_INT) || defined(ENET_LINK_CHECK_USE_PIN_POLL)
+
+#include <cstdint>
+
+#include "emac/emac_phy.h"
+#include "emac/emac_debug.h"
+
+#ifndef BIT
+#define BIT(x) static_cast<uint16_t>(1U << (x))
+#endif // BIT
+
+namespace emac::phy {
+void CustomizedLed() {
+    EMAC_PHY_DEBUG_ENTRY();
+
+    EMAC_PHY_DEBUG_EXIT();
+}
+
+void CustomizedTiming() {
+    EMAC_PHY_DEBUG_ENTRY();
+
+    EMAC_PHY_DEBUG_EXIT();
+}
+
+// PHY SPECIAL CONTROL/STATUS REGISTER Index (In Decimal): 31
+
+void CustomizedStatus(emac::phy::Status& phy_status) {
+    phy_status.link = emac::phy::GetLink(kAddress);
+
+    uint16_t value;
+    phy::Read(emac::phy::kAddress, 0x1f, value);
+
+    phy_status.duplex = ((value & BIT(4)) == BIT(4)) ? phy::Duplex::kDuplexFull : phy::Duplex::kDuplexHalf;
+    phy_status.speed = ((value & BIT(2)) == BIT(2)) ? phy::Speed::kSpeed10 : phy::Speed::kSpeed100;
+    phy_status.autonegotiation = ((value & BIT(12)) == BIT(12));
+}
+} // namespace emac::phy
