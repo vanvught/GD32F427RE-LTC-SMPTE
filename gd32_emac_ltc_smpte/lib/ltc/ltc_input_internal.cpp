@@ -24,6 +24,7 @@
 */
 
 #include <cstdint>
+#include <string_view>
 
 #include "ltc.h"
 #include "ltc_timecode.h"
@@ -31,6 +32,7 @@
 #include "ltc_debug.h"
 #include "input/ltc_input_internal.h"
 #include "input/ltc_input.h"
+#include "common/utils/utils_print.h"
 
 namespace ltc::global {
 extern volatile bool timecode_available;
@@ -47,6 +49,8 @@ uint32_t pitch_ticker{0};
 uint32_t pitch_previous{0};
 float pitch_control{0};
 auto is_started{false};
+
+constexpr std::string_view kErrorInput{"kInput != Input::kInternal"};
 
 bool PitchControl() {
     const auto kPitch = static_cast<uint32_t>(pitch_control * static_cast<float>(pitch_ticker)); // / 100;
@@ -122,6 +126,7 @@ void SetRunning(const ::ltc::TimeCode& timecode) {
     const auto kInput = ::ltc::input::Source::Instance().Input();
 
     if (kInput != Input::kInternal) {
+        ERROR(kErrorInput);
         return;
     }
 
@@ -141,6 +146,7 @@ void SetForward(uint32_t seconds) {
     const auto kInput = ::ltc::input::Source::Instance().Input();
 
     if (kInput != Input::kInternal) {
+        ERROR(kErrorInput);
         return;
     }
 
@@ -158,6 +164,7 @@ void SetBackward([[maybe_unused]] uint32_t seconds) {
     const auto kInput = ::ltc::input::Source::Instance().Input();
 
     if (kInput != Input::kInternal) {
+        ERROR(kErrorInput);
         return;
     }
 
