@@ -84,9 +84,6 @@ void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_
 
     if (request.starts_with(commands::kType)) {
         request.remove_prefix(commands::kType.size());
-        if (request.size() != 2) {
-            return;
-        }
         ltc::actions::SetType(request);
         return;
     }

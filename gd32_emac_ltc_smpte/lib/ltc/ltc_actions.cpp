@@ -43,32 +43,44 @@ using ::ltc::output::Destination;
 namespace ltc::actions {
 namespace {} // namespace
 
-bool SetType(std::string_view type) {
+void SetType(std::string_view type) {
     if (type.size() != 2) {
-        return false;
+        return;
     }
 
+    auto is_valid{false};
     const auto kValue = common::Atoi(type.data(), type.size());
 
     switch (kValue) {
         case 24:
             Destination::Instance().SetType(::ltc::Type::kFilm);
-            return true;
+            is_valid = true;
+            break;
 
         case 25:
             Destination::Instance().SetType(::ltc::Type::kEbu);
-            return true;
+            is_valid = true;
+            break;
 
         case 29:
             Destination::Instance().SetType(::ltc::Type::kDf);
-            return true;
+            is_valid = true;
+            break;
 
         case 30:
             Destination::Instance().SetType(::ltc::Type::kSmpte);
-            return true;
+            is_valid = true;
+            break;
 
         default:
-            return false;
+            is_valid = false;
+    }
+
+    if (is_valid) {
+        const auto kInput = ::ltc::input::Source::Instance().Input();
+        if ((kInput == Input::kInternal) || (kInput == Input::kSystime)) {
+            Destination::Instance().DisplayType(Destination::Instance().Type());
+        }
     }
 }
 
@@ -194,7 +206,6 @@ void SetStart(std::string_view start) {
         }
 
         if (set) {
-            printf("Set: %u:%u:%u.%u\n", static_cast<unsigned>(timecode.hours), static_cast<unsigned>(timecode.minutes), static_cast<unsigned>(timecode.seconds), static_cast<unsigned>(timecode.frames));
             input::internal::SetStart(timecode);
             return;
         }
@@ -213,7 +224,6 @@ void SetStart(std::string_view start) {
         }
 
         if (running) {
-            printf("Running: %u:%u:%u.%u\n", static_cast<unsigned>(timecode.hours), static_cast<unsigned>(timecode.minutes), static_cast<unsigned>(timecode.seconds), static_cast<unsigned>(timecode.frames));
             input::internal::SetRunning(timecode);
             return;
         }
@@ -324,14 +334,7 @@ void HandleAction(std::string_view action) {
 
     if (action.starts_with(ltc::commands::kType)) {
         action.remove_prefix(ltc::commands::kType.size());
-
-        if (SetType(action)) {
-            const auto kInput = ::ltc::input::Source::Instance().Input();
-            if ((kInput == Input::kInternal) || (kInput == Input::kSystime)) {
-                Destination::Instance().DisplayType(Destination::Instance().Type());
-            }
-        }
-
+        SetType(action);
         return;
     }
 
