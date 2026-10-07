@@ -65,6 +65,32 @@ inline int32_t Atoi(const char* buffer, uint32_t size) {
     return sign * result;
 }
 
+inline int32_t Atoi(std::string_view value) {
+    int32_t sign = 1;
+    int32_t result = 0;
+
+    if (value.empty()) {
+        return 0;
+    }
+
+    if (value.front() == '-') {
+        sign = -1;
+        value.remove_prefix(1);
+    } else if (value.front() == '+') {
+        value.remove_prefix(1);
+    }
+
+    for (const auto kCh : value) {
+        if ((kCh < '0') || (kCh > '9')) {
+            break;
+        }
+
+        result = (result * 10) + (kCh - '0');
+    }
+
+    return sign * result;
+}
+
 inline float Atof(const char* buffer, uint32_t size) {
     const char* p = buffer;
     float sign = 1.0F;
