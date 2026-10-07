@@ -51,8 +51,10 @@ class Node : input::Source {
         gnss::Receiver::Instance().SetDate(static_cast<uint32_t>(_TIME_STAMP_YEAR_), static_cast<uint32_t>(_TIME_STAMP_MONTH_), static_cast<uint32_t>(_TIME_STAMP_DAY_));
         gnss::Receiver::Instance().SetModule(gnss::Module::kUbloxNeo);
         // Internal
-        input::internal::SetStart(::ltc::TimeCode{.frames = 0, .seconds = 0, .minutes = 0, .hours = 0, .type = 0});
-        input::internal::SetStop(::ltc::TimeCode{.frames = 0, .seconds = 0, .minutes = 0, .hours = 1, .type = 0});
+        input::internal::SetStart(::ltc::TimeCode{.frames = 0, .seconds = 0, .minutes = 0, .hours = 0, .type = 1});
+        input::internal::SetStop(::ltc::TimeCode{.frames = 0, .seconds = 0, .minutes = 0, .hours = 1, .type = 1});
+        //
+        output::Destination::Instance().SetType(::ltc::Type::kSmpte); 
         // Human readable UDP messages
         ltc::actions::udp::Start();
         // OSC Server

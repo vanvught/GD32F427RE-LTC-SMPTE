@@ -80,7 +80,7 @@ constexpr auto MakeCommandTable() {
     };
 
     table[::ltc::Input::kInternal] = {
-        .start = ::ltc::input::internal::Start,
+        .start = ::ltc::input::internal::StartInit,
         .stop = ::ltc::input::internal::Stop,
     };
 
@@ -141,7 +141,12 @@ class Source : public output::Destination {
             }
 
             output::Destination::Update(kInput);
-            output::Destination::Reset();
+
+            if ((kInput == ::ltc::Input::kInternal) || (kInput == ::ltc::Input::kSystime)) {
+                output::Destination::Reset(output::Destination::Type());
+            } else {
+                output::Destination::Reset(::ltc::Type::kUnknown);
+            }
 
             entry_new.start();
             input_ = kInput;

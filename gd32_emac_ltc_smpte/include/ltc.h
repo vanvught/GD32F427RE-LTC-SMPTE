@@ -28,7 +28,6 @@
 
 #include <cstdint>
 #include <string_view>
-#include <cstdio>
 
 #include "common/utils/utils_string.h"
 

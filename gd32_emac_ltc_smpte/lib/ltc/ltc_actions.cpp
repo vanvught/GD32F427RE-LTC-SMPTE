@@ -27,6 +27,7 @@
 #include <string_view>
 
 #include "ltc_actions.h"
+#include "common/utils/utils_string.h"
 #include "input/ltc_input.h"
 #include "input/ltc_input_internal.h"
 #include "ltc.h"
@@ -40,10 +41,13 @@
 using ::ltc::output::Destination;
 
 namespace ltc::actions {
-namespace {
-} // namespace
+namespace {} // namespace
 
 bool SetType(std::string_view type) {
+    if (type.size() != 2) {
+        return false;
+    }
+
     const auto kValue = common::Atoi(type.data(), type.size());
 
     switch (kValue) {
@@ -68,12 +72,83 @@ bool SetType(std::string_view type) {
     }
 }
 
+bool Parse(std::string_view timecode_sv, const char delimiters[3], ltc::TimeCode& timecode) {
+    if (timecode_sv.size() != ltc::timecode::kCodeMaxLength) {
+        return false;
+    }
+
+    const auto* const kPlaceholderHours = timecode_sv.data();
+    const auto kHours = common::Atoi(kPlaceholderHours, 2);
+    if ((kHours < 0) || (kHours >= 24)) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(2);
+
+    if (!timecode_sv.starts_with(delimiters[0])) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(1);
+
+    const auto* const kPlaceholderMinutes = timecode_sv.data();
+    const auto kMinutes = common::Atoi(kPlaceholderMinutes, 2);
+    if ((kMinutes < 0) || (kMinutes >= 60)) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(2);
+
+    if (!timecode_sv.starts_with(delimiters[1])) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(1);
+
+    const auto* const kPlaceholderSeconds = timecode_sv.data();
+    const auto kSeconds = common::Atoi(kPlaceholderSeconds, 2);
+    if ((kSeconds < 0) || (kSeconds >= 60)) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(2);
+
+    if (!timecode_sv.starts_with(delimiters[2])) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(1);
+
+    const auto* const kPlaceholderFrames = timecode_sv.data();
+    const auto kFrames = common::Atoi(kPlaceholderFrames, 2);
+    if ((kFrames < 0) || (kFrames >= 30)) {
+        return false;
+    }
+
+    timecode.hours = static_cast<uint8_t>(kHours);
+    timecode.minutes = static_cast<uint8_t>(kMinutes);
+    timecode.seconds = static_cast<uint8_t>(kSeconds);
+    timecode.frames = static_cast<uint8_t>(kFrames);
+
+    return true;
+}
+
+bool ParseUdp(std::string_view timecode_sv, ltc::TimeCode& timecode) {
+    constexpr char kDelimiters[] = {':', ':', '.'};
+    return Parse(timecode_sv, kDelimiters, timecode);
+}
+
+bool ParseOsc(std::string_view timecode_sv, ltc::TimeCode& timecode) {
+    constexpr char kDelimiters[] = {'/', '/', '/'};
+    return Parse(timecode_sv, kDelimiters, timecode);
+}
+
 void SetStart(std::string_view start) {
     LTC_DEBUG_ENTRY();
 
-    if (start.empty()) {
-        const auto kInput = ::ltc::input::Source::Instance().Input();
+    const auto kInput = ::ltc::input::Source::Instance().Input();
 
+    if (start.empty()) {
         switch (kInput) {
             case Input::kLtc:
             case Input::kArtnet:
@@ -96,6 +171,52 @@ void SetStart(std::string_view start) {
 
         LTC_DEBUG_EXIT();
         return;
+    }
+
+    if (kInput != Input::kInternal) {
+        return;
+    }
+
+    ltc::TimeCode timecode{};
+    printf("%.*s\n", static_cast<int>(start.size()), start.data());
+
+    {
+        auto set{false};
+
+        if (start.starts_with(commands::udp::kSet)) {
+            start.remove_prefix(commands::udp::kSet.size());
+            set = ParseUdp(start, timecode);
+        }
+
+        if (start.starts_with(commands::osc::kSet)) {
+            start.remove_prefix(commands::osc::kSet.size());
+            set = ParseOsc(start, timecode);
+        }
+
+        if (set) {
+            printf("Set: %u:%u:%u.%u\n", static_cast<unsigned>(timecode.hours), static_cast<unsigned>(timecode.minutes), static_cast<unsigned>(timecode.seconds), static_cast<unsigned>(timecode.frames));
+            input::internal::SetStart(timecode);
+            return;
+        }
+    }
+    {
+        auto running{false};
+
+        if (start.starts_with(commands::udp::kRunning)) {
+            start.remove_prefix(commands::udp::kRunning.size());
+            running = ParseUdp(start, timecode);
+        }
+
+        if (start.starts_with(commands::osc::kRunning)) {
+            start.remove_prefix(commands::osc::kRunning.size());
+            running = ParseOsc(start, timecode);
+        }
+
+        if (running) {
+            printf("Running: %u:%u:%u.%u\n", static_cast<unsigned>(timecode.hours), static_cast<unsigned>(timecode.minutes), static_cast<unsigned>(timecode.seconds), static_cast<unsigned>(timecode.frames));
+            input::internal::SetRunning(timecode);
+            return;
+        }
     }
 
     LTC_DEBUG_EXIT();
@@ -121,6 +242,36 @@ void SetStop(std::string_view stop) {
             case Input::kSystime:
                 input::systime::Stop();
                 break;
+            case Input::kEtc:
+            case Input::kUndefined:
+                break;
+        }
+
+        LTC_DEBUG_EXIT();
+        return;
+    }
+
+    LTC_DEBUG_EXIT();
+}
+
+void SetResume(std::string_view resume) {
+    LTC_DEBUG_ENTRY();
+
+    if (resume.empty()) {
+        const auto kInput = ::ltc::input::Source::Instance().Input();
+
+        switch (kInput) {
+            case Input::kLtc:
+            case Input::kArtnet:
+            case Input::kMidi:
+            case Input::kTcnet:
+                break;
+            case Input::kInternal:
+                input::internal::Resume();
+                break;
+            case Input::kApplemidi:
+            case Input::kUsbmidi:
+            case Input::kSystime:
             case Input::kEtc:
             case Input::kUndefined:
                 break;
@@ -171,15 +322,19 @@ void HandleAction(std::string_view action) {
         return;
     }
 
-	if (action.starts_with(ltc::commands::kType)) {
-	    action.remove_prefix(ltc::commands::kType.size());
+    if (action.starts_with(ltc::commands::kType)) {
+        action.remove_prefix(ltc::commands::kType.size());
 
-	    if (action.size() == 2) {
-	        SetType(action);
-	    }
-	    return;
-	}
-    
+        if (SetType(action)) {
+            const auto kInput = ::ltc::input::Source::Instance().Input();
+            if ((kInput == Input::kInternal) || (kInput == Input::kSystime)) {
+                Destination::Instance().DisplayType(Destination::Instance().Type());
+            }
+        }
+
+        return;
+    }
+
     if (action.starts_with(ltc::commands::kStart)) {
         action.remove_prefix(ltc::commands::kStart.size());
         SetStart(action);
@@ -189,6 +344,12 @@ void HandleAction(std::string_view action) {
     if (action.starts_with(ltc::commands::kStop)) {
         action.remove_prefix(ltc::commands::kStop.size());
         SetStop(action);
+        return;
+    }
+
+    if (action.starts_with(ltc::commands::kResume)) {
+        action.remove_prefix(ltc::commands::kResume.size());
+        SetResume(action);
         return;
     }
 

@@ -29,15 +29,16 @@
 #include "ltc.h"
 
 namespace ltc::input::internal {
+void StartInit();
 void Start();
 void Stop();
+void Resume();
 void Run();
 //
-void SetStart();
-void SetStop();
-void SetResume();
 void SetStart(const ::ltc::TimeCode& timecode);
 void SetStop(const ::ltc::TimeCode& timecode);
+void SetRunning(const ::ltc::TimeCode& timecode);
+void SetGoto(const ::ltc::TimeCode& timecode);
 } // namespace ltc::input::internal
 
 #endif // INPUT_LTC_INPUT_INTERNAL_H_

@@ -47,7 +47,6 @@
 #include "board_statusled.h"
 #include "firmware/debug/debug_printbits.h"
 #include "ltc_debug.h"
-#include "usb/usbd/midi/usbd_midi.h"
 
 namespace ltc::global {
 extern ::ltc::TimeCode timecode_running;
@@ -230,7 +229,7 @@ class Destination {
         LTC_OUTPUT_DEBUG_EXIT();
     }
 
-    void SetType(::ltc::Type type);
+    void SetType(::ltc::Type type) const;
     [[nodiscard]] ::ltc::Type Type() const;
 
     void SetUtcOffset(int32_t hours, uint32_t minutes) {
@@ -256,12 +255,8 @@ class Destination {
         DistributeInternal(timecode);
     }
 
-    void DisplayType() const {
+    void DisplayType(const ::ltc::Type kType) const {
         LTC_OUTPUT_DEBUG_ENTRY();
-
-        const auto kType = static_cast<::ltc::Type>(global::timecode_running.type);
-
-        LTC_OUTPUT_DEBUG_PRINTF("global::timecode.type=%u", static_cast<unsigned>(kType));
 
         if (IsEnabled(::ltc::Output::kDisplayOled)) {
             Display::Get()->TextLine(2, ::ltc::TypeToName(kType), kTypeMaxNameLength - 1);
@@ -270,11 +265,11 @@ class Destination {
         LTC_OUTPUT_DEBUG_EXIT();
     }
 
-    void Reset() {
+    void Reset(const ::ltc::Type kType) {
         LTC_OUTPUT_DEBUG_ENTRY();
 
         DisplayTimecodeInit();
-        DisplayType();
+        DisplayType(kType);
 
         if (IsEnabled(::ltc::Output::kDisplayOled)) {
             Display::Get()->TextLine(1, timecode_, timecode::kCodeMaxLength);

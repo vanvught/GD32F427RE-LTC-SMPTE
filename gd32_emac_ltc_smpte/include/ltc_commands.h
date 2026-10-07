@@ -51,6 +51,15 @@ inline constexpr std::string_view kContinue{"continue"};
 // TCNet
 inline constexpr std::string_view kLayer{"layer#"};
 inline constexpr std::string_view kTimecode{"timecode#"};
+
+namespace udp {
+inline constexpr std::string_view kSet{"#"};
+inline constexpr std::string_view kRunning{"!"};
+}
+namespace osc {
+inline constexpr std::string_view kSet{"/set/"};
+inline constexpr std::string_view kRunning{"/"};
+}
 } // namespace ltc::commands
 
 #endif // LTC_COMMANDS_H_

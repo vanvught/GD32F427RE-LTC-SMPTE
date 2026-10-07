@@ -276,7 +276,7 @@ void Destination::StartEnabled() {
     LTC_OUTPUT_DEBUG_EXIT();
 }
 
-void Destination::SetType(::ltc::Type type) {
+void Destination::SetType(::ltc::Type type) const {
     LTC_OUTPUT_DEBUG_ENTRY();
     LTC_OUTPUT_DEBUG_PRINTF("type=%u", static_cast<unsigned>(type));
 
@@ -456,7 +456,7 @@ void Destination::DistributeInternal(const ::ltc::TimeCode* timecode) {
 
         timecode_[::ltc::timecode::index::kColon3] = (timecode->type != static_cast<uint8_t>(::ltc::Type::kDf) ? ':' : ';');
 
-        DisplayType();
+        DisplayType(static_cast<::ltc::Type>(timecode->type));
     }
 
     if (midi_quarter_frame_piece_running) {

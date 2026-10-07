@@ -27,6 +27,7 @@
 #include "ltc_timecode.h"
 #include "output/ltc_output.h"
 #include "ltc_debug.h"
+#include "input/ltc_input_internal.h"
 
 namespace ltc::global {
 extern volatile bool timecode_available;
@@ -95,49 +96,60 @@ void Backward() {
         }
     }
 }
+
+void Copy(::ltc::TimeCode& timecode_to, const ::ltc::TimeCode& timecode_from) {
+    const auto kFps = TimeCodeConst::kFps[static_cast<uint32_t>(global::timecode_running.type)];
+
+    if (timecode_from.frames >= kFps) {
+        timecode_to.frames = kFps - 1;
+    } else {
+        timecode_to.frames = timecode_from.frames;
+    }
+
+    timecode_to.seconds = timecode_from.seconds;
+    timecode_to.minutes = timecode_from.minutes;
+    timecode_to.hours = timecode_from.hours;
+}
+
 } // namespace
 
-void SetStart() {
-    LTC_INPUT_DEBUG_ENTRY();
-
-    is_started = true;
-
-    LTC_INPUT_DEBUG_EXIT();
-}
-
-void SetStop() {
-    LTC_INPUT_DEBUG_ENTRY();
-
-    is_started = false;
-
-    LTC_INPUT_DEBUG_EXIT();
-}
-
 void SetStart(const ::ltc::TimeCode& timecode) {
-    // TODO (AvV) Validation
-    memcpy(&timecode_start, &timecode, sizeof(struct ltc::TimeCode));
+    Copy(timecode_start, timecode);
+
+    if (!is_started) {
+        StartInit();
+    }
 }
 void SetStop(const ::ltc::TimeCode& timecode) {
-    // TODO (AvV) Validation
-    memcpy(&timecode_stop, &timecode, sizeof(struct ltc::TimeCode));
+    Copy(timecode_stop, timecode);
+}
+
+void SetRunning(const ::ltc::TimeCode& timecode) {
+    Copy(global::timecode_running, timecode);
+}
+
+void StartInit() {
+    LTC_INPUT_DEBUG_ENTRY();
+
+    SetRunning(timecode_start);
+
+//    ltc::output::Destination::Instance().SetType(static_cast<::ltc::Type>(timecode_start.type));
+    ltc::output::Destination::Instance().Distribute(&ltc::global::timecode_running);
+
+    LTC_INPUT_DEBUG_EXIT();
 }
 
 void Start() {
     LTC_INPUT_DEBUG_ENTRY();
 
-    memcpy(&global::timecode_running, &timecode_start, sizeof(struct ltc::TimeCode));
+    StartInit();
+    is_started = true;
 
-    const auto kFps = TimeCodeConst::kFps[static_cast<uint32_t>(global::timecode_running.type)];
+    LTC_INPUT_DEBUG_EXIT();
+}
 
-    if (timecode_start.frames >= kFps) {
-        timecode_start.frames = kFps - 1;
-    }
-
-    if (timecode_stop.frames >= kFps) {
-        timecode_stop.frames = kFps - 1;
-    }
-
-    ltc::output::Destination::Instance().SetType(static_cast<::ltc::Type>(timecode_start.type));
+void Resume() {
+    LTC_INPUT_DEBUG_ENTRY();
 
     is_started = true;
 
