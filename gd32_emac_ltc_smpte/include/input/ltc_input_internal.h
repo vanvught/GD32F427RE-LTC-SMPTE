@@ -47,6 +47,7 @@ void SetGoto(const ::ltc::TimeCode& timecode);
 void SetDirection(Direction direction);
 void SetForward(uint32_t seconds);
 void SetBackward(uint32_t seconds);
+void SetPitch(float pitch);
 } // namespace ltc::input::internal
 
 #endif // INPUT_LTC_INPUT_INTERNAL_H_

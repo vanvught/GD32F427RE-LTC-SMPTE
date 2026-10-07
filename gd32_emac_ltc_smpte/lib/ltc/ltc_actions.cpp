@@ -132,6 +132,17 @@ void HandleSkip(Skip skip, std::string_view skip_sv) {
         SetSkip(skip, static_cast<uint32_t>(kSeconds));
     }
 }
+
+void HandlePitch(std::string_view pitch) {
+    if (pitch.empty() || pitch.size() > 4) {
+        return;
+    }
+
+    const auto kPitch = common::Atoi(pitch);
+    if ((kPitch >= -100) && (kPitch <= 100)) {
+        SetPitch(static_cast<float>(kPitch) / 100U);
+    }
+}
 } // namespace
 
 void SetType(std::string_view type) {
@@ -332,6 +343,16 @@ void SetSkip(Skip skip, uint32_t seconds) {
     ltc::input::internal::SetBackward(seconds);
 }
 
+void SetPitch(float pitch) {
+    const auto kInput = ::ltc::input::Source::Instance().Input();
+
+    if (kInput != Input::kInternal) {
+        return;
+    }
+
+    ltc::input::internal::SetPitch(pitch);
+}
+
 void HandleAction(std::string_view action) {
     if (action.starts_with(ltc::commands::kSource)) {
         action.remove_prefix(ltc::commands::kSource.size());
@@ -345,10 +366,7 @@ void HandleAction(std::string_view action) {
 
     if (action.starts_with(ltc::commands::kRate)) {
         action.remove_prefix(ltc::commands::kRate.size());
-
-        if (action.size() == 2) {
-            SetType(action);
-        }
+        SetType(action);
         return;
     }
 
@@ -385,6 +403,12 @@ void HandleAction(std::string_view action) {
     if (action.starts_with(ltc::commands::kBackward)) {
         action.remove_prefix(ltc::commands::kBackward.size());
         HandleSkip(Skip::kBackward, action);
+        return;
+    }
+
+    if (action.starts_with(ltc::commands::kPitch)) {
+        action.remove_prefix(ltc::commands::kPitch.size());
+        HandlePitch(action);
         return;
     }
 

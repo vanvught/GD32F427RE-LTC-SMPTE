@@ -39,6 +39,7 @@ void SetDirection(std::string_view direction);
 
 enum class Skip { kForward = 0, kBackward = 1 };
 void SetSkip(Skip skip, uint32_t seconds);
+void SetPitch(float pitch);
 
 namespace udp {
 void Start();

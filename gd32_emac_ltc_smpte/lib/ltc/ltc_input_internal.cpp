@@ -44,7 +44,7 @@ TimeCode timecode_start{};
 TimeCode timecode_stop{};
 
 auto direction{input::internal::Direction::kForward};
-auto pitch{Pitch::kNormal};
+auto pitch_type{Pitch::kNormal};
 uint32_t pitch_ticker{0};
 uint32_t pitch_previous{0};
 float pitch_control{0};
@@ -63,10 +63,10 @@ bool PitchControl() {
 }
 
 void Forward() {
-    if (pitch == Pitch::kNormal) {
+    if (pitch_type == Pitch::kNormal) {
         timecode::Increment();
     } else {
-        if (pitch == Pitch::kFaster) {
+        if (pitch_type == Pitch::kFaster) {
             timecode::Increment();
             if (PitchControl()) {
                 timecode::Increment();
@@ -80,10 +80,10 @@ void Forward() {
 }
 
 void Backward() {
-    if (pitch == Pitch::kNormal) {
+    if (pitch_type == Pitch::kNormal) {
         timecode::Decrement();
     } else {
-        if (pitch == Pitch::kFaster) {
+        if (pitch_type == Pitch::kFaster) {
             timecode::Decrement();
             if (PitchControl()) {
                 timecode::Decrement();
@@ -160,7 +160,7 @@ void SetForward(uint32_t seconds) {
     }
 }
 
-void SetBackward([[maybe_unused]] uint32_t seconds) {
+void SetBackward(uint32_t seconds) {
     const auto kInput = ::ltc::input::Source::Instance().Input();
 
     if (kInput != Input::kInternal) {
@@ -178,6 +178,22 @@ void SetBackward([[maybe_unused]] uint32_t seconds) {
     if (!is_started) {
         output::Destination::Instance().Distribute(&global::timecode_running);
     }
+}
+
+void SetPitch(float pitch) {
+    if (pitch < 0) {
+        pitch_type = Pitch::kSlower;
+        pitch_control = -pitch;
+    } else if (pitch == 0) {
+        pitch_type = Pitch::kNormal;
+        return;
+    } else {
+        pitch_type = Pitch::kFaster;
+        pitch_control = pitch;
+    }
+
+    pitch_previous = 0;
+    pitch_ticker = 1;
 }
 
 void StartInit() {
