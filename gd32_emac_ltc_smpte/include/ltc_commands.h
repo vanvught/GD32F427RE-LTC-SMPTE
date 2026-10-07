@@ -55,11 +55,13 @@ inline constexpr std::string_view kTimecode{"timecode#"};
 namespace udp {
 inline constexpr std::string_view kSet{"#"};
 inline constexpr std::string_view kRunning{"!"};
-}
+inline constexpr std::string_view kGoto{"@"};
+} // namespace udp
 namespace osc {
 inline constexpr std::string_view kSet{"/set/"};
 inline constexpr std::string_view kRunning{"/"};
-}
+inline constexpr std::string_view kGoto{"goto/"};
+} // namespace osc
 } // namespace ltc::commands
 
 #endif // LTC_COMMANDS_H_

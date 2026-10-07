@@ -105,9 +105,14 @@ inline void Decrement() {
     // Drop-frame handling...
 }
 
-inline uint32_t ToFrames(const TimeCode& timecode) {
-    const auto kFps = TimeCodeConst::kFps[timecode.type];
+inline uint32_t ToSeconds(const TimeCode& timecode) {
     const auto kSeconds = (static_cast<uint32_t>(timecode.hours) * 60U * 60U) + (static_cast<uint32_t>(timecode.minutes) * 60U) + static_cast<uint32_t>(timecode.seconds);
+    return kSeconds;
+}
+
+inline uint32_t ToFrames(const TimeCode& timecode) {
+    const auto kSeconds = ToSeconds(timecode);
+    const auto kFps = TimeCodeConst::kFps[timecode.type];
     return (kSeconds * kFps) + timecode.frames;
 }
 
@@ -145,8 +150,8 @@ inline void Sync(const timeval& time_val) {
         Set(kSeconds, static_cast<uint32_t>(time_val.tv_usec), static_cast<ltc::Type>(kType));
     }
 
- //   printf("reference=%u running=%u difference=%d, TIMER_CNT(TIMER3)=%u, TIMER_CNT(TIMER0)=%u, TIMER_CNT(TIMER10)=%u\n", static_cast<unsigned>(kReference), static_cast<unsigned>(kRunning), static_cast<unsigned>(kDifference),
- //          static_cast<unsigned>(TIMER_CNT(TIMER3)), static_cast<unsigned>(TIMER_CNT(TIMER0)), static_cast<unsigned>(TIMER_CNT(TIMER10)));
+    //   printf("reference=%u running=%u difference=%d, TIMER_CNT(TIMER3)=%u, TIMER_CNT(TIMER0)=%u, TIMER_CNT(TIMER10)=%u\n", static_cast<unsigned>(kReference), static_cast<unsigned>(kRunning), static_cast<unsigned>(kDifference),
+    //          static_cast<unsigned>(TIMER_CNT(TIMER3)), static_cast<unsigned>(TIMER_CNT(TIMER0)), static_cast<unsigned>(TIMER_CNT(TIMER10)));
 }
 
 inline void LocalTime(uint32_t& seconds, uint32_t& microseconds) {

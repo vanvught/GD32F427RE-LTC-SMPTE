@@ -36,6 +36,7 @@
 #include "ltc_udp_port.h"
 #include "input/ltc_input.h"
 #include "ltc_gps.h"
+#include "oscsimplemessage.h"
 
 using ::ltc::output::Destination;
 
@@ -51,8 +52,25 @@ inline constexpr std::string_view kSource{"source/"};
 inline constexpr std::string_view kType{"type/"};
 inline constexpr std::string_view kEnable{"enable/"};
 inline constexpr std::string_view kDisable{"disable/"};
+inline constexpr std::string_view kDirection{"direction/"};
+inline constexpr std::string_view kForward{"forward"};
+inline constexpr std::string_view kBackward{"backward"};
 inline constexpr std::string_view kGps{"gps/"};
+inline constexpr std::string_view kGoto{"goto"};
 } // namespace commands
+
+void HandleSkip(const uint8_t* buffer, uint32_t size, ltc::actions::Skip skip) {
+    OscSimpleMessage msg(buffer, size);
+
+    if (msg.GetType(0) != osc::type::kInt32) {
+        return;
+    }
+
+    const auto kValue = msg.GetInt(0);
+    if ((kValue > 0) && (kValue <= 99)) {
+        ltc::actions::SetSkip(skip, static_cast<uint32_t>(kValue));
+    }
+}
 
 void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_ip, [[maybe_unused]] uint16_t from_port) {
     assert(buffer != nullptr);
@@ -94,12 +112,39 @@ void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_
         return;
     }
 
+    if (request.starts_with(commands::kGoto)) {
+        ltc::actions::SetStart(request);
+        return;
+    }
+
+    if (request.starts_with(commands::kDirection)) {
+        request.remove_prefix(commands::kDirection.size());
+        ltc::actions::SetDirection(request);
+        return;
+    }
+
+    if (request.starts_with(commands::kForward)) {
+        HandleSkip(buffer, size, ltc::actions::Skip::kForward);
+        return;
+    }
+
+    if (request.starts_with(commands::kBackward)) {
+        HandleSkip(buffer, size, ltc::actions::Skip::kBackward);
+        return;
+    }
+
     if (request.starts_with(ltc::commands::kStop)) {
         request.remove_prefix(ltc::commands::kStop.size());
         ltc::actions::SetStop(request);
         return;
     }
 
+	if (request.starts_with(ltc::commands::kResume)) {
+	    request.remove_prefix(ltc::commands::kResume.size());
+	    ltc::actions::SetResume(request);
+	    return;
+	}
+    
     if (request.starts_with(commands::kEnable)) {
         request.remove_prefix(commands::kEnable.size());
         const auto kEnable = ltc::OutputFromName(request);
@@ -123,10 +168,10 @@ void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_
             ::ltc::gps::Start();
             return;
         }
-		if (request == ltc::commands::kStop) {
-		    ::ltc::gps::Stop();
-		    return;
-		}
+        if (request == ltc::commands::kStop) {
+            ::ltc::gps::Stop();
+            return;
+        }
     }
 }
 

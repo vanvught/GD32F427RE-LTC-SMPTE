@@ -148,8 +148,8 @@ class Source : public output::Destination {
                 output::Destination::Reset(::ltc::Type::kUnknown);
             }
 
-            entry_new.start();
             input_ = kInput;
+            entry_new.start();
 
             DisplayInput();
         }

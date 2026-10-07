@@ -53,9 +53,6 @@ extern ::ltc::TimeCode timecode_running;
 } // namespace ltc::global
 
 namespace ltc::output {
-enum class Direction { kForward, kBackward };
-enum class Pitch { kNormal, kFaster, kSlower };
-
 struct Entry {
     void (*start)();
     void (*stop)();
@@ -322,9 +319,6 @@ class Destination {
     int32_t utc_offset_{0};
 
     char timecode_[timecode::kCodeMaxLength];
-
-    Direction direction_{Direction::kForward};
-    Pitch pitch_{Pitch::kNormal};
 
     inline static Destination* s_this;
 };

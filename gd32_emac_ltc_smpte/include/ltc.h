@@ -285,10 +285,13 @@ inline Output OutputFromName(std::string_view name) {
 void ConvertToString(const struct TimeCode* ltc_timecode, char* timecode);
 
 namespace timecode {
-inline constexpr auto kCodeMaxLength = 11;
-inline constexpr auto kTypeMaxLength = 11;
-inline constexpr auto kRateMaxLength = 2;
-inline constexpr auto kSystimeMaxLength = kCodeMaxLength;
+inline constexpr uint32_t kCodeMaxLength = 11;
+inline constexpr uint32_t kTypeMaxLength = 11;
+inline constexpr uint32_t kRateMaxLength = 2;
+inline constexpr uint32_t kSystimeMaxLength = kCodeMaxLength;
+inline constexpr uint32_t kMaxSeconds = (((23 * 60) + 59) * 60) + 59;
+static constexpr uint32_t kSecondsPerDay = 24U * 60U * 60U;
+
 
 namespace index {
 inline constexpr auto kHours = 0;

@@ -32,7 +32,6 @@
 #include "input/ltc_input_internal.h"
 #include "ltc.h"
 #include "output/ltc_output.h"
-#include "output/ltc_output_internal.h"
 #include "ltc_commands.h"
 #include "ltc_debug.h"
 #include "ltc_udp_port.h"
@@ -41,7 +40,99 @@
 using ::ltc::output::Destination;
 
 namespace ltc::actions {
-namespace {} // namespace
+namespace {
+bool Parse(std::string_view timecode_sv, const char delimiters[3], ltc::TimeCode& timecode) {
+    if (timecode_sv.size() != ltc::timecode::kCodeMaxLength) {
+        return false;
+    }
+
+    const auto kHours = common::Atoi(timecode_sv.substr(0, 2));
+    if ((kHours < 0) || (kHours >= 24)) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(2);
+
+    if (!timecode_sv.starts_with(delimiters[0])) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(1);
+
+    const auto kMinutes = common::Atoi(timecode_sv.substr(0, 2));
+    if ((kMinutes < 0) || (kMinutes >= 60)) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(2);
+
+    if (!timecode_sv.starts_with(delimiters[1])) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(1);
+
+    const auto kSeconds = common::Atoi(timecode_sv.substr(0, 2));
+    if ((kSeconds < 0) || (kSeconds >= 60)) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(2);
+
+    if (!timecode_sv.starts_with(delimiters[2])) {
+        return false;
+    }
+
+    timecode_sv.remove_prefix(1);
+
+    const auto kFrames = common::Atoi(timecode_sv.substr(0, 2));
+    if ((kFrames < 0) || (kFrames >= 30)) {
+        return false;
+    }
+
+    timecode.hours = static_cast<uint8_t>(kHours);
+    timecode.minutes = static_cast<uint8_t>(kMinutes);
+    timecode.seconds = static_cast<uint8_t>(kSeconds);
+    timecode.frames = static_cast<uint8_t>(kFrames);
+
+    return true;
+}
+
+bool ParseUdp(std::string_view timecode_sv, ltc::TimeCode& timecode) {
+    constexpr char kDelimiters[] = {':', ':', '.'};
+    return Parse(timecode_sv, kDelimiters, timecode);
+}
+
+bool ParseOsc(std::string_view timecode_sv, ltc::TimeCode& timecode) {
+    constexpr char kDelimiters[] = {'/', '/', '/'};
+    return Parse(timecode_sv, kDelimiters, timecode);
+}
+
+bool ParseCommand(std::string_view command, std::string_view udp_prefix, std::string_view osc_prefix, ltc::TimeCode& timecode) {
+    if (command.starts_with(udp_prefix)) {
+        command.remove_prefix(udp_prefix.size());
+        return ParseUdp(command, timecode);
+    }
+
+    if (command.starts_with(osc_prefix)) {
+        command.remove_prefix(osc_prefix.size());
+        return ParseOsc(command, timecode);
+    }
+
+    return false;
+}
+
+void HandleSkip(Skip skip, std::string_view skip_sv) {
+    if (skip_sv.empty() || skip_sv.size() > 2) {
+        return;
+    }
+
+    const auto kSeconds = common::Atoi(skip_sv);
+    if (kSeconds > 0) {
+        SetSkip(skip, static_cast<uint32_t>(kSeconds));
+    }
+}
+} // namespace
 
 void SetType(std::string_view type) {
     if (type.size() != 2) {
@@ -73,7 +164,7 @@ void SetType(std::string_view type) {
             break;
 
         default:
-            is_valid = false;
+            break;
     }
 
     if (is_valid) {
@@ -84,80 +175,7 @@ void SetType(std::string_view type) {
     }
 }
 
-bool Parse(std::string_view timecode_sv, const char delimiters[3], ltc::TimeCode& timecode) {
-    if (timecode_sv.size() != ltc::timecode::kCodeMaxLength) {
-        return false;
-    }
-
-    const auto* const kPlaceholderHours = timecode_sv.data();
-    const auto kHours = common::Atoi(kPlaceholderHours, 2);
-    if ((kHours < 0) || (kHours >= 24)) {
-        return false;
-    }
-
-    timecode_sv.remove_prefix(2);
-
-    if (!timecode_sv.starts_with(delimiters[0])) {
-        return false;
-    }
-
-    timecode_sv.remove_prefix(1);
-
-    const auto* const kPlaceholderMinutes = timecode_sv.data();
-    const auto kMinutes = common::Atoi(kPlaceholderMinutes, 2);
-    if ((kMinutes < 0) || (kMinutes >= 60)) {
-        return false;
-    }
-
-    timecode_sv.remove_prefix(2);
-
-    if (!timecode_sv.starts_with(delimiters[1])) {
-        return false;
-    }
-
-    timecode_sv.remove_prefix(1);
-
-    const auto* const kPlaceholderSeconds = timecode_sv.data();
-    const auto kSeconds = common::Atoi(kPlaceholderSeconds, 2);
-    if ((kSeconds < 0) || (kSeconds >= 60)) {
-        return false;
-    }
-
-    timecode_sv.remove_prefix(2);
-
-    if (!timecode_sv.starts_with(delimiters[2])) {
-        return false;
-    }
-
-    timecode_sv.remove_prefix(1);
-
-    const auto* const kPlaceholderFrames = timecode_sv.data();
-    const auto kFrames = common::Atoi(kPlaceholderFrames, 2);
-    if ((kFrames < 0) || (kFrames >= 30)) {
-        return false;
-    }
-
-    timecode.hours = static_cast<uint8_t>(kHours);
-    timecode.minutes = static_cast<uint8_t>(kMinutes);
-    timecode.seconds = static_cast<uint8_t>(kSeconds);
-    timecode.frames = static_cast<uint8_t>(kFrames);
-
-    return true;
-}
-
-bool ParseUdp(std::string_view timecode_sv, ltc::TimeCode& timecode) {
-    constexpr char kDelimiters[] = {':', ':', '.'};
-    return Parse(timecode_sv, kDelimiters, timecode);
-}
-
-bool ParseOsc(std::string_view timecode_sv, ltc::TimeCode& timecode) {
-    constexpr char kDelimiters[] = {'/', '/', '/'};
-    return Parse(timecode_sv, kDelimiters, timecode);
-}
-
 void SetStart(std::string_view start) {
-    LTC_DEBUG_ENTRY();
-
     const auto kInput = ::ltc::input::Source::Instance().Input();
 
     if (start.empty()) {
@@ -181,7 +199,6 @@ void SetStart(std::string_view start) {
                 break;
         }
 
-        LTC_DEBUG_EXIT();
         return;
     }
 
@@ -190,54 +207,27 @@ void SetStart(std::string_view start) {
     }
 
     ltc::TimeCode timecode{};
-    printf("%.*s\n", static_cast<int>(start.size()), start.data());
+    LTC_DEBUG_PRINTF("%.*s", static_cast<int>(start.size()), start.data());
 
-    {
-        auto set{false};
-
-        if (start.starts_with(commands::udp::kSet)) {
-            start.remove_prefix(commands::udp::kSet.size());
-            set = ParseUdp(start, timecode);
-        }
-
-        if (start.starts_with(commands::osc::kSet)) {
-            start.remove_prefix(commands::osc::kSet.size());
-            set = ParseOsc(start, timecode);
-        }
-
-        if (set) {
-            input::internal::SetStart(timecode);
-            return;
-        }
-    }
-    {
-        auto running{false};
-
-        if (start.starts_with(commands::udp::kRunning)) {
-            start.remove_prefix(commands::udp::kRunning.size());
-            running = ParseUdp(start, timecode);
-        }
-
-        if (start.starts_with(commands::osc::kRunning)) {
-            start.remove_prefix(commands::osc::kRunning.size());
-            running = ParseOsc(start, timecode);
-        }
-
-        if (running) {
-            input::internal::SetRunning(timecode);
-            return;
-        }
+    if (ParseCommand(start, commands::udp::kSet, commands::osc::kSet, timecode)) {
+        input::internal::SetStart(timecode);
+        return;
     }
 
-    LTC_DEBUG_EXIT();
+    if (ParseCommand(start, commands::udp::kGoto, commands::osc::kGoto, timecode)) {
+        input::internal::SetGoto(timecode);
+        return;
+    }
+
+    if (ParseCommand(start, commands::udp::kRunning, commands::osc::kRunning, timecode)) {
+        input::internal::SetRunning(timecode);
+    }
 }
 
 void SetStop(std::string_view stop) {
-    LTC_DEBUG_ENTRY();
+    const auto kInput = ::ltc::input::Source::Instance().Input();
 
     if (stop.empty()) {
-        const auto kInput = ::ltc::input::Source::Instance().Input();
-
         switch (kInput) {
             case Input::kLtc:
             case Input::kArtnet:
@@ -257,16 +247,32 @@ void SetStop(std::string_view stop) {
                 break;
         }
 
-        LTC_DEBUG_EXIT();
         return;
     }
 
-    LTC_DEBUG_EXIT();
+    if (kInput != Input::kInternal) {
+        return;
+    }
+
+    ltc::TimeCode timecode{};
+    auto set{false};
+
+    if (stop.starts_with(commands::udp::kSet)) {
+        stop.remove_prefix(commands::udp::kSet.size());
+        set = ParseUdp(stop, timecode);
+    }
+
+    if (stop.starts_with(commands::osc::kSet)) {
+        stop.remove_prefix(commands::osc::kSet.size());
+        set = ParseOsc(stop, timecode);
+    }
+
+    if (set) {
+        input::internal::SetStop(timecode);
+    }
 }
 
 void SetResume(std::string_view resume) {
-    LTC_DEBUG_ENTRY();
-
     if (resume.empty()) {
         const auto kInput = ::ltc::input::Source::Instance().Input();
 
@@ -287,29 +293,43 @@ void SetResume(std::string_view resume) {
                 break;
         }
 
-        LTC_DEBUG_EXIT();
         return;
     }
-
-    LTC_DEBUG_EXIT();
 }
 
 void SetDirection(std::string_view direction) {
-    LTC_DEBUG_ENTRY();
+    const auto kInput = ::ltc::input::Source::Instance().Input();
+
+    if (kInput != Input::kInternal) {
+        return;
+    }
 
     if (direction == ltc::commands::kDirectionForward) {
-        ltc::output::internal::SetDirection(::ltc::output::Direction::kForward);
+        input::internal::SetDirection(input::internal::Direction::kForward);
         LTC_DEBUG_EXIT();
         return;
     }
 
     if (direction == ltc::commands::kDirectionBackward) {
-        ltc::output::internal::SetDirection(::ltc::output::Direction::kBackward);
+        input::internal::SetDirection(input::internal::Direction::kBackward);
         LTC_DEBUG_EXIT();
         return;
     }
+}
 
-    LTC_DEBUG_EXIT();
+void SetSkip(Skip skip, uint32_t seconds) {
+    const auto kInput = ::ltc::input::Source::Instance().Input();
+
+    if (kInput != Input::kInternal) {
+        return;
+    }
+
+    if (skip == ltc::actions::Skip::kForward) {
+        ltc::input::internal::SetForward(seconds);
+        return;
+    }
+
+    ltc::input::internal::SetBackward(seconds);
 }
 
 void HandleAction(std::string_view action) {
@@ -353,6 +373,18 @@ void HandleAction(std::string_view action) {
     if (action.starts_with(ltc::commands::kResume)) {
         action.remove_prefix(ltc::commands::kResume.size());
         SetResume(action);
+        return;
+    }
+
+    if (action.starts_with(ltc::commands::kForward)) {
+        action.remove_prefix(ltc::commands::kForward.size());
+        HandleSkip(Skip::kForward, action);
+        return;
+    }
+
+    if (action.starts_with(ltc::commands::kBackward)) {
+        action.remove_prefix(ltc::commands::kBackward.size());
+        HandleSkip(Skip::kBackward, action);
         return;
     }
 

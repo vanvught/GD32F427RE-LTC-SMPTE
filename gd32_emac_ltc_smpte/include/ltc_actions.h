@@ -26,6 +26,7 @@
 #ifndef LTC_ACTIONS_H_
 #define LTC_ACTIONS_H_
 
+#include <cstdint>
 #include <string_view>
 
 namespace ltc::actions {
@@ -33,7 +34,11 @@ void HandleAction(std::string_view action);
 void SetType(std::string_view type);
 void SetStart(std::string_view start);
 void SetStop(std::string_view stop);
+void SetResume(std::string_view resume);
 void SetDirection(std::string_view direction);
+
+enum class Skip { kForward = 0, kBackward = 1 };
+void SetSkip(Skip skip, uint32_t seconds);
 
 namespace udp {
 void Start();

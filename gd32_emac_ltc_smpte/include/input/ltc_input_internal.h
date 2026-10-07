@@ -26,9 +26,14 @@
 #ifndef INPUT_LTC_INPUT_INTERNAL_H_
 #define INPUT_LTC_INPUT_INTERNAL_H_
 
+#include <cstdint>
+
 #include "ltc.h"
 
 namespace ltc::input::internal {
+enum class Direction { kForward, kBackward };
+enum class Pitch { kNormal, kFaster, kSlower };
+
 void StartInit();
 void Start();
 void Stop();
@@ -39,6 +44,9 @@ void SetStart(const ::ltc::TimeCode& timecode);
 void SetStop(const ::ltc::TimeCode& timecode);
 void SetRunning(const ::ltc::TimeCode& timecode);
 void SetGoto(const ::ltc::TimeCode& timecode);
+void SetDirection(Direction direction);
+void SetForward(uint32_t seconds);
+void SetBackward(uint32_t seconds);
 } // namespace ltc::input::internal
 
 #endif // INPUT_LTC_INPUT_INTERNAL_H_

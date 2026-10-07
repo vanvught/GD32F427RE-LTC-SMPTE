@@ -23,31 +23,26 @@
 * THE SOFTWARE.
 */
 
+#include <cstdint>
+
 #include "ltc.h"
 #include "ltc_timecode.h"
 #include "output/ltc_output.h"
 #include "ltc_debug.h"
 #include "input/ltc_input_internal.h"
+#include "input/ltc_input.h"
 
 namespace ltc::global {
 extern volatile bool timecode_available;
 } // namespace ltc::global
 
-namespace ltc::output::internal {
-namespace {
-auto direction{output::Direction::kForward};
-}
-void SetDirection(::ltc::output::Direction dir) {
-    direction = dir;
-}
-} // namespace ltc::output::internal
-
 namespace ltc::input::internal {
 namespace {
-ltc::TimeCode timecode_start{};
-ltc::TimeCode timecode_stop{};
+TimeCode timecode_start{};
+TimeCode timecode_stop{};
 
-auto pitch{ltc::output::Pitch::kNormal};
+auto direction{input::internal::Direction::kForward};
+auto pitch{Pitch::kNormal};
 uint32_t pitch_ticker{0};
 uint32_t pitch_previous{0};
 float pitch_control{0};
@@ -64,34 +59,34 @@ bool PitchControl() {
 }
 
 void Forward() {
-    if (pitch == ltc::output::Pitch::kNormal) {
-        ltc::timecode::Increment();
+    if (pitch == Pitch::kNormal) {
+        timecode::Increment();
     } else {
-        if (pitch == ltc::output::Pitch::kFaster) {
-            ltc::timecode::Increment();
+        if (pitch == Pitch::kFaster) {
+            timecode::Increment();
             if (PitchControl()) {
-                ltc::timecode::Increment();
+                timecode::Increment();
             }
         } else {
             if (!PitchControl()) {
-                ltc::timecode::Increment();
+                timecode::Increment();
             }
         }
     }
 }
 
 void Backward() {
-    if (pitch == ltc::output::Pitch::kNormal) {
-        ltc::timecode::Decrement();
+    if (pitch == Pitch::kNormal) {
+        timecode::Decrement();
     } else {
-        if (pitch == ltc::output::Pitch::kFaster) {
-            ltc::timecode::Decrement();
+        if (pitch == Pitch::kFaster) {
+            timecode::Decrement();
             if (PitchControl()) {
-                ltc::timecode::Decrement();
+                timecode::Decrement();
             }
         } else {
             if (!PitchControl()) {
-                ltc::timecode::Decrement();
+                timecode::Decrement();
             }
         }
     }
@@ -110,7 +105,6 @@ void Copy(::ltc::TimeCode& timecode_to, const ::ltc::TimeCode& timecode_from) {
     timecode_to.minutes = timecode_from.minutes;
     timecode_to.hours = timecode_from.hours;
 }
-
 } // namespace
 
 void SetStart(const ::ltc::TimeCode& timecode) {
@@ -125,7 +119,58 @@ void SetStop(const ::ltc::TimeCode& timecode) {
 }
 
 void SetRunning(const ::ltc::TimeCode& timecode) {
+    const auto kInput = ::ltc::input::Source::Instance().Input();
+
+    if (kInput != Input::kInternal) {
+        return;
+    }
+
     Copy(global::timecode_running, timecode);
+}
+
+void SetGoto(const ::ltc::TimeCode& timecode) {
+    is_started = false;
+    SetStart(timecode);
+}
+
+void SetDirection(input::internal::Direction dir) {
+    direction = dir;
+}
+
+void SetForward(uint32_t seconds) {
+    const auto kInput = ::ltc::input::Source::Instance().Input();
+
+    if (kInput != Input::kInternal) {
+        return;
+    }
+
+    const auto kSecondsCurrent = timecode::ToSeconds(global::timecode_running);
+    const auto kSecondsNew = kSecondsCurrent + seconds;
+
+    timecode::Set(kSecondsNew % timecode::kSecondsPerDay, 0, output::Destination::Instance().Type());
+
+    if (!is_started) {
+        output::Destination::Instance().Distribute(&global::timecode_running);
+    }
+}
+
+void SetBackward([[maybe_unused]] uint32_t seconds) {
+    const auto kInput = ::ltc::input::Source::Instance().Input();
+
+    if (kInput != Input::kInternal) {
+        return;
+    }
+
+    const auto kSecondsCurrent = timecode::ToSeconds(global::timecode_running);
+
+    if (kSecondsCurrent >= seconds) {
+        timecode::Set(kSecondsCurrent - seconds, 0, output::Destination::Instance().Type());
+    } else {
+        timecode::Set(timecode::kSecondsPerDay - (seconds - kSecondsCurrent), 0, output::Destination::Instance().Type());
+    }
+    if (!is_started) {
+        output::Destination::Instance().Distribute(&global::timecode_running);
+    }
 }
 
 void StartInit() {
@@ -133,8 +178,7 @@ void StartInit() {
 
     SetRunning(timecode_start);
 
-//    ltc::output::Destination::Instance().SetType(static_cast<::ltc::Type>(timecode_start.type));
-    ltc::output::Destination::Instance().Distribute(&ltc::global::timecode_running);
+    output::Destination::Instance().Distribute(&global::timecode_running);
 
     LTC_INPUT_DEBUG_EXIT();
 }
@@ -169,15 +213,15 @@ void Run() {
         return;
     }
 
-    if (!ltc::global::timecode_available) {
+    if (!global::timecode_available) {
         return;
     }
 
-    ltc::global::timecode_available = false;
+    global::timecode_available = false;
 
-    ltc::output::Destination::Instance().Distribute(&ltc::global::timecode_running);
+    output::Destination::Instance().Distribute(&global::timecode_running);
 
-    if (output::internal::direction == ltc::output::Direction::kForward) {
+    if (direction == Direction::kForward) {
         Forward();
     } else {
         Backward();
