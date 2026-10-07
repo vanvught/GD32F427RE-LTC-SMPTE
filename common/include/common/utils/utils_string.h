@@ -27,24 +27,17 @@
 #define COMMON_UTILS_UTILS_STRING_H_
 
 #include <cstdint>
+#include <string_view>
 
 namespace common {
 inline constexpr char kWarning[] = "Warning";
 inline constexpr char kError[] = "Error";
 inline constexpr char kSuccess[] = "Success";
-inline constexpr char kUnknown[] = "Unknown"; 
+inline constexpr char kUnknown[] = "Unknown";
 inline constexpr char kUndefined[] = "Undefined";
 
 constexpr const char* IsSuccess(bool is_success) {
-  return is_success ? kSuccess : kError;
-}
-
-constexpr uint32_t ConstStrLen(const char* str) {
-    uint32_t len = 0;
-    while (str[len] != '\0') {
-        ++len;
-    }
-    return len;
+    return is_success ? kSuccess : kError;
 }
 
 inline int32_t Atoi(const char* buffer, uint32_t size) {
