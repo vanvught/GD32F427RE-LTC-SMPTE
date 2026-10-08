@@ -1,7 +1,7 @@
 /**
  * @file rtpmidi.cpp
  */
-/* Copyright (C) 2019-2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -124,7 +124,6 @@ int32_t RtpMidi::DecodeMidi(uint32_t command_length, uint32_t offset) {
     }
 
     RTPMIDI_DEBUG_PRINTF("size=%d", static_cast<unsigned>(size));
-
 
     rtpmidi::MidiMessage(&message_);
     

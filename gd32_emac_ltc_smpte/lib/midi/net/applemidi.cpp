@@ -127,10 +127,10 @@ void AppleMidi::InputControlMessage(const uint8_t* buffer, uint32_t size, uint32
 
             APPLEMIDI_DEBUG_EXIT();
             return;
-        } else {
-            APPLEMIDI_DEBUG_EXIT();
-            return;
         }
+        
+        APPLEMIDI_DEBUG_EXIT();
+        return;
     }
 
     if (session_status_.session_state == applemidi::SessionState::kEstablished) {

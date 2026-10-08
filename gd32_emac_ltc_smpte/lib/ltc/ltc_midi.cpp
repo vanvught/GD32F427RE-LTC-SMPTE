@@ -580,61 +580,72 @@ void HandleDinMtc() {
     }
 }
 
-extern "C" void MIDI_UARTx_IRQHandler() {
-    if (RESET != usart_interrupt_flag_get(kUart, USART_INT_FLAG_RBNE)) {
-        const uint8_t kByte = gd32::UartGetRxData(kUart);
+extern "C" {
+void MIDI_UARTx_IRQHandler() {
+    if (SET != usart_interrupt_flag_get(kUart, USART_INT_FLAG_RBNE)) {
+        return;
+    }
 
-        // System Real-Time Override (0xF8 - 0xFF)
-        if (kByte >= std::to_underlying(midi::Type::kClock)) {
-            if (kByte == std::to_underlying(midi::Type::kSystemReset)) {
-                state = State::kIdle;
+    const uint8_t kByte = gd32::UartGetRxData(kUart);
+
+    // System Real-Time Override (0xF8 - 0xFF)
+    if (kByte >= std::to_underlying(midi::Type::kClock)) {
+        if (kByte == std::to_underlying(midi::Type::kClock)) {
+            uint32_t bpm;
+            if (CalculateBpm(timing::Micros(), bpm)) {
+                ltc::output::Destination::Instance().DisplayBpm(bpm);
             }
-            // Handle
+
             return;
         }
 
-        // Process Status Bytes (0x80 - 0xF7)
-        if (kByte >= std::to_underlying(midi::Type::kNoteOff)) {
-            if (kByte == std::to_underlying(midi::Type::kTimeCodeQuarterFrame)) {
-                state = State::kMtcQf;
-            } else if (kByte == std::to_underlying(midi::Type::kSystemExclusive)) {
-                state = State::kSysex;
-                sysex_count = 0;
-            } else if ((kByte == 0xF7) && (state == State::kSysex)) {
-                HandleDinMtc();
-                state = State::kIdle;
-            } else {
-                // Ignore Voice Channel messages (0x80-0xEF) or unsupported System Common strings
-                state = State::kIdle;
+        if (kByte == std::to_underlying(midi::Type::kSystemReset)) {
+            state = State::kIdle;
+        }
+
+        return;
+    }
+
+    // Process Status Bytes (0x80 - 0xF7)
+    if (kByte >= std::to_underlying(midi::Type::kNoteOff)) {
+        if (kByte == std::to_underlying(midi::Type::kTimeCodeQuarterFrame)) {
+            state = State::kMtcQf;
+        } else if (kByte == std::to_underlying(midi::Type::kSystemExclusive)) {
+            state = State::kSysex;
+            sysex_count = 0;
+        } else if ((kByte == 0xF7) && (state == State::kSysex)) {
+            HandleDinMtc();
+            state = State::kIdle;
+        } else {
+            // Ignore Voice Channel messages (0x80-0xEF) or unsupported System Common strings
+            state = State::kIdle;
+        }
+        return;
+    }
+
+    // Process Stream Data Bytes (0x00 - 0x7F)
+
+    switch (state) {
+        case State::kIdle:
+            break;
+        case State::kMtcQf:
+            ltc::input::mtc::HandleQuarterFrame(kByte);
+            state = State::kIdle; // QF is a single data byte message; clear state
+            break;
+
+        case State::kSysex:
+            if (sysex_count < kSysexBufferSize) {
+                sysex[sysex_count++] = kByte;
             }
-            return;
-        }
 
-        // Process Stream Data Bytes (0x00 - 0x7F)
+            break;
 
-        switch (state) {
-            case State::kIdle:
-                break;
-            case State::kMtcQf:
-                ltc::input::mtc::HandleQuarterFrame(kByte);
-                state = State::kIdle; // QF is a single data byte message; clear state
-                break;
-
-            case State::kSysex:
-                if (sysex_count < kSysexBufferSize) {
-                    sysex[sysex_count++] = kByte;
-                }
-
-                break;
-
-            default:
-                // Discard data payload bytes that belong to channel messages (0x80 - 0xEF)
-                break;
-        }
+        default:
+            // Discard data payload bytes that belong to channel messages (0x80 - 0xEF)
+            break;
     }
 }
 
-extern "C" {
 void TIMER0_UP_TIMER9_IRQHandler() {
     const auto kIntFlag = TIMER_INTF(TIMER9);
 
@@ -679,7 +690,12 @@ void MidiMessage(const struct midi::Message* message) {
             HandleAppleMtc(message);
             break;
 
-        case midi::Type::kClock:
+        case midi::Type::kClock: {
+            uint32_t bpm;
+            if (CalculateBpm(message->timestamp, bpm)) {
+                ltc::output::Destination::Instance().DisplayBpm(bpm);
+            }
+        } break;
         default:
             break;
     }
