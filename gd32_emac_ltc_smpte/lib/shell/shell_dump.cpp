@@ -37,7 +37,7 @@ constexpr std::string_view kUdp{"udp"};
 constexpr std::string_view kStack{"stack"};
 
 void Usage() {
-    uart0::Puts("dump udp");
+    uart0::Puts("dump udp|stack");
 }
 } // namespace
 
