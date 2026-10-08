@@ -277,6 +277,40 @@ class Destination {
         LTC_OUTPUT_DEBUG_EXIT();
     }
 
+    void DisplayBpm(uint32_t bpm) {
+        if (IsEnabled(::ltc::Output::kDisplayOled)) {
+            if ((bpm < ::midi::bpm::kMin) || (bpm > ::midi::bpm::kMax)) {
+                bpm_[0] = '-';
+                bpm_[1] = '-';
+                bpm_[2] = '-';
+            } else {
+                bpm_[2] = static_cast<char>((bpm % 10U) + '0');
+                bpm /= 10U;
+                const uint32_t kDigit1 = bpm % 10U;
+
+                if (bpm != 0) {
+                    bpm_[1] = static_cast<char>(kDigit1 + '0');
+                    bpm /= 10U;
+                    const uint32_t kDigit2 = bpm % 10U;
+
+                    if (bpm != 0) {
+                        bpm_[0] = static_cast<char>(kDigit2 + '0');
+                    } else {
+                        bpm_[0] = ' ';
+                    }
+                } else {
+                    bpm_[1] = ' ';
+                    bpm_[0] = ' ';
+                }
+            }
+
+            Display::Get()->SetCursorPos(static_cast<uint8_t>(Display::Get()->GetColumns() - 3U), 1);
+            Display::Get()->PutChar(bpm_[0]);
+            Display::Get()->PutChar(bpm_[1]);
+            Display::Get()->PutChar(bpm_[2]);
+        }
+    }
+
     void Reset(const ::ltc::Type kType) {
         LTC_OUTPUT_DEBUG_ENTRY();
 
@@ -334,6 +368,7 @@ class Destination {
     int32_t utc_offset_{0};
 
     char timecode_[timecode::kCodeMaxLength];
+    char bpm_[3];
 
     inline static Destination* s_this;
 };

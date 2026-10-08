@@ -33,6 +33,7 @@
 #include "ltc_commands.h"
 #include "midi.h"
 #include "net/rtpmidi.h"
+#include "timing.h"
 #include "usb/usbd/midi/usbd_midi.h"
 #include "gd32_uart.h"
 #include "ltc_timecode.h"
@@ -273,6 +274,53 @@ void DinUartInit() {
 
 void DinUartTransmit(const uint8_t* data, uint32_t length) {
     gd32::UartTransmit(kUart, data, length);
+}
+bool CalculateBpm(uint32_t timestamp, uint32_t& bpm) {
+    static uint32_t delta[24]{};
+    static uint32_t clock_counter{0};
+    static uint32_t previous{0};
+    static uint32_t timestamp_previous{0};
+    static bool initialized{false};
+
+    if (!initialized) {
+        timestamp_previous = timestamp;
+        initialized = true;
+        return false;
+    }
+
+    const auto kDelta = timestamp - timestamp_previous;
+    timestamp_previous = timestamp;
+
+    if (kDelta == 0) {
+        return false;
+    }
+
+    delta[clock_counter++] = kDelta;
+
+    if (clock_counter != 24) {
+        return false;
+    }
+
+    clock_counter = 0;
+
+    uint64_t delta_sum = 0;
+
+    for (const auto kDeltas : delta) {
+        delta_sum += kDeltas;
+    }
+
+    if (delta_sum != 0) {
+        bpm = static_cast<uint32_t>((60000000ULL + (delta_sum / 2)) / delta_sum);
+    } else {
+        bpm = 0;
+    }
+
+    if (bpm != previous) {
+        previous = bpm;
+        return true;
+    }
+
+    return false;
 }
 } // namespace
 
@@ -692,6 +740,15 @@ void HandleUsbMtc(const ::usbmidi::MidiEvent& event) {
         }
     }
 }
+
+void HandleSystemRealtime(const ::usbmidi::MidiEvent& event) {
+    if (event.midi[0] == std::to_underlying(::midi::Type::kClock)) {
+        uint32_t bpm;
+        if (CalculateBpm(timing::Micros(), bpm)) {
+            output::Destination::Instance().DisplayBpm(bpm);
+        }
+    }
+}
 } // namespace
 
 void Run() {
@@ -712,6 +769,10 @@ void Run() {
             case 0x06: // SysEx end, 2 bytes
             case 0x07: // SysEx end, 3 bytes
                 HandleUsbMtc(event);
+                break;
+
+            case 0x0F: // System real-time, 1 byte
+                HandleSystemRealtime(event);
                 break;
 
             default:
