@@ -35,13 +35,13 @@ inline constexpr std::string_view kEnable{"enable#"};
 inline constexpr std::string_view kDisable{"disable#"};
 inline constexpr std::string_view kStart{"start"};
 inline constexpr std::string_view kStop{"stop"};
-inline constexpr std::string_view kResume{"resume"};
 inline constexpr std::string_view kRate{"rate#"};
 inline constexpr std::string_view kType{"type#"};
-// Internal
+// Internal generator
 inline constexpr std::string_view kDirection{"direction#"};
 inline constexpr std::string_view kDirectionForward{"forward"};
 inline constexpr std::string_view kDirectionBackward{"backward"};
+inline constexpr std::string_view kResume{"resume"};
 inline constexpr std::string_view kPitch{"pitch#"};
 inline constexpr std::string_view kForward{"forward#"};
 inline constexpr std::string_view kBackward{"backward#"};

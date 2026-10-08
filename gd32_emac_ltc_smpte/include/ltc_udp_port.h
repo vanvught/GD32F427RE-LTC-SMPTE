@@ -31,6 +31,7 @@
 namespace ltc::udp::port {
 inline constexpr uint16_t kLtc = 0x5443;
 inline constexpr uint16_t kOsc = 8000;
+inline constexpr uint16_t kMidi = 0x4444;
 inline constexpr uint16_t kTCNet = 0x0ACA;
 } // namespace ltc::udp::port
 

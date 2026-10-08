@@ -59,6 +59,8 @@ inline constexpr std::string_view kBackward{"backward"};
 inline constexpr std::string_view kPitch{"pitch"};
 inline constexpr std::string_view kGps{"gps/"};
 inline constexpr std::string_view kGoto{"goto"};
+inline constexpr std::string_view kMidiBpm{"midi/bpm"};
+inline constexpr std::string_view kMidi{"midi/"}; // start, stop and continue
 } // namespace commands
 
 void HandleSkip(const uint8_t* buffer, uint32_t size, ltc::actions::Skip skip) {
@@ -85,6 +87,26 @@ void HandlePitch(const uint8_t* buffer, uint32_t size) {
     if ((kPitch >= -1.0F) && (kPitch <= 1.0F)) {
         ltc::actions::SetPitch(kPitch);
     }
+}
+
+void HandleMidiBpm(const uint8_t* buffer, uint32_t size) {
+    uint32_t bpm{0};
+
+    OscSimpleMessage msg(buffer, size);
+
+    if (msg.GetType(0) == osc::type::kFloat) {
+        const auto kValue = msg.GetFloat(0);
+        if (kValue >= 0) {
+            bpm = static_cast<uint32_t>(kValue);
+        }
+    } else if (msg.GetType(0) == osc::type::kInt32) {
+        const auto kValue = msg.GetInt(0);
+        if (kValue >= 0) {
+            bpm = static_cast<uint32_t>(kValue);
+        }
+    }
+
+    ltc::actions::midi::SetBpm(bpm);
 }
 
 void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_ip, [[maybe_unused]] uint16_t from_port) {
@@ -176,6 +198,18 @@ void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_
         request.remove_prefix(commands::kDisable.size());
         const auto kDisable = ltc::OutputFromName(request);
         Destination::Instance().Disable(kDisable);
+        return;
+    }
+
+    if (request.starts_with(commands::kMidiBpm)) {
+        request.remove_prefix(commands::kMidiBpm.size());
+        HandleMidiBpm(buffer, size);
+        return;
+    }
+
+    if (request.starts_with(commands::kMidi)) {
+        request.remove_prefix(commands::kMidi.size());
+        ltc::actions::midi::HandleAction(request);
         return;
     }
 

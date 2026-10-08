@@ -87,6 +87,7 @@ void HwClock(Arguments args);
 #endif // DISABLE_RTC
 namespace ltc {
 void Ltc(Arguments args);
+void Midi(Arguments args);
 void UtcOffset(Arguments args);
 void Intensity(Arguments args);
 void Gps(Arguments args);
@@ -102,7 +103,8 @@ inline constexpr Entry kCommandTable[] = {
 #ifndef DISABLE_RTC
     {.name = "hwclock", .function = HwClock}, //
 #endif
-    {.name = "ltc", .function = ltc::Ltc},           //
+    {.name = "ltc", .function = ltc::Ltc},             //
+    {.name = "midi", .function = ltc::Midi},           //
     {.name = "utc", .function = ltc::UtcOffset},       //
     {.name = "intensity", .function = ltc::Intensity}, //
     {.name = "gps", .function = ltc::Gps},             //

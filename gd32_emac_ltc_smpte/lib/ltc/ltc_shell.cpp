@@ -59,6 +59,15 @@ void Ltc(Arguments args) {
    	::ltc::actions::HandleAction(args[1]);
 }
 
+void Midi(Arguments args) {
+	if (args.size() != 2) {
+	    uart0::Puts(common::kUnknown);
+	    return;
+    }
+
+   	::ltc::actions::midi::HandleAction(args[1]);
+}
+
 void UtcOffset(Arguments args) {
     if (args.size() == 1) {
         const auto kSeconds = Destination::Instance().UtcOffset();

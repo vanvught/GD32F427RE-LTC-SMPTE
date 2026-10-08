@@ -266,21 +266,11 @@ void SetStop(std::string_view stop) {
     }
 
     ltc::TimeCode timecode{};
-    auto set{false};
 
-    if (stop.starts_with(commands::udp::kSet)) {
-        stop.remove_prefix(commands::udp::kSet.size());
-        set = ParseUdp(stop, timecode);
-    }
-
-    if (stop.starts_with(commands::osc::kSet)) {
-        stop.remove_prefix(commands::osc::kSet.size());
-        set = ParseOsc(stop, timecode);
-    }
-
-    if (set) {
-        input::internal::SetStop(timecode);
-    }
+	if (ParseCommand(stop, commands::udp::kSet, commands::osc::kSet, timecode)) {
+	    input::internal::SetStop(timecode);
+	    return;
+	}
 }
 
 void SetResume(std::string_view resume) {
@@ -443,7 +433,6 @@ void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_
     std::string_view request{reinterpret_cast<const char*>(buffer), size};
 
     if (!request.starts_with("ltc!")) {
-        LTC_DEBUG_EXIT();
         return;
     }
 

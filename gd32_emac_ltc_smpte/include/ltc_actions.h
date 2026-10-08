@@ -45,6 +45,11 @@ namespace udp {
 void Start();
 void Stop();
 } // namespace udp
+
+namespace midi {
+void HandleAction(std::string_view action);
+void SetBpm(uint32_t bpm);
+}
 } // namespace ltc::actions
 
 #endif // LTC_ACTIONS_H_
