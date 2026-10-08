@@ -85,6 +85,7 @@ void Date(Arguments args);
 #ifndef DISABLE_RTC
 void HwClock(Arguments args);
 #endif // DISABLE_RTC
+void Dump(Arguments args);
 namespace ltc {
 void Ltc(Arguments args);
 void Midi(Arguments args);
@@ -97,6 +98,7 @@ void TCNet(Arguments args);
 inline constexpr Entry kCommandTable[] = {
     {.name = "reboot", .function = Reboot},   //
     {.name = "version", .function = Version}, //
+    {.name = "dump", .function = Dump},       //
 #ifdef HAVE_TIMEOFDAY
     {.name = "date", .function = Date}, //
 #endif
