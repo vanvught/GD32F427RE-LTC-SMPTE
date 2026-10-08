@@ -28,10 +28,11 @@
 #include "firmware/firmwareversion.h"
 
 namespace shell {
-
-static void Usage() {
+namespace {
+void Usage() {
     uart0::Puts("version");
 }
+} // namespace
 
 void Version(Arguments args) {
     if (args.size() != 1) {

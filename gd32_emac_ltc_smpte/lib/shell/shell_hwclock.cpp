@@ -26,25 +26,25 @@
 #include <span>
 #include <string_view>
 
+#include "shell.h"
 #include "uart0.h"
 #include "hwclock.h"
 
 namespace shell {
 namespace {
 // Read the Hardware Clock and print the time.
-constexpr char kShow[] = "show";
+constexpr std::string_view kShow{"show"};
 // Set the System Time from the Hardware Clock.
-constexpr char kHcToSys[] = "hctosys";
-// systohc
+constexpr std::string_view kHcToSys{"hctosys"};
 // Set the Hardware Clock to the current System Time.
-constexpr char kSysToHc[] = "systohc";
-} // namespace
+constexpr std::string_view kSysToHc{"systohc"};
 
-static void Usage() {
+void Usage() {
     uart0::Puts("hwclock show|hctosys|systohc");
 }
+} // namespace
 
-void HwClock(std::span<const std::string_view> args) {
+void HwClock(Arguments args) {
     if (args.size() != 2) {
         Usage();
         return;
