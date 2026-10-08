@@ -32,6 +32,7 @@
 
 #include <cstdint>
 #include <cassert>
+#include <utility>
 
 #include "net/applemidi.h"
 #include "midi.h"
@@ -92,7 +93,10 @@ class RtpMidi final : public AppleMidi {
         Send(1);
     }
 
-    void TransmitRaw(midi::Type type) { TransmitRaw(static_cast<uint8_t>(type)); }
+    void TransmitRaw(midi::Type type) {
+        assert((type >= ::midi::Type::kClock) && (type <= ::midi::Type::kSystemReset));
+        TransmitRaw(std::to_underlying(type));
+    }
 
     void SendTimeCode(const midi::Timecode* timecode) {
         auto* data = &send_buffer_[rtpmidi::kCommandOffset + 1];

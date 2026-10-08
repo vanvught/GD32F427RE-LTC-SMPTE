@@ -37,6 +37,7 @@
 #include "ltc_display_pixel.h"
 #include "ltc_display_max7219.h"
 #include "ltc_display_oled.h"
+#include "midi.h"
 #include "output/ltc_output_artnet.h"
 #include "output/ltc_output_etc.h"
 #include "output/ltc_output_ltc.h"
@@ -250,6 +251,20 @@ class Destination {
         }
 
         DistributeInternal(timecode);
+    }
+
+    void MidiSend(::midi::Type type) const {
+        if (IsEnabled(::ltc::Output::kApplemidi)) {
+            ::ltc::output::applemidi::Output(type);
+        }
+
+        if (IsEnabled(::ltc::Output::kUsbmidi)) {
+            ::ltc::output::usbmidi::Output(type);
+        }
+
+        if (IsEnabled(::ltc::Output::kMidi)) {
+            ::ltc::output::midi::Output(type);
+        }
     }
 
     void DisplayType(const ::ltc::Type kType) const {

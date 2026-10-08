@@ -29,6 +29,8 @@
 
 #include "core/netif.h"
 #include "gd32f4xx.h"
+#include "gd32f4xx_timer.h"
+#include "ltc_commands.h"
 #include "midi.h"
 #include "net/rtpmidi.h"
 #include "usb/usbd/midi/usbd_midi.h"
@@ -37,11 +39,85 @@
 #include "output/ltc_output.h"
 #include "ltc_gpio_config.h"
 #include "ltc_debug.h"
-#include "firmware/debug/debug_dump.h"
+#include "ltc_udp_port.h"
+#include "network_udp.h"
+#include "ltc_actions.h"
 
 namespace ltc::global {
 extern volatile bool timecode_available;
 } // namespace ltc::global
+
+namespace ltc::actions::midi {
+namespace {
+void HandleBpm(std::string_view bpm_sv) {
+    if (bpm_sv.empty() || bpm_sv.size() > 3) {
+        return;
+    }
+
+    const auto kBpm = common::Atoi(bpm_sv);
+    if (kBpm >= 0) {
+        SetBpm(static_cast<uint32_t>(kBpm));
+    }
+}
+} // namespace
+
+uint32_t bpm_previous{0};
+
+void SetBpm(uint32_t bpm) {
+    if (bpm == bpm_previous) {
+        return;
+    }
+
+    if (bpm == 0) {
+        TIMER_CTL0(TIMER13) &= ~TIMER_CTL0_CEN;
+        bpm_previous = 0;
+        return;
+    }
+
+    if ((bpm < ::midi::bpm::kMin) || (bpm > ::midi::bpm::kMax)) {
+        return;
+    }
+
+    bpm_previous = bpm;
+
+    const auto kCar = ((25000U + (bpm / 2U)) / bpm) - 1U;
+
+    TIMER_CTL0(TIMER13) &= ~TIMER_CTL0_CEN;
+    TIMER_CAR(TIMER13) = kCar;
+    TIMER_CNT(TIMER13) = 0;
+
+    timer_interrupt_flag_clear(TIMER13, UINT32_MAX);
+    timer_interrupt_enable(TIMER13, TIMER_INT_UP);
+
+    TIMER_CTL0(TIMER13) |= TIMER_CTL0_CEN;
+}
+
+void HandleAction(std::string_view action) {
+    if (action.starts_with(ltc::commands::kStart)) {
+        action.remove_prefix(ltc::commands::kStart.size());
+        ltc::output::Destination::Instance().MidiSend(::midi::Type::kStart);
+        return;
+    }
+
+    if (action.starts_with(ltc::commands::kStop)) {
+        action.remove_prefix(ltc::commands::kStop.size());
+        ltc::output::Destination::Instance().MidiSend(::midi::Type::kStop);
+        return;
+    }
+
+    if (action.starts_with(ltc::commands::kContinue)) {
+        action.remove_prefix(ltc::commands::kContinue.size());
+        ltc::output::Destination::Instance().MidiSend(::midi::Type::kContinue);
+        return;
+    }
+
+    if (action.starts_with(ltc::commands::kBpm)) {
+        action.remove_prefix(ltc::commands::kBpm.size());
+        HandleBpm(action);
+        return;
+    }
+}
+} // namespace ltc::actions::midi
 
 namespace {
 RtpMidi apple_midi;
@@ -95,27 +171,119 @@ void Timer9Set(uint32_t type) {
         timer_interrupt_enable(TIMER9, TIMER_INT_UP);
     }
 }
-} // namespace
 
-namespace ltc {
-namespace {
+int32_t handle{-1};
+uint32_t realtime_configs{0};
 
-void Init() {
+void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_ip, [[maybe_unused]] uint16_t from_port) {
+    assert(buffer != nullptr);
+
+    std::string_view request{reinterpret_cast<const char*>(buffer), size};
+
+    if (!request.starts_with("midi!")) {
+        return;
+    }
+
+    request.remove_prefix(4);
+
+    ltc::actions::midi::HandleAction(request);
+}
+
+void Timer13Config() {
+    LTC_OUTPUT_DEBUG_ENTRY();
+
+    rcu_periph_clock_enable(RCU_TIMER13);
+    timer_deinit(TIMER13);
+
+    timer_parameter_struct timer_initpara;
+    timer_struct_para_init(&timer_initpara);
+
+    timer_initpara.prescaler = TIMER_PSC_10KHZ;
+    timer_initpara.period = UINT32_MAX;
+    timer_init(TIMER13, &timer_initpara);
+
+    timer_counter_value_config(TIMER13, 0);
+    timer_interrupt_flag_clear(TIMER13, UINT32_MAX);
+    timer_interrupt_enable(TIMER13, TIMER_INT_UP);
+
+    NVIC_SetPriority(TIMER7_TRG_CMT_TIMER13_IRQn, 2);
+    NVIC_EnableIRQ(TIMER7_TRG_CMT_TIMER13_IRQn);
+
+    LTC_OUTPUT_DEBUG_EXIT();
+}
+
+void Timer13Stop() {
+    LTC_OUTPUT_DEBUG_ENTRY();
+
+    timer_disable(TIMER13);
+
+    NVIC_DisableIRQ(TIMER7_TRG_CMT_TIMER13_IRQn);
+    timer_interrupt_disable(TIMER13, TIMER_INT_UP);
+
+    LTC_OUTPUT_DEBUG_EXIT();
+}
+
+void RealtimeStart() {
+    LTC_OUTPUT_DEBUG_ENTRY();
+
+    realtime_configs++;
+
+    if (realtime_configs > 1) {
+        LTC_OUTPUT_DEBUG_EXIT();
+        return;
+    }
+
+    Timer13Config();
+
+    if (handle != -1) {
+        ::network::udp::End(::ltc::udp::port::kMidi);
+    }
+
+    handle = ::network::udp::Begin(::ltc::udp::port::kMidi, Input);
+    assert(handle != -1);
+
+    LTC_OUTPUT_DEBUG_EXIT();
+}
+
+void RealtimeStop() {
+    LTC_OUTPUT_DEBUG_ENTRY();
+
+    if (realtime_configs == 0) {
+        LTC_OUTPUT_DEBUG_EXIT();
+        return;
+    }
+
+    if (realtime_configs > 0) {
+        realtime_configs--;
+    }
+
+    if (realtime_configs != 0) {
+        LTC_OUTPUT_DEBUG_EXIT();
+        return;
+    }
+
+    Timer13Stop();
+
+    LTC_OUTPUT_DEBUG_EXIT();
+}
+
+void DinUartInit() {
     gd32::UartBegin(kUart, kBaudrateDefault, gd32::kUartBits8, gd32::kUartParityNone, gd32::kUartStop1Bit);
 }
 
-void TransmitRaw(const uint8_t* data, uint32_t length) {
+void DinUartTransmit(const uint8_t* data, uint32_t length) {
     gd32::UartTransmit(kUart, data, length);
 }
 } // namespace
 
+namespace ltc {
 // Input
 namespace input::midi {
 void Start() {
     LTC_INPUT_DEBUG_ENTRY();
 
     output::Destination::Instance().SetType(::ltc::Type::kUnknown);
-    Init();
+    DinUartInit();
 
     sysex_count = 0;
     state = State::kIdle;
@@ -146,13 +314,16 @@ namespace output::midi {
 void Start() {
     LTC_OUTPUT_DEBUG_ENTRY();
 
-    Init();
+    DinUartInit();
+    RealtimeStart();
 
     LTC_OUTPUT_DEBUG_EXIT();
 }
 
 void Stop() {
     LTC_OUTPUT_DEBUG_ENTRY();
+
+    RealtimeStop();
 
     LTC_OUTPUT_DEBUG_EXIT();
 }
@@ -165,7 +336,16 @@ void Output(const struct ::midi::Timecode* timecode) {
     data[7] = timecode->seconds & 0x3F;
     data[8] = timecode->frames & 0x1F;
 
-    TransmitRaw(data, 10);
+    DinUartTransmit(data, sizeof(data));
+}
+
+void Output(::midi::Type type) {
+    assert((type >= ::midi::Type::kClock) && (type <= ::midi::Type::kSystemReset));
+    uint8_t data[1];
+
+    data[0] = std::to_underlying(type);
+
+    DinUartTransmit(data, sizeof(data));
 }
 
 void Output(uint8_t value) {
@@ -174,7 +354,7 @@ void Output(uint8_t value) {
     data[0] = std::to_underlying(::midi::Type::kTimeCodeQuarterFrame);
     data[1] = value;
 
-    TransmitRaw(data, 2);
+    DinUartTransmit(data, sizeof(data));
 }
 } // namespace output::midi
 
@@ -218,6 +398,8 @@ void Start() {
         is_started = true;
     }
 
+    RealtimeStart();
+
     LTC_OUTPUT_DEBUG_EXIT();
 }
 
@@ -226,6 +408,8 @@ void Stop() {
 
     is_started = false;
     apple_midi.Stop();
+
+    RealtimeStop();
 
     LTC_OUTPUT_DEBUG_EXIT();
 }
@@ -268,11 +452,15 @@ namespace output::usbmidi {
 void Start() {
     LTC_OUTPUT_DEBUG_ENTRY();
 
+    RealtimeStart();
+
     LTC_OUTPUT_DEBUG_EXIT();
 }
 
 void Stop() {
     LTC_OUTPUT_DEBUG_ENTRY();
+
+    RealtimeStop();
 
     LTC_OUTPUT_DEBUG_EXIT();
 }
@@ -409,6 +597,16 @@ void TIMER0_UP_TIMER9_IRQHandler() {
     }
 
     TIMER_INTF(TIMER9) = ~kIntFlag;
+}
+
+void TIMER7_TRG_CMT_TIMER13_IRQHandler() {
+    const auto kIntFlag = TIMER_INTF(TIMER13);
+
+    if ((kIntFlag & TIMER_INT_FLAG_UP) == TIMER_INT_FLAG_UP) {
+        ltc::output::Destination::Instance().MidiSend(::midi::Type::kClock);
+    }
+
+    TIMER_INTF(TIMER13) = ~kIntFlag;
 }
 }
 
