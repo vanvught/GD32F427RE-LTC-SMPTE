@@ -63,7 +63,7 @@ usb_class_core midi_class = {
     .ctlx_out = nullptr, // Control OUT transfer (not needed for MIDI)
     .data_in = MidiIn,
     .data_out = MidiOut,
-    .SOF = MidiSof,                 // Kick queued MIDI after USB configuration
+    .SOF = nullptr,                 // Optional: Kick queued MIDI after USB configuration
     .incomplete_isoc_in = nullptr,  // MIDI does not use ISO IN
     .incomplete_isoc_out = nullptr, // MIDI does not use ISO OUT
 };
@@ -137,7 +137,7 @@ static void KickNextIn(usb_dev* udev) {
     usbd_ep_send(udev, MIDI_EPIN_ADDR, ptr, length);
 }
 
-static uint8_t MidiSof(usb_dev* udev) {
+[[maybe_unused]] static uint8_t MidiSof(usb_dev* udev) {
     KickNextIn(udev);
     return USBD_OK;
 }
