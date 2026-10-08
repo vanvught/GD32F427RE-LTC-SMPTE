@@ -50,6 +50,7 @@ static uint8_t MidiDeinit(usb_dev* udev, uint8_t config_index);
 static uint8_t MidiReqProc(usb_dev* udev, usb_req* req);
 static uint8_t MidiIn(usb_dev* udev, uint8_t ep_num);
 static uint8_t MidiOut(usb_dev* udev, uint8_t ep_num);
+static uint8_t MidiSof(usb_dev* udev);
 
 usb_class_core midi_class = {
     .command = NO_CMD,
@@ -62,17 +63,22 @@ usb_class_core midi_class = {
     .ctlx_out = nullptr, // Control OUT transfer (not needed for MIDI)
     .data_in = MidiIn,
     .data_out = MidiOut,
-    .SOF = nullptr,                 // Start of Frame (optional, not needed for MIDI)
+    .SOF = MidiSof,                 // Kick queued MIDI after USB configuration
     .incomplete_isoc_in = nullptr,  // MIDI does not use ISO IN
     .incomplete_isoc_out = nullptr, // MIDI does not use ISO OUT
 };
 
 static __ALIGN_BEGIN usb_midi_handler midi_handler __ALIGN_END;
 
+static TxQueue<4> tx_queue;
+static volatile auto tx_busy{false};
+
 static uint8_t MidiInit(usb_dev* udev, [[maybe_unused]] uint8_t config_index) {
     puts("> MidiInit");
 
     memset(&midi_handler, 0, sizeof(usb_midi_handler));
+
+    tx_busy = false;
 
     // Setup MIDI IN and OUT endpoints
     usbd_ep_setup(static_cast<usb_core_driver*>(udev), &midi_ep_in);
@@ -105,9 +111,6 @@ static uint8_t MidiReqProc([[maybe_unused]] usb_dev* udev, [[maybe_unused]] usb_
     return USBD_OK;
 }
 
-static TxQueue<4> tx_queue;
-static volatile auto tx_busy{false};
-
 static bool IsConfigured(usb_dev* udev) {
     return (udev->dev.cur_status == USBD_CONFIGURED);
 }
@@ -134,13 +137,20 @@ static void KickNextIn(usb_dev* udev) {
     usbd_ep_send(udev, MIDI_EPIN_ADDR, ptr, length);
 }
 
-static uint8_t MidiIn([[maybe_unused]] usb_dev* udev, [[maybe_unused]] uint8_t ep_num) {
+static uint8_t MidiSof(usb_dev* udev) {
+    KickNextIn(udev);
+    return USBD_OK;
+}
+
+static uint8_t MidiIn(usb_dev* udev, uint8_t ep_num) {
     if ((ep_num & 0x7FU) != (MIDI_EPIN_ADDR & 0x7FU)) {
         return USBD_OK;
     }
 
     tx_queue.OnPacketSent();
     tx_busy = false;
+
+    KickNextIn(udev);
 
     return USBD_OK;
 }
@@ -203,8 +213,8 @@ bool Send(const uint8_t* data, uint32_t length) {
         return false;
     }
 
-	KickNextIn(&usb_midi);
-    
+    KickNextIn(&usb_midi);
+
     return true;
 }
 } // namespace usbmidi
