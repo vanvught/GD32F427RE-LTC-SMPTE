@@ -55,6 +55,10 @@ inline void Size(uint32_t size, std::string_view suffix = {}) {
 
     printf("%.*s", static_cast<int>(suffix.size()), suffix.data());
 }
+
+inline void StringView(std::string_view s_v) {
+    printf("%.*s\n", static_cast<int>(s_v.size()), s_v.data());
+}
 } // namespace common::print
 
 #define ERROR(s)                             \
