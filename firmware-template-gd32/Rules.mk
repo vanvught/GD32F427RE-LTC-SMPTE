@@ -55,21 +55,11 @@ LDLIBS:=$(MBEDTLSLIBS) $(addprefix -l,$(LIBS))
 # The variables for the dependency check
 LIBDEP=$(addprefix ../lib-,$(LIBS))
 
-ifdef USEMBEDTLS
-  LIBGD32+=-L../mbedtls/lib/gd32/$(strip $(FAMILY))
-endif
-
-ifdef USEFREERTOS
-  LIBGD32+=-L../FreeRTOS/lib_gd32
-  LDLIBS+=-lFreeRTOS
-	LIBDEP+=../FreeRTOS
-endif
-
 COPS=-DGD32 -D$(FAMILY_UCA) -D$(LINE_UC) -D$(MCU) -D$(BOARD)
 COPS+=$(strip $(DEFINES) $(MAKE_FLAGS))
 COPS+=$(strip $(INCLUDES) $(LIBINCDIRS))
 COPS+=$(strip $(ARMOPS) $(CMSISOPS))
-COPS+=-Os -nostartfiles -fno-builtin -D_GNU_SOURCE	
+COPS+=-Os -nostartfiles -D_GNU_SOURCE	
 COPS+=-fstack-usage
 COPS+=-ffunction-sections -fdata-sections
 COPS+=-Wall -Werror -Wpedantic -Wextra -Wunused -Wsign-conversion -Wconversion -Wduplicated-cond -Wlogical-op
