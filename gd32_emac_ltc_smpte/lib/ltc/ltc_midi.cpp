@@ -289,6 +289,8 @@ struct BpmState {
 };
 
 BpmState bpm_state;
+
+constexpr uint32_t kBpmTimeoutMicros = 1000000U;
 } // namespace
 
 bool CalculateBpm(uint32_t timestamp, uint32_t received, uint32_t& bpm) {
@@ -304,6 +306,12 @@ bool CalculateBpm(uint32_t timestamp, uint32_t received, uint32_t& bpm) {
     bpm_state.timestamp_previous = timestamp;
 
     if (kDelta == 0) {
+        return false;
+    }
+
+    if (kDelta >= kBpmTimeoutMicros) {
+        bpm_state.delta_sum = 0;
+        bpm_state.clock_counter = 0;
         return false;
     }
 
@@ -331,8 +339,6 @@ bool CalculateBpm(uint32_t timestamp, uint32_t received, uint32_t& bpm) {
 
     return false;
 }
-
-constexpr uint32_t kBpmTimeoutMicros = 1000000U;
 
 void HandleBpmTimeout() {
     if (!bpm_state.initialized) {
@@ -619,6 +625,24 @@ void HandleFullFrame(uint8_t hours, uint8_t minutes, uint8_t seconds, uint8_t fr
 
 } // namespace ltc::input::mtc
 
+namespace din {
+namespace {
+struct MidiRxEvent {
+    uint32_t timestamp;
+    uint8_t data;
+};
+
+constexpr uint32_t kMidiRxBufferSize = 256;
+constexpr uint32_t kMidiRxBufferMask = kMidiRxBufferSize - 1;
+
+static_assert((kMidiRxBufferSize & kMidiRxBufferMask) == 0);
+
+MidiRxEvent midi_rx_buffer[kMidiRxBufferSize];
+
+volatile uint32_t midi_rx_head{0};
+volatile uint32_t midi_rx_tail{0};
+} // namespace
+
 void HandleDinMtc() {
     if (sysex_count != kSysexBufferSize) [[unlikely]] {
         return;
@@ -629,40 +653,65 @@ void HandleDinMtc() {
     }
 }
 
-extern "C" {
-void MIDI_UARTx_IRQHandler() {
-    if (SET != usart_interrupt_flag_get(kUart, USART_INT_FLAG_RBNE)) {
-        return;
+void RxPush(uint8_t data, uint32_t timestamp) {
+    const auto kHead = midi_rx_head;
+    const auto kNext = (kHead + 1U) & kMidiRxBufferMask;
+
+    if (kNext == midi_rx_tail) {
+        return; // Buffer full
     }
 
-    const uint8_t kByte = gd32::UartGetRxData(kUart);
+    midi_rx_buffer[kHead] = {.timestamp = timestamp, .data = data};
 
-    // System Real-Time Override (0xF8 - 0xFF)
-    if (kByte >= std::to_underlying(midi::Type::kClock)) {
-        if (kByte == std::to_underlying(midi::Type::kClock)) {
+    __DMB();
+    midi_rx_head = kNext;
+}
+
+bool RxPop(MidiRxEvent& event) {
+    const auto kTail = midi_rx_tail;
+
+    if (kTail == midi_rx_head) {
+        return false;
+    }
+
+    event = midi_rx_buffer[kTail];
+
+    __DMB();
+    midi_rx_tail = (kTail + 1U) & kMidiRxBufferMask;
+
+    return true;
+}
+
+void Reset() {
+    midi_rx_head = 0;
+    midi_rx_tail = 0;
+}
+
+void HandleByte(uint8_t data, uint32_t timestamp) {
+    if (data >= std::to_underlying(::midi::Type::kClock)) {
+        if (data == std::to_underlying(::midi::Type::kClock)) {
             uint32_t bpm;
-            if (CalculateBpm(timing::Micros(), timing::Micros(), bpm)) {
+
+            if (CalculateBpm(timestamp, timestamp, bpm)) {
                 ltc::output::Destination::Instance().DisplayBpm(bpm);
             }
-
             return;
         }
 
-        if (kByte == std::to_underlying(midi::Type::kSystemReset)) {
+        if (data == std::to_underlying(::midi::Type::kSystemReset)) {
             state = State::kIdle;
         }
-
         return;
     }
 
     // Process Status Bytes (0x80 - 0xF7)
-    if (kByte >= std::to_underlying(midi::Type::kNoteOff)) {
-        if (kByte == std::to_underlying(midi::Type::kTimeCodeQuarterFrame)) {
+    if (data >= std::to_underlying(midi::Type::kNoteOff)) {
+        if (data == std::to_underlying(midi::Type::kTimeCodeQuarterFrame)) {
             state = State::kMtcQf;
-        } else if (kByte == std::to_underlying(midi::Type::kSystemExclusive)) {
+        } else if (data == std::to_underlying(midi::Type::kSystemExclusive)) {
             state = State::kSysex;
             sysex_count = 0;
-        } else if ((kByte == 0xF7) && (state == State::kSysex)) {
+        } else if ((data == 0xF7) && (state == State::kSysex)) {
             HandleDinMtc();
             state = State::kIdle;
         } else {
@@ -678,13 +727,13 @@ void MIDI_UARTx_IRQHandler() {
         case State::kIdle:
             break;
         case State::kMtcQf:
-            ltc::input::mtc::HandleQuarterFrame(kByte);
+            ltc::input::mtc::HandleQuarterFrame(data);
             state = State::kIdle; // QF is a single data byte message; clear state
             break;
 
         case State::kSysex:
             if (sysex_count < kSysexBufferSize) {
-                sysex[sysex_count++] = kByte;
+                sysex[sysex_count++] = data;
             }
 
             break;
@@ -693,6 +742,19 @@ void MIDI_UARTx_IRQHandler() {
             // Discard data payload bytes that belong to channel messages (0x80 - 0xEF)
             break;
     }
+}
+} // namespace din
+
+extern "C" {
+void MIDI_UARTx_IRQHandler() {
+    if (SET != usart_interrupt_flag_get(kUart, USART_INT_FLAG_RBNE)) {
+        return;
+    }
+
+    const auto kTimestamp = timing::Micros();
+    const auto kByte = gd32::UartGetRxData(kUart);
+
+    din::RxPush(kByte, kTimestamp);
 }
 
 void TIMER0_UP_TIMER9_IRQHandler() {
@@ -763,6 +825,12 @@ void MidiMessage(const struct midi::Message* message) {
 
 namespace ltc::input::midi {
 void Run() {
+    din::MidiRxEvent event;
+
+    while (din::RxPop(event)) {
+        din::HandleByte(event.data, event.timestamp);
+    }
+
     HandleBpmTimeout();
 }
 } // namespace ltc::input::midi
@@ -831,7 +899,8 @@ void HandleUsbMtc(const ::usbmidi::MidiEvent& event) {
 void HandleSystemRealtime(const ::usbmidi::MidiEvent& event) {
     if (event.midi[0] == std::to_underlying(::midi::Type::kClock)) {
         uint32_t bpm;
-        if (CalculateBpm(timing::Micros(), timing::Micros(), bpm)) {
+        const auto kNow = timing::Micros();
+        if (CalculateBpm(kNow, kNow, bpm)) {
             output::Destination::Instance().DisplayBpm(bpm);
         }
     }

@@ -44,7 +44,6 @@ void Start();
 void Stop();
 void Run();
 } // namespace usbmidi
-
 } // namespace ltc::input
 
 #endif // INPUT_LTC_INPUT_MIDI_H_
