@@ -390,7 +390,7 @@ void Stop() {
 // Optimized
 
 #pragma GCC push_options
-#pragma GCC optimize("O3")
+#pragma GCC optimize("O2")
 
 namespace {
 uint8_t CreateQuarterFrame(const struct midi::Timecode* timecode) {

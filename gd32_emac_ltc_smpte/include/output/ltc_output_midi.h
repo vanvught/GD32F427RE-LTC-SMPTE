@@ -69,6 +69,8 @@ inline void Output(const ::midi::Timecode* timecode) {
                                0x05, 0xF7, 0x00, 0x00};
 
     ::usbmidi::Send(kData, sizeof(kData));
+
+    puts(">-------------<");
 }
 
 inline void Output(::midi::Type type) {

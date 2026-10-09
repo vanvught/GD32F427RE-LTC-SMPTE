@@ -24,6 +24,7 @@
 * THE SOFTWARE.
 */
 
+#include <sys/_types.h>
 #include <cstdint>
 #include <utility>
 
@@ -31,6 +32,7 @@
 #include "gd32f4xx.h"
 #include "gd32f4xx_timer.h"
 #include "ltc_commands.h"
+#include "input/ltc_input.h"
 #include "midi.h"
 #include "net/rtpmidi.h"
 #include "timing.h"
@@ -275,52 +277,77 @@ void DinUartInit() {
 void DinUartTransmit(const uint8_t* data, uint32_t length) {
     gd32::UartTransmit(kUart, data, length);
 }
-bool CalculateBpm(uint32_t timestamp, uint32_t& bpm) {
-    static uint32_t delta[24]{};
-    static uint32_t clock_counter{0};
-    static uint32_t previous{0};
-    static uint32_t timestamp_previous{0};
-    static bool initialized{false};
 
-    if (!initialized) {
-        timestamp_previous = timestamp;
-        initialized = true;
+namespace {
+struct BpmState {
+    uint32_t timestamp_previous{0};
+    uint32_t timestamp_received{0};
+    uint32_t delta_sum{0};
+    uint32_t previous{0};
+    uint32_t clock_counter{0};
+    bool initialized{false};
+};
+
+BpmState bpm_state;
+} // namespace
+
+bool CalculateBpm(uint32_t timestamp, uint32_t received, uint32_t& bpm) {
+    bpm_state.timestamp_received = received;
+
+    if (!bpm_state.initialized) {
+        bpm_state.timestamp_previous = timestamp;
+        bpm_state.initialized = true;
         return false;
     }
 
-    const auto kDelta = timestamp - timestamp_previous;
-    timestamp_previous = timestamp;
+    const auto kDelta = timestamp - bpm_state.timestamp_previous;
+    bpm_state.timestamp_previous = timestamp;
 
     if (kDelta == 0) {
         return false;
     }
 
-    delta[clock_counter++] = kDelta;
+    bpm_state.delta_sum += kDelta;
 
-    if (clock_counter != 24) {
+    if (++bpm_state.clock_counter != 24) {
         return false;
     }
 
-    clock_counter = 0;
+    bpm_state.clock_counter = 0;
 
-    uint64_t delta_sum = 0;
+    const auto kDeltaSum = bpm_state.delta_sum;
+    bpm_state.delta_sum = 0;
 
-    for (const auto kDeltas : delta) {
-        delta_sum += kDeltas;
+    if (kDeltaSum == 0) {
+        return false;
     }
 
-    if (delta_sum != 0) {
-        bpm = static_cast<uint32_t>((60000000ULL + (delta_sum / 2)) / delta_sum);
-    } else {
-        bpm = 0;
-    }
+    bpm = (60000000U + (kDeltaSum / 2U)) / kDeltaSum;
 
-    if (bpm != previous) {
-        previous = bpm;
+    if (bpm != bpm_state.previous) {
+        bpm_state.previous = bpm;
         return true;
     }
 
     return false;
+}
+
+constexpr uint32_t kBpmTimeoutMicros = 1000000U;
+
+void HandleBpmTimeout() {
+    if (!bpm_state.initialized) {
+        return;
+    }
+
+    const auto kNow = timing::Micros();
+
+    if ((kNow - bpm_state.timestamp_received) < kBpmTimeoutMicros) [[likely]] {
+        return;
+    }
+
+    bpm_state = {};
+
+    ltc::output::Destination::Instance().DisplayBpm(0);
 }
 } // namespace
 
@@ -408,18 +435,40 @@ void Output(uint8_t value) {
 
 // Input
 namespace input::applemidi {
+namespace {
+bool is_started{false};
+}
 void Start() {
     LTC_INPUT_DEBUG_ENTRY();
+
+    if (is_started) {
+        LTC_INPUT_DEBUG_EXIT();
+        return;
+    }
 
     output::Destination::Instance().SetType(::ltc::Type::kUnknown);
 
     Timer9Config();
+
+    if (netif::IpAddr() != 0) {
+        apple_midi.Start();
+        apple_midi.Print();
+        is_started = true;
+    }
 
     LTC_INPUT_DEBUG_EXIT();
 }
 
 void Stop() {
     LTC_INPUT_DEBUG_ENTRY();
+
+    if (!is_started) {
+        LTC_INPUT_DEBUG_EXIT();
+        return;
+    }
+
+    apple_midi.Stop();
+    is_started = false;
 
     NVIC_DisableIRQ(TIMER0_UP_TIMER9_IRQn);
 
@@ -544,9 +593,9 @@ void HandleQuarterFrame(uint8_t value) {
             timecode_input.type = (mtc_assembly[7] >> 1) & 0x03;
 
             if (kPiece == 7) {
-                memcpy(&ltc::global::timecode_running, &timecode_input, sizeof(::midi::Timecode));
+                memcpy(&global::timecode_running, &timecode_input, sizeof(::midi::Timecode));
 
-                ltc::output::Destination::Instance().Distribute(&timecode_input);
+                output::Destination::Instance().Distribute(&timecode_input);
                 Timer9Set(timecode_input.type);
             }
             break;
@@ -563,9 +612,9 @@ void HandleFullFrame(uint8_t hours, uint8_t minutes, uint8_t seconds, uint8_t fr
     timecode_input.hours = hours & 0x1F;
     timecode_input.type = static_cast<uint8_t>(hours >> 5);
 
-    memcpy(&ltc::global::timecode_running, &timecode_input, sizeof(::midi::Timecode));
+    memcpy(&global::timecode_running, &timecode_input, sizeof(::midi::Timecode));
 
-    ltc::output::Destination::Instance().Distribute(&timecode_input);
+    output::Destination::Instance().Distribute(&timecode_input);
 }
 
 } // namespace ltc::input::mtc
@@ -592,7 +641,7 @@ void MIDI_UARTx_IRQHandler() {
     if (kByte >= std::to_underlying(midi::Type::kClock)) {
         if (kByte == std::to_underlying(midi::Type::kClock)) {
             uint32_t bpm;
-            if (CalculateBpm(timing::Micros(), bpm)) {
+            if (CalculateBpm(timing::Micros(), timing::Micros(), bpm)) {
                 ltc::output::Destination::Instance().DisplayBpm(bpm);
             }
 
@@ -681,6 +730,12 @@ void HandleAppleMtc(const struct midi::Message* message) {
 } // namespace
 
 void MidiMessage(const struct midi::Message* message) {
+    const auto kInput = ::ltc::input::Source::Instance().Input();
+
+    if (kInput != ltc::Input::kApplemidi) {
+        return;
+    }
+
     switch (static_cast<midi::Type>(message->type)) {
         case midi::Type::kTimeCodeQuarterFrame:
             ltc::input::mtc::HandleQuarterFrame(message->data1);
@@ -692,15 +747,31 @@ void MidiMessage(const struct midi::Message* message) {
 
         case midi::Type::kClock: {
             uint32_t bpm;
-            if (CalculateBpm(message->timestamp, bpm)) {
+            const auto kNow = timing::Micros();
+            const auto kTimestamp = message->timestamp * 100U;
+
+            if (CalculateBpm(kTimestamp, kNow, bpm)) {
                 ltc::output::Destination::Instance().DisplayBpm(bpm);
             }
         } break;
+
         default:
             break;
     }
 }
 } // namespace rtpmidi
+
+namespace ltc::input::midi {
+void Run() {
+    HandleBpmTimeout();
+}
+} // namespace ltc::input::midi
+
+namespace ltc::input::applemidi {
+void Run() {
+    HandleBpmTimeout();
+}
+} // namespace ltc::input::applemidi
 
 namespace ltc::input::usbmidi {
 namespace {
@@ -749,7 +820,7 @@ void HandleUsbMtc(const ::usbmidi::MidiEvent& event) {
 
         if (kByte == 0xF7) {
             if ((sysex_count == kMtcSysExSize) && (sysex[0] == 0xF0) && (sysex[1] == 0x7F) && (sysex[2] == 0x7F) && (sysex[3] == 0x01) && (sysex[4] == 0x01)) {
-                ltc::input::mtc::HandleFullFrame(sysex[5], sysex[6], sysex[7], sysex[8]);
+                input::mtc::HandleFullFrame(sysex[5], sysex[6], sysex[7], sysex[8]);
             }
 
             sysex_count = 0;
@@ -760,7 +831,7 @@ void HandleUsbMtc(const ::usbmidi::MidiEvent& event) {
 void HandleSystemRealtime(const ::usbmidi::MidiEvent& event) {
     if (event.midi[0] == std::to_underlying(::midi::Type::kClock)) {
         uint32_t bpm;
-        if (CalculateBpm(timing::Micros(), bpm)) {
+        if (CalculateBpm(timing::Micros(), timing::Micros(), bpm)) {
             output::Destination::Instance().DisplayBpm(bpm);
         }
     }
@@ -776,7 +847,7 @@ void Run() {
         switch (kCin) {
             case 0x02: // two-byte System Common
                 if (event.midi[0] == std::to_underlying(::midi::Type::kTimeCodeQuarterFrame)) {
-                    ltc::input::mtc::HandleQuarterFrame(event.midi[1]);
+                    input::mtc::HandleQuarterFrame(event.midi[1]);
                 }
                 break;
 
@@ -795,5 +866,7 @@ void Run() {
                 break;
         }
     }
+
+    HandleBpmTimeout();
 }
 } // namespace ltc::input::usbmidi

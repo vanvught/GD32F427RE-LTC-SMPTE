@@ -114,6 +114,12 @@ void Copy(::ltc::TimeCode& timecode_to, const ::ltc::TimeCode& timecode_from) {
 void SetStart(const ::ltc::TimeCode& timecode) {
     Copy(timecode_start, timecode);
 
+	const auto kInput = ::ltc::input::Source::Instance().Input();
+
+	if (kInput != Input::kInternal) {
+	    return;
+	}
+
     if (!is_started) {
         StartInit();
     }

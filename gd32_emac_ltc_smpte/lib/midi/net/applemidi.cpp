@@ -163,19 +163,14 @@ void AppleMidi::InputControlMessage(const uint8_t* buffer, uint32_t size, uint32
 }
 
 void AppleMidi::InputMidiMessage(const uint8_t* buffer, uint32_t size, uint32_t from_ip, uint16_t from_port) {
-    APPLEMIDI_DEBUG_ENTRY();
-
     if (__builtin_expect((size >= 12), 0)) {
         if (session_status_.remote_ip != from_ip) {
-            APPLEMIDI_DEBUG_EXIT();
             return;
         }
     }
 
     if (*reinterpret_cast<const uint16_t*>(buffer) == 0x6180) {
         HandleRtpMidi(buffer);
-
-        APPLEMIDI_DEBUG_EXIT();
         return;
     }
 
@@ -203,7 +198,6 @@ void AppleMidi::InputMidiMessage(const uint8_t* buffer, uint32_t size, uint32_t 
                     s_timer_id = SoftwareTimerAdd(kTimeout, TimeoutTimer);
                 }
 
-                APPLEMIDI_DEBUG_EXIT();
                 return;
             }
 
@@ -244,6 +238,4 @@ void AppleMidi::InputMidiMessage(const uint8_t* buffer, uint32_t size, uint32_t 
             }
         }
     }
-
-    APPLEMIDI_DEBUG_EXIT();
 }

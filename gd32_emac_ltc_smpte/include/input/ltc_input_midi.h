@@ -30,11 +30,13 @@ namespace ltc::input {
 namespace midi {
 void Start();
 void Stop();
+void Run();
 } // namespace midi
 
 namespace applemidi {
 void Start();
 void Stop();
+void Run();
 } // namespace applemidi
 
 namespace usbmidi {

@@ -167,13 +167,17 @@ class Source : public output::Destination {
                 input::ltc::Run();
                 break;
             case Input::kArtnet:
+                break;
             case Input::kMidi:
+                input::midi::Run();
+                break;
             case Input::kTcnet:
                 break;
             case Input::kInternal:
                 input::internal::Run();
                 break;
             case Input::kApplemidi:
+                input::applemidi::Run();
                 break;
             case Input::kUsbmidi:
                 input::usbmidi::Run();
