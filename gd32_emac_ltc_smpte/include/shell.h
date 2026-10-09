@@ -89,7 +89,6 @@ void Dump(Arguments args);
 namespace ltc {
 void Ltc(Arguments args);
 void Midi(Arguments args);
-void Intensity(Arguments args);
 void Gps(Arguments args);
 void TCNet(Arguments args);
 } // namespace ltc
@@ -106,7 +105,6 @@ inline constexpr Entry kCommandTable[] = {
 #endif
     {.name = "ltc", .function = ltc::Ltc},             //
     {.name = "midi", .function = ltc::Midi},           //
-    {.name = "intensity", .function = ltc::Intensity}, //
     {.name = "gps", .function = ltc::Gps},             //
     {.name = "tcnet", .function = ltc::TCNet},         //
 };

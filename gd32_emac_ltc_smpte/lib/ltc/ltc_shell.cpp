@@ -23,29 +23,16 @@
  * THE SOFTWARE.
  */
 
-#include <cstdint>
-
 #include "shell.h"
 #include "common/utils/utils_string.h"
 #include "input/ltc_input.h"
 #include "output/ltc_output.h"
-#include "ltc.h"
 #include "ltc_actions.h"
-#include "ltc_display_max7219.h"
 #include "uart0.h"
 
 namespace shell::ltc {
-
 using ::ltc::input::Source;
 using ::ltc::output::Destination;
-
-namespace {
-
-constexpr int32_t kMaxType = 30;
-constexpr int32_t kMaxIntensity = 15;
-constexpr auto kMaxOutput = static_cast<int32_t>(sizeof(::ltc::kOutputs) / sizeof(::ltc::kOutputs[0]));
-
-} // namespace
 
 void Ltc(Arguments args) {
     if (args.size() != 2) {
@@ -72,21 +59,5 @@ void Gps(Arguments args) {
     }
 
     ::ltc::actions::gps::HandleAction(args[1]);
-}
-
-void Intensity(Arguments args) {
-    if (args.size() != 2) {
-        uart0::Puts(common::kUnknown);
-        return;
-    }
-
-    const auto kValue = shell::GetValue(args[1], kMaxIntensity);
-
-    if (!kValue) {
-        uart0::Puts(common::kUnknown);
-        return;
-    }
-
-    ::ltc::display::max7219::SetIntensity(static_cast<uint8_t>(*kValue));
 }
 } // namespace shell::ltc
