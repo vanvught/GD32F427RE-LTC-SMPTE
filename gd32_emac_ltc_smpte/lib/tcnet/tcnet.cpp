@@ -189,7 +189,7 @@ void Start() {
     packet_opt_in.management_header.node_options = 0;
     packet_opt_in.node_count = 1;
     packet_opt_in.node_listener_port = Unicast::kPort;
-    memcpy(&packet_opt_in.vendor_name, "gd32-dmx.org", packet::kVendorNameLength);
+    memcpy(&packet_opt_in.vendor_name, "gd32-dmx.org    ", packet::kVendorNameLength);
     memcpy(&packet_opt_in.device_name, "LTC SMPTE Node  ", packet::kDeviceNameLength);
     packet_opt_in.device_major_version = static_cast<uint8_t>(_TIME_STAMP_YEAR_ - 2000);
     packet_opt_in.device_minor_version = _TIME_STAMP_MONTH_;
