@@ -34,10 +34,9 @@ void Dump();
 namespace shell {
 namespace {
 constexpr std::string_view kUdp{"udp"};
-constexpr std::string_view kStack{"stack"};
 
 void Usage() {
-    uart0::Puts("dump udp|stack");
+    uart0::Puts("dump udp");
 }
 } // namespace
 
@@ -49,11 +48,6 @@ void Dump(Arguments args) {
 
     if (args[1] == kUdp) {
         network::udp::Dump();
-        return;
-    }
-
-    if (args[1] == kStack) {
-        debug::stack::Print();
         return;
     }
 
