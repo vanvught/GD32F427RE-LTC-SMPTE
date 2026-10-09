@@ -60,7 +60,6 @@ int main() { // NOLINT
     network::apps::ntpclient::ptp::SetServerIp(network::ConvertToUint(45, 138, 55, 61));
 
 	tcnet::SetUseTimeCode(true);
-    tcnet::Print();
         
     usb::Init();
 
