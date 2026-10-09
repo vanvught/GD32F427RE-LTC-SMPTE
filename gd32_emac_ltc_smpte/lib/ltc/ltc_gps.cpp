@@ -24,21 +24,93 @@
 */
 
 #include <sys/time.h>
+#include <cstdint>
 
+#include "common/utils/utils_print.h"
+#include "firmware/utc.h"
 #include "gnss.h"
 #include "ltc_gps.h"
+#include "ltc_commands.h"
 #include "ltc_gpio_config.h"
 #include "ltc_debug.h"
 #include "display.h" // IWYU pragma: keep
 #include "gd32.h"    // IWYU pragma: keep
 #include "ltc_ntpclient.h"
+#include "network_udp.h"
+#include "ltc_udp_port.h"
+#include "output/ltc_output.h"
+
+namespace ltc::actions::gps {
+void SetUtcOffset(int32_t hours, uint32_t minutes) {
+    if (utc::IsValidateOffset(hours, minutes)) {
+        gnss::Receiver::Instance().SetUtcOffset(hours, minutes);
+    }
+}
+
+void HandleUtc(std::string_view utc_offset) {
+    int32_t hours;
+    uint32_t minutes;
+
+    if (!utc::ParseOffset(utc_offset, hours, minutes)) {
+        return;
+    }
+
+    gnss::Receiver::Instance().SetUtcOffset(hours, minutes);
+}
+
+void HandleAction(std::string_view action) {
+    if (action.starts_with(ltc::commands::kStart)) {
+        action.remove_prefix(ltc::commands::kStart.size());
+        ltc::gps::Start();
+        return;
+    }
+
+    if (action.starts_with(ltc::commands::kStop)) {
+        action.remove_prefix(ltc::commands::kStop.size());
+        ltc::gps::Stop();
+        return;
+    }
+
+    if (action.starts_with(commands::kUtc)) {
+        action.remove_prefix(commands::kUtc.size());
+        HandleUtc(action);
+        return;
+    }
+}
+} // namespace ltc::actions::gps
 
 namespace ltc::gps {
 namespace {
 gnss::Receiver receiver;
+bool is_started{false};
+int32_t handle{-1};
+
+constexpr std::string_view kGps{"gps!"};
+
+void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_ip, [[maybe_unused]] uint16_t from_port) {
+    assert(buffer != nullptr);
+
+    std::string_view request{reinterpret_cast<const char*>(buffer), size};
+
+    if (!request.starts_with(kGps)) {
+        return;
+    }
+
+    request.remove_prefix(kGps.size());
+
+    actions::gps::HandleAction(request);
 }
+} // namespace
+
 void Start() {
     LTC_GPS_DEBUG_ENTRY();
+
+    if (is_started) {
+        LTC_GPS_DEBUG_EXIT();
+        return;
+    }
+
+    is_started = true;
 
     ltc::ntpclient::Stop();
 
@@ -56,6 +128,10 @@ void Start() {
     NVIC_SetPriority(PPS_INPUT_EXTIx_IRQn, gnss::kPpsIrqPriority);
     NVIC_EnableIRQ(PPS_INPUT_EXTIx_IRQn);
 
+    assert(handle == -1);
+    handle = ::network::udp::Begin(::ltc::udp::port::kGps, Input);
+    assert(handle != -1);
+
     receiver.Start();
 
     LTC_GPS_DEBUG_EXIT();
@@ -64,11 +140,24 @@ void Start() {
 void Stop() {
     LTC_GPS_DEBUG_ENTRY();
 
+    if (!is_started) {
+        LTC_GPS_DEBUG_EXIT();
+        return;
+    }
+
+    is_started = false;
+
+    assert(handle != -1);
+    ::network::udp::End(::ltc::udp::port::kGps);
+    handle = -1;
+
     NVIC_DisableIRQ(PPS_INPUT_EXTIx_IRQn);
 
     receiver.Stop();
 
-    ltc::ntpclient::Start();
+    if (output::Destination::Instance().IsDisabled(::ltc::Output::kNtpServer)) {
+        ltc::ntpclient::Start();
+    }
 
     LTC_GPS_DEBUG_EXIT();
 }

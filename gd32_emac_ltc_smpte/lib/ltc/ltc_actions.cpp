@@ -27,6 +27,7 @@
 #include <string_view>
 
 #include "ltc_actions.h"
+#include "common/utils/utils_print.h"
 #include "common/utils/utils_string.h"
 #include "input/ltc_input.h"
 #include "input/ltc_input_internal.h"
@@ -142,6 +143,17 @@ void HandlePitch(std::string_view pitch) {
     if ((kPitch >= -100) && (kPitch <= 100)) {
         SetPitch(static_cast<float>(kPitch) / 100U);
     }
+}
+
+void HandleUtcOffset(std::string_view utc_offset) {
+    int32_t hours;
+    uint32_t minutes;
+
+    if (!utc::ParseOffset(utc_offset, hours, minutes)) {
+        return;
+    }
+
+    Destination::Instance().SetUtcOffset(hours, minutes);
 }
 } // namespace
 
@@ -267,10 +279,10 @@ void SetStop(std::string_view stop) {
 
     ltc::TimeCode timecode{};
 
-	if (ParseCommand(stop, commands::udp::kSet, commands::osc::kSet, timecode)) {
-	    input::internal::SetStop(timecode);
-	    return;
-	}
+    if (ParseCommand(stop, commands::udp::kSet, commands::osc::kSet, timecode)) {
+        input::internal::SetStop(timecode);
+        return;
+    }
 }
 
 void SetResume(std::string_view resume) {
@@ -307,14 +319,18 @@ void SetDirection(std::string_view direction) {
 
     if (direction == ltc::commands::kDirectionForward) {
         input::internal::SetDirection(input::internal::Direction::kForward);
-        LTC_DEBUG_EXIT();
         return;
     }
 
     if (direction == ltc::commands::kDirectionBackward) {
         input::internal::SetDirection(input::internal::Direction::kBackward);
-        LTC_DEBUG_EXIT();
         return;
+    }
+}
+
+void SetUtcOffset(int32_t hours, uint32_t minutes) {
+    if (utc::IsValidateOffset(hours, minutes)) {
+        Destination::Instance().SetUtcOffset(hours, minutes);
     }
 }
 
@@ -363,6 +379,12 @@ void HandleAction(std::string_view action) {
     if (action.starts_with(ltc::commands::kType)) {
         action.remove_prefix(ltc::commands::kType.size());
         SetType(action);
+        return;
+    }
+
+    if (action.starts_with(ltc::commands::kUtc)) {
+        action.remove_prefix(ltc::commands::kUtc.size());
+        HandleUtcOffset(action);
         return;
     }
 
@@ -426,6 +448,7 @@ void HandleAction(std::string_view action) {
 namespace udp {
 namespace {
 int32_t handle{-1};
+bool is_started{false};
 
 void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_ip, [[maybe_unused]] uint16_t from_port) {
     assert(buffer != nullptr);
@@ -445,10 +468,14 @@ void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_
 void Start() {
     LTC_DEBUG_ENTRY();
 
-    if (handle != -1) {
-        ::network::udp::End(::ltc::udp::port::kLtc);
+    if (is_started) {
+        LTC_DEBUG_EXIT();
+        return;
     }
 
+    is_started = true;
+
+    assert(handle == -1);
     handle = ::network::udp::Begin(::ltc::udp::port::kLtc, Input);
     assert(handle != -1);
 
@@ -458,10 +485,16 @@ void Start() {
 void Stop() {
     LTC_DEBUG_ENTRY();
 
-    if (handle != -1) {
-        ::network::udp::End(::ltc::udp::port::kLtc);
-        handle = -1;
+    if (!is_started) {
+        LTC_DEBUG_EXIT();
+        return;
     }
+
+    is_started = false;
+
+    assert(handle != -1);
+    ::network::udp::End(::ltc::udp::port::kLtc);
+    handle = -1;
 
     LTC_DEBUG_EXIT();
 }

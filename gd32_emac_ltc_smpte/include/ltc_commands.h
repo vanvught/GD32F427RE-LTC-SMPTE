@@ -37,6 +37,7 @@ inline constexpr std::string_view kStart{"start"};
 inline constexpr std::string_view kStop{"stop"};
 inline constexpr std::string_view kRate{"rate#"};
 inline constexpr std::string_view kType{"type#"};
+inline constexpr std::string_view kUtc{"utc#"};
 // Internal generator
 inline constexpr std::string_view kDirection{"direction#"};
 inline constexpr std::string_view kDirectionForward{"forward"};

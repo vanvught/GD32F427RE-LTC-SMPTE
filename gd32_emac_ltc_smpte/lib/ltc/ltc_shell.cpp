@@ -25,8 +25,6 @@
 
 #include <cstdint>
 
-#include "gnss.h"
-#include "ltc_commands.h"
 #include "shell.h"
 #include "common/utils/utils_string.h"
 #include "input/ltc_input.h"
@@ -34,7 +32,6 @@
 #include "ltc.h"
 #include "ltc_actions.h"
 #include "ltc_display_max7219.h"
-#include "ltc_gps.h"
 #include "uart0.h"
 
 namespace shell::ltc {
@@ -51,49 +48,30 @@ constexpr auto kMaxOutput = static_cast<int32_t>(sizeof(::ltc::kOutputs) / sizeo
 } // namespace
 
 void Ltc(Arguments args) {
-	if (args.size() != 2) {
-	    uart0::Puts(common::kUnknown);
-	    return;
+    if (args.size() != 2) {
+        uart0::Puts(common::kUnknown);
+        return;
     }
 
-   	::ltc::actions::HandleAction(args[1]);
+    ::ltc::actions::HandleAction(args[1]);
 }
 
 void Midi(Arguments args) {
-	if (args.size() != 2) {
-	    uart0::Puts(common::kUnknown);
-	    return;
+    if (args.size() != 2) {
+        uart0::Puts(common::kUnknown);
+        return;
     }
 
-   	::ltc::actions::midi::HandleAction(args[1]);
+    ::ltc::actions::midi::HandleAction(args[1]);
 }
 
-void UtcOffset(Arguments args) {
-    if (args.size() == 1) {
-        const auto kSeconds = Destination::Instance().UtcOffset();
-
-        int32_t hours;
-        uint32_t minutes;
-        utc::SplitOffset(kSeconds, hours, minutes);
-
-        uart0::Printf("UTC offset: %.2d:%.2u\n\n", static_cast<signed>(hours), static_cast<unsigned>(minutes));
+void Gps(Arguments args) {
+    if (args.size() != 2) {
+        uart0::Puts(common::kUnknown);
         return;
     }
 
-    if (args.size() == 2) {
-        int32_t hours;
-        uint32_t minutes;
-
-        if (utc::ParseOffset(args[1].data(), args[1].size(), hours, minutes)) {
-            Destination::Instance().SetUtcOffset(hours, minutes);
-        } else {
-            uart0::Puts(common::kUndefined);
-        }
-
-        return;
-    }
-
-    uart0::Puts(common::kUnknown);
+    ::ltc::actions::gps::HandleAction(args[1]);
 }
 
 void Intensity(Arguments args) {
@@ -111,45 +89,4 @@ void Intensity(Arguments args) {
 
     ::ltc::display::max7219::SetIntensity(static_cast<uint8_t>(*kValue));
 }
-
-void Gps(Arguments args) {
-    if (args.size() == 2) {
-        if (args[1] == ::ltc::commands::kStart) {
-            ::ltc::gps::Start();
-            return;
-        }
-
-        if (args[1] == ::ltc::commands::kStop) {
-            ::ltc::gps::Stop();
-            return;
-        }
-
-        if (args[1] == "utc") {
-            const auto kSeconds = gnss::Receiver::Instance().UtcOffset();
-
-            int32_t hours;
-            uint32_t minutes;
-            utc::SplitOffset(kSeconds, hours, minutes);
-
-            uart0::Printf("UTC offset: %.2d:%.2u\n\n", static_cast<signed>(hours), static_cast<unsigned>(minutes));
-            return;
-        }
-    }
-
-    if ((args.size() == 3) && (args[1] == "utc")) {
-        int32_t hours;
-        uint32_t minutes;
-
-        if (utc::ParseOffset(args[2].data(), args[2].size(), hours, minutes)) {
-            gnss::Receiver::Instance().SetUtcOffset(hours, minutes);
-        } else {
-            uart0::Puts(common::kUndefined);
-        }
-
-        return;
-    }
-
-    uart0::Puts(common::kUnknown);
-}
-
 } // namespace shell::ltc

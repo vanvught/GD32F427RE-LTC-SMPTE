@@ -28,6 +28,7 @@
 #include <cstdint>
 #include <utility>
 
+#include "common/utils/utils_print.h"
 #include "core/netif.h"
 #include "gd32f4xx.h"
 #include "gd32f4xx_timer.h"
@@ -178,16 +179,18 @@ void Timer9Set(uint32_t type) {
 int32_t handle{-1};
 uint32_t realtime_configs{0};
 
+constexpr std::string_view kMidi{"midi!"};
+
 void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_ip, [[maybe_unused]] uint16_t from_port) {
     assert(buffer != nullptr);
 
     std::string_view request{reinterpret_cast<const char*>(buffer), size};
 
-    if (!request.starts_with("midi!")) {
+    if (!request.starts_with(kMidi)) {
         return;
     }
 
-    request.remove_prefix(4);
+    request.remove_prefix(kMidi.size());
 
     ltc::actions::midi::HandleAction(request);
 }

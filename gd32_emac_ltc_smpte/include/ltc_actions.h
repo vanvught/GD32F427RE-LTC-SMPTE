@@ -32,6 +32,7 @@
 namespace ltc::actions {
 void HandleAction(std::string_view action);
 void SetType(std::string_view type);
+void SetUtcOffset(int32_t hours, uint32_t minutes);
 void SetStart(std::string_view start);
 void SetStop(std::string_view stop);
 void SetResume(std::string_view resume);
@@ -49,7 +50,12 @@ void Stop();
 namespace midi {
 void HandleAction(std::string_view action);
 void SetBpm(uint32_t bpm);
-}
+} // namespace midi
+
+namespace gps {
+void HandleAction(std::string_view action);
+void SetUtcOffset(int32_t hours, uint32_t minutes);
+} // namespace gps
 } // namespace ltc::actions
 
 #endif // LTC_ACTIONS_H_
