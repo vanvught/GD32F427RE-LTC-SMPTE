@@ -26,7 +26,6 @@
 #include <sys/time.h>
 #include <cstdint>
 
-#include "common/utils/utils_print.h"
 #include "firmware/utc.h"
 #include "gnss.h"
 #include "ltc_gps.h"

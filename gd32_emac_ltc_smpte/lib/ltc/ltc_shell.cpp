@@ -60,4 +60,13 @@ void Gps(Arguments args) {
 
     ::ltc::actions::gps::HandleAction(args[1]);
 }
+
+void TCNet(Arguments args) {
+    if (args.size() != 2) {
+        uart0::Puts(common::kUnknown);
+        return;
+    }
+
+    ::ltc::actions::tcnet::HandleAction(args[1]);
+}
 } // namespace shell::ltc

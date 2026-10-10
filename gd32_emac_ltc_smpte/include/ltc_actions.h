@@ -56,6 +56,13 @@ namespace gps {
 void HandleAction(std::string_view action);
 void SetUtcOffset(int32_t hours, uint32_t minutes);
 } // namespace gps
+
+namespace tcnet {
+void HandleAction(std::string_view action);
+void SetLayer(std::string_view layer);
+void SetType(std::string_view type);
+void SetUseTimecode(std::string_view type);
+} // namespace tcnet
 } // namespace ltc::actions
 
 #endif // LTC_ACTIONS_H_

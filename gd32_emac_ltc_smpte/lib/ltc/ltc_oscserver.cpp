@@ -48,6 +48,27 @@ bool is_started{false};
 char path[network::iface::kHostnameSize + 8];
 uint32_t path_length{0};
 
+namespace commands {
+// Generic
+inline constexpr std::string_view kSource{"source/"};
+inline constexpr std::string_view kType{"type/"};
+inline constexpr std::string_view kUtc{"utc"};
+inline constexpr std::string_view kEnable{"enable/"};
+inline constexpr std::string_view kDisable{"disable/"};
+inline constexpr std::string_view kDirection{"direction/"};
+inline constexpr std::string_view kForward{"forward"};
+inline constexpr std::string_view kBackward{"backward"};
+inline constexpr std::string_view kPitch{"pitch"};
+inline constexpr std::string_view kGpsUtc{"gps/utc"};
+inline constexpr std::string_view kGps{"gps/"};
+inline constexpr std::string_view kGoto{"goto"};
+inline constexpr std::string_view kMidiBpm{"midi/bpm"};
+inline constexpr std::string_view kMidi{"midi/"};   // start, stop and continue
+inline constexpr std::string_view kTCNet{"tcnet/"}; // layer, type and timecode
+inline constexpr std::string_view kLayer{"layer/"};
+inline constexpr std::string_view kUseTimecide{"timecode/"};
+} // namespace commands
+
 bool ValidateUtc(const uint8_t* buffer, uint32_t size, int32_t& hours, uint32_t& minutes) {
     OscSimpleMessage msg(buffer, size);
 
@@ -66,24 +87,6 @@ bool ValidateUtc(const uint8_t* buffer, uint32_t size, int32_t& hours, uint32_t&
 
     return true;
 }
-
-namespace commands {
-// Generic
-inline constexpr std::string_view kSource{"source/"};
-inline constexpr std::string_view kType{"type/"};
-inline constexpr std::string_view kUtc{"utc"};
-inline constexpr std::string_view kEnable{"enable/"};
-inline constexpr std::string_view kDisable{"disable/"};
-inline constexpr std::string_view kDirection{"direction/"};
-inline constexpr std::string_view kForward{"forward"};
-inline constexpr std::string_view kBackward{"backward"};
-inline constexpr std::string_view kPitch{"pitch"};
-inline constexpr std::string_view kGpsUtc{"gps/utc"};
-inline constexpr std::string_view kGps{"gps/"};
-inline constexpr std::string_view kGoto{"goto"};
-inline constexpr std::string_view kMidiBpm{"midi/bpm"};
-inline constexpr std::string_view kMidi{"midi/"}; // start, stop and continue                                                //
-} // namespace commands
 
 void HandleSkip(const uint8_t* buffer, uint32_t size, ltc::actions::Skip skip) {
     OscSimpleMessage msg(buffer, size);
@@ -151,6 +154,26 @@ void HandleGpsUtc(const uint8_t* buffer, uint32_t size) {
     }
 
     ltc::actions::gps::SetUtcOffset(hours, minutes);
+}
+
+void HandleTCNet(std::string_view tcnet) {
+    if (tcnet.starts_with(commands::kLayer)) {
+        tcnet.remove_prefix(commands::kLayer.size());
+        ltc::actions::tcnet::SetLayer(tcnet);
+        return;
+    }
+
+    if (tcnet.starts_with(commands::kType)) {
+        tcnet.remove_prefix(commands::kType.size());
+        ltc::actions::tcnet::SetType(tcnet);
+        return;
+    }
+
+    if (tcnet.starts_with(commands::kUseTimecide)) {
+        tcnet.remove_prefix(commands::kUseTimecide.size());
+        ltc::actions::tcnet::SetUseTimecode(tcnet);
+        return;
+    }
 }
 
 void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_ip, [[maybe_unused]] uint16_t from_port) {
@@ -274,14 +297,17 @@ void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_
         ltc::actions::gps::HandleAction(request);
         return;
     }
+
+    if (request.starts_with(commands::kTCNet)) {
+        request.remove_prefix(commands::kTCNet.size());
+        HandleTCNet(request);
+        return;
+    }
 }
 
 } // namespace
 void Start() {
-    LTC_OSCSERVER_DEBUG_ENTRY();
-
     if (is_started) {
-        LTC_OSCSERVER_DEBUG_EXIT();
         return;
     }
 
@@ -293,15 +319,10 @@ void Start() {
     assert(handle == -1);
     handle = ::network::udp::Begin(::ltc::udp::port::kOsc, Input);
     assert(handle != -1);
-
-    LTC_OSCSERVER_DEBUG_EXIT();
 }
 
 void Stop() {
-    LTC_OSCSERVER_DEBUG_ENTRY();
-
     if (!is_started) {
-        LTC_OSCSERVER_DEBUG_EXIT();
         return;
     }
 
@@ -310,7 +331,5 @@ void Stop() {
     assert(handle != -1);
     ::network::udp::End(::ltc::udp::port::kOsc);
     handle = -1;
-
-    LTC_OSCSERVER_DEBUG_EXIT();
 }
 } // namespace ltc::oscserver

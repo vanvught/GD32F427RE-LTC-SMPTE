@@ -27,7 +27,6 @@
 #include <string_view>
 
 #include "ltc_actions.h"
-#include "common/utils/utils_print.h"
 #include "common/utils/utils_string.h"
 #include "input/ltc_input.h"
 #include "input/ltc_input_internal.h"
@@ -163,7 +162,7 @@ void SetType(std::string_view type) {
     }
 
     auto is_valid{false};
-    const auto kValue = common::Atoi(type.data(), type.size());
+    const auto kValue = common::Atoi(type);
 
     switch (kValue) {
         case 24:

@@ -24,15 +24,121 @@
 */
 
 #include "ltc.h"
+#include "ltc_commands.h"
 #include "output/ltc_output.h"
 #include "ltc_debug.h"
 #include "tcnet.h"
 #include "tcnet_timecode.h"
+#include "ltc_actions.h"
+#include "network_udp.h"
+#include "ltc_udp_port.h"
+
+namespace ltc::actions::tcnet {
+void SetLayer(std::string_view layer) {
+    if (layer.size() != 1) {
+        return;
+    }
+
+    const auto kLayer = ::tcnet::LayerFromChar(layer.front());
+
+    if (kLayer == ::tcnet::Layer::kLayerUndefined) {
+        return;
+    }
+
+    ::tcnet::SetLayer(kLayer);
+    // update Display
+}
+
+void SetType(std::string_view type) {
+    if (type.size() != 2) {
+        return;
+    }
+
+    auto is_valid{false};
+    const auto kValue = common::Atoi(type);
+
+    switch (kValue) {
+        case 24:
+            ::tcnet::SetTimeCodeType(::tcnet::TimeCodeType::kFilm);
+            is_valid = true;
+            break;
+
+        case 25:
+            ::tcnet::SetTimeCodeType(::tcnet::TimeCodeType::kEbu25Fps);
+            is_valid = true;
+            break;
+
+        case 29:
+            ::tcnet::SetTimeCodeType(::tcnet::TimeCodeType::kDf);
+            is_valid = true;
+            break;
+
+        case 30:
+            ::tcnet::SetTimeCodeType(::tcnet::TimeCodeType::kSmpte30Fps);
+            is_valid = true;
+            break;
+
+        default:
+            break;
+    }
+
+    if (is_valid) {
+        // update Display
+    }
+}
+
+void SetUseTimecode(std::string_view use_timecode) {
+    if (use_timecode.size() != 1) {
+        return;
+    }
+
+    const auto kUse = use_timecode.front() == 'y';
+    ::tcnet::SetUseTimeCode(kUse);
+}
+
+void HandleAction(std::string_view action) {
+    if (action.starts_with(ltc::commands::kLayer)) {
+        action.remove_prefix(ltc::commands::kLayer.size());
+        SetLayer(action);
+        return;
+    }
+
+    if (action.starts_with(ltc::commands::kType)) {
+        action.remove_prefix(ltc::commands::kType.size());
+        SetType(action);
+        return;
+    }
+
+    if (action.starts_with(ltc::commands::kTimecode)) {
+        action.remove_prefix(ltc::commands::kTimecode.size());
+        SetUseTimecode(action);
+        return;
+    }
+}
+} // namespace ltc::actions::tcnet
 
 namespace ltc::input::tcnet {
 namespace {
-auto is_started{false};
+bool is_started{false};
+int32_t handle{-1};
+
+constexpr std::string_view kTcnet{"tcnet!"};
+
+void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_ip, [[maybe_unused]] uint16_t from_port) {
+    assert(buffer != nullptr);
+
+    std::string_view request{reinterpret_cast<const char*>(buffer), size};
+
+    if (!request.starts_with(kTcnet)) {
+        return;
+    }
+
+    request.remove_prefix(kTcnet.size());
+
+    actions::tcnet::HandleAction(request);
 }
+} // namespace
+
 void Start() {
     LTC_INPUT_DEBUG_ENTRY();
 
@@ -47,6 +153,10 @@ void Start() {
 
     ::tcnet::Start();
 
+    assert(handle == -1);
+    handle = ::network::udp::Begin(::ltc::udp::port::kTCNet, Input);
+    assert(handle != -1);
+
     LTC_INPUT_DEBUG_EXIT();
 }
 
@@ -60,6 +170,10 @@ void Stop() {
 
     is_started = false;
 
+    assert(handle != -1);
+    ::network::udp::End(::ltc::udp::port::kTCNet);
+    handle = -1;
+
     ::tcnet::Stop();
 
     LTC_INPUT_DEBUG_EXIT();
@@ -68,6 +182,6 @@ void Stop() {
 
 namespace tcnet {
 void Handle([[maybe_unused]] const tcnet::Timecode* timecode) {
-		ltc::output::Destination::Instance().Distribute(reinterpret_cast<const ::ltc::TimeCode*>(timecode));
+    ltc::output::Destination::Instance().Distribute(reinterpret_cast<const ::ltc::TimeCode*>(timecode));
 }
 } // namespace tcnet
