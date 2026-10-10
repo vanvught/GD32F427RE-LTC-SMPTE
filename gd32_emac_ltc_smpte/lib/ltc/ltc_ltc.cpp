@@ -218,7 +218,7 @@ void Timer10Config() {
 }
 
 void Timer0SetType(uint32_t type) {
-    TIMER_CTL0(TIMER0) &= TIMER_CTL0_CEN;
+    TIMER_CTL0(TIMER0) &= ~TIMER_CTL0_CEN;
     TIMER_CAR(TIMER0) = ((TimeCodeConst::kTmrIntv[type] + 1) / (::ltc::encoder::kFormatSizeBits * 2U)) - 1U;
     TIMER_CNT(TIMER0) = 0;
     TIMER_CTL0(TIMER0) |= TIMER_CTL0_CEN;
