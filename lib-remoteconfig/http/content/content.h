@@ -28,7 +28,6 @@
 #if !defined (CONFIG_HTTP_HTML_NO_RTC) && !defined (DISABLE_RTC)
 #include "rtc_index.html.h"
 #endif // !defined (CONFIG_HTTP_HTML_NO_RTC) && !defined (DISABLE_RTC)
-#include "status_dmx.js.h"
 #if !defined (CONFIG_HTTP_HTML_NO_TIME)
 #include "time_index.html.h"
 #endif // !defined (CONFIG_HTTP_HTML_NO_TIME)
@@ -37,7 +36,6 @@
 #if defined (NODE_LTC_SMPTE)
 #include "config_ltcdisplays.js.h"
 #endif // (NODE_LTC_SMPTE)
-#include "config_rdmdevice.js.h"
 #include "storage_index.html.h"
 #if defined (CONFIG_HTTPD_ENABLE_UPLOAD)
 #include "upload_index.html.h"
@@ -78,7 +76,6 @@ inline constexpr struct FilesContent kHttpContent[] = {
 #if !defined (CONFIG_HTTP_HTML_NO_RTC) && !defined (DISABLE_RTC)
 	{ 1233896314,"rtc_index.html", rtc_index_html_gz, 239, static_cast<http::ContentTypes>(0), true },
 #endif // !defined (CONFIG_HTTP_HTML_NO_RTC) && !defined (DISABLE_RTC)
-	{ 3583512354,"status_dmx.js", status_dmx_js_gz, 868, static_cast<http::ContentTypes>(2), true },
 #if !defined (CONFIG_HTTP_HTML_NO_TIME)
 	{ 2057353734,"time_index.html", time_index_html_gz, 520, static_cast<http::ContentTypes>(0), true },
 #endif // !defined (CONFIG_HTTP_HTML_NO_TIME)
@@ -87,7 +84,6 @@ inline constexpr struct FilesContent kHttpContent[] = {
 #if defined (NODE_LTC_SMPTE)
 	{ 1194496967,"config_ltcdisplays.js", config_ltcdisplays_js_gz, 565, static_cast<http::ContentTypes>(2), true },
 #endif // (NODE_LTC_SMPTE)
-	{ 1557939568,"config_rdmdevice.js", config_rdmdevice_js_gz, 433, static_cast<http::ContentTypes>(2), true },
 	{ 2148610488,"storage_index.html", storage_index_html_gz, 513, static_cast<http::ContentTypes>(0), true },
 #if defined (CONFIG_HTTPD_ENABLE_UPLOAD)
 	{ 137651886,"upload_index.html", upload_index_html_gz, 563, static_cast<http::ContentTypes>(0), true },

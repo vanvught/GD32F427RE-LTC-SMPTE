@@ -23,7 +23,6 @@
 #if !defined (CONFIG_HTTP_HTML_NO_RTC) && !defined (DISABLE_RTC)
 #include "rtc_index.html.h"
 #endif // !defined (CONFIG_HTTP_HTML_NO_RTC) && !defined (DISABLE_RTC)
-#include "status_dmx.js.h"
 #if !defined (CONFIG_HTTP_HTML_NO_TIME)
 #include "time_index.html.h"
 #endif // !defined (CONFIG_HTTP_HTML_NO_TIME)
@@ -32,7 +31,6 @@
 #if defined (NODE_LTC_SMPTE)
 #include "config_ltcdisplays.js.h"
 #endif // (NODE_LTC_SMPTE)
-#include "config_rdmdevice.js.h"
 #include "storage_index.html.h"
 #if defined (CONFIG_HTTPD_ENABLE_UPLOAD)
 #include "upload_index.html.h"
