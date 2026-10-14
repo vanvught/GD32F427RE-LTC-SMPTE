@@ -31,7 +31,9 @@
 #include "json/json_parser.h"
 
 static void SetDisplay(const char* val, uint32_t len) {
-    if (len != 1) return;
+    if (len != 1) {
+        return;
+    }
 
     Display::Get()->SetSleep(val[0] == '0');
 }
@@ -53,7 +55,9 @@ static void SetReboot(const char* val, uint32_t len) {
     if (len != 1) {
         return;
     }
-    if (val[0] != '0') board::Reboot();
+    if (val[0] != '0') {
+        board::Reboot();
+    }
 }
 
 static constexpr auto kDisplay = json::MakeSimpleKey("display");
