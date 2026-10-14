@@ -88,9 +88,9 @@ inline void ParseJsonWithTable(const char* buffer, size_t size, const json::Key*
     }
 }
 
-template <size_t N>
-inline void ParseJsonWithTable(const char* buffer, size_t size, const json::Key (&keys)[N]) {
-    ParseJsonWithTable(buffer, size, keys, N);
+template <size_t kN>
+inline void ParseJsonWithTable(const char* buffer, size_t size, const json::Key (&keys)[kN]) {
+    ParseJsonWithTable(buffer, size, keys, kN);
 }
 
 #endif // JSON_JSON_PARSER_H_

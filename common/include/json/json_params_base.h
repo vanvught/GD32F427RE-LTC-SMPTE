@@ -26,7 +26,6 @@
 #ifndef JSON_JSON_PARAMS_BASE_H_
 #define JSON_JSON_PARAMS_BASE_H_
 
-#include <cstdio>
 #include <cstdint>
 
 #include "json/json_debug.h"
@@ -38,7 +37,7 @@ template <typename Derived>
 class JsonParamsBase {
    public:
     void Load([[maybe_unused]] const char* file_name) {
-#if !defined(DISABLE_FS)
+#ifndef DISABLE_FS
         FILE* file = fopen(file_name, "r");
         if (file != nullptr) {
             char buffer[kMaxBufferSize];

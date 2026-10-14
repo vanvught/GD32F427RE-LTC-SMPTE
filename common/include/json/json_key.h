@@ -71,15 +71,15 @@ constexpr Key MakeKey(void (*set)(const char*, uint32_t, const char*, uint32_t),
     return Key{.port_key = &port, .set_keyed = set, .type = Key::kKeyed};
 }
 
-template <std::size_t N>
-constexpr SimpleKey MakeSimpleKey(const char (&name)[N]) noexcept {
-    static_assert(N > 1);
-    static_assert(N - 1 <= UINT8_MAX);
+template <std::size_t kN>
+constexpr SimpleKey MakeSimpleKey(const char (&name)[kN]) noexcept {
+    static_assert(kN > 1);
+    static_assert(kN - 1 <= UINT8_MAX);
 
     return {
         .name = name,
-        .length = static_cast<uint8_t>(N - 1),
-        .hash = Fnv1a32(name, N - 1)
+        .length = static_cast<uint8_t>(kN - 1),
+        .hash = Fnv1a32(name, kN - 1),
     };
 }
 } // namespace json
