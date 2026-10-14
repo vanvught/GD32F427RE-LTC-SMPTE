@@ -39,13 +39,13 @@ RemoteConfigParams::RemoteConfigParams() {
 }
 
 void RemoteConfigParams::SetDisplayName(std::string_view value) {
-    constexpr std::size_t kLength = common::store::remoteconfig::kDisplayNameLength;
+    constexpr std::size_t kDisplayNameLength = common::store::remoteconfig::kDisplayNameLength;
 
-    const auto length = std::min(value.size(), kLength - 1);
+    const auto kLength = std::min(value.size(), kDisplayNameLength - 1);
     auto* destination = reinterpret_cast<char*>(store_remoteconfig.display_name);
 
-    memcpy(destination, value.data(), length);
-    memset(destination + length, 0, kLength - length);
+    memcpy(destination, value.data(), kLength);
+    memset(destination + kLength, 0, kDisplayNameLength - kLength);
 }
 
 void RemoteConfigParams::Store(const char* buffer, uint32_t buffer_size) {
