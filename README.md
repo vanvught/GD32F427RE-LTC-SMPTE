@@ -13,7 +13,7 @@ Input
 - [x] System time
   - [x] GPS
   - [x] NTP-PTP
-- [x] ETC
+- [ ] ETC
 
 
 Output
@@ -22,7 +22,7 @@ Output
 - [x] DIN MIDI
 - [x] Apple MIDI
 - [x] USB MIDI
-- [x] ETC
+- [ ] ETC
 - [x] NTP Server
 - [x] Display OLED
 - [x] Display MAX7219 Matrix / 7-Segment

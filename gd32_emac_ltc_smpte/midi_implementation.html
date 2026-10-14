@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MIDI Implementation — LTC Firmware</title>
+<style>
+body {
+	font: 15px/1.55 system-ui, Arial, sans-serif;
+	max-width: 1080px;
+	margin: 35px auto;
+	padding: 0 20px;
+	color: #202832
+}
+
+h1, h2 {
+	color: #173c60
+}
+
+h1 {
+	border-bottom: 3px solid #3479a8;
+	padding-bottom: 12px
+}
+
+h2 {
+	margin-top: 35px;
+	border-bottom: 1px solid #ccd6df;
+	padding-bottom: 5px
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	margin: 14px 0 22px
+}
+
+th, td {
+	border: 1px solid #ccd6df;
+	padding: 9px 11px;
+	text-align: left;
+	vertical-align: top
+}
+
+th {
+	background: #eaf2f8
+}
+
+tr:nth-child(even) {
+	background: #f8fafc
+}
+
+pre {
+	background: #f2f5f8;
+	border: 1px solid #dce4eb;
+	border-radius: 5px;
+	padding: 15px;
+	overflow-x: auto;
+	line-height: 1.4
+}
+
+code {
+	font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+	font-size: .92em
+}
+
+.note {
+	border-left: 4px solid #3479a8;
+	padding: 9px 14px;
+	background: #f2f7fa
+}
+
+small {
+	color: #536273
+}
+
+a {
+	color: #145c94
+}
+</style>
+</head>
+<body>
+	<h1>MIDI Implementation — LTC Firmware</h1>
+	<p>
+		Source-based reference for MIDI Time Code (MTC), MIDI Clock, DIN MIDI,
+		AppleMIDI/RTP-MIDI and USB-MIDI. Structured around the signal-flow
+		examples in
+		<code>midi.txt</code>
+		. This describes the supplied implementation, not every feature of the
+		MIDI standard.
+	</p>
+	<h2>1. Architecture</h2>
+	<pre>DIN MIDI (UART)       AppleMIDI / RTP-MIDI       USB-MIDI
+      |                       |                       |
+  RX ring / parser       RTP message parser       USB CIN decoder
+      |                       |                       |
+      +-----------------------+-----------------------+
+                              |
+                 MTC QF / MTC Full Frame
+                              |
+                ltc::input::mtc handlers
+                              |
+                    Distribute(timecode)
+                              |
+             LTC and enabled output destinations
+                              |
+                MTC Full Frame / QF generator
+                              |
+               DIN MIDI / AppleMIDI / USB-MIDI</pre>
+	<p>
+		The input source is selected through
+		<code>ltc::input::Source</code>
+		; the corresponding
+		<code>Start()</code>
+		,
+		<code>Stop()</code>
+		and (where needed)
+		<code>Run()</code>
+		functions are dispatched by the input table. Only the selected
+		AppleMIDI source is accepted by its RTP callback.
+	</p>
+	<h2>2. Transports</h2>
+	<table>
+		<tr>
+			<th>Transport</th>
+			<th>Input handling</th>
+			<th>Output handling</th>
+			<th>Notes</th>
+		</tr>
+		<tr>
+			<td>DIN MIDI</td>
+			<td>UART RX interrupt timestamps bytes and enqueues them; <code>midi::Run()</code>
+				parses them.
+			</td>
+			<td>UART transmit of Full Frame SysEx, QF and realtime bytes.</td>
+			<td>31,250 baud, 8 data bits, no parity, 1 stop bit.</td>
+		</tr>
+		<tr>
+			<td>AppleMIDI</td>
+			<td>UDP session establishment; RTP-MIDI decoder calls <code>rtpmidi::MidiMessage()</code>.
+			</td>
+			<td>AppleMIDI output routines are called for Full Frame and QF.</td>
+			<td>Session invitations, synchronization and timeout are
+				implemented.</td>
+		</tr>
+		<tr>
+			<td>USB-MIDI</td>
+			<td><code>usbmidi::Message()</code> supplies USB events; <code>Run()</code>
+				switches on CIN.</td>
+			<td>Full Frame and QF sent through USB MIDI output API.</td>
+			<td>USB endpoint queue internals are not present in the attached
+				source.</td>
+		</tr>
+	</table>
+	<h2>3. MTC Quarter Frame input</h2>
+	<pre>DIN: F1 xx ───────────────┐
+AppleMIDI: type F1 + xx ─┼──► mtc::HandleQuarterFrame(xx)
+USB: CIN 02, F1 xx ──────┘                 |
+                               pieces 0 ... 7 assembled
+                                         |
+                                  piece 7 received
+                                         |
+                              copy to timecode_running
+                                         |
+                                    Distribute()
+                                         |
+                                TIMER9 configured</pre>
+	<p>
+		The eight 4-bit pieces assemble frames, seconds, minutes, hours and
+		the frame-rate type. On piece 7, the decoded timecode is distributed
+		and
+		<code>Timer9Set(type)</code>
+		arms a one-frame interpolation interval. The TIMER9 interrupt
+		increments and distributes once, then disables its update interrupt
+		until rearmed.
+	</p>
+	<h2>4. MTC Full Frame input</h2>
+	<pre>DIN SysEx ──────┐
+AppleMIDI SysEx ├──► transport-specific decoding
+USB SysEx ──────┘                |
+                       mtc::HandleFullFrame(
+                         hours, minutes, seconds, frames)
+                                 |
+                         update timecode_running
+                                 |
+                              Distribute()</pre>
+	<p>
+		Full Frame format:
+		<code>F0 7F 7F 01 01 hr mn ss ff F7</code>
+		. The upper bits of
+		<code>hr</code>
+		encode the MTC type; the lower five bits encode the hour. Unlike
+		Quarter Frame completion,
+		<code>HandleFullFrame()</code>
+		does not call
+		<code>Timer9Set()</code>
+		.
+	</p>
+	<h2>5. USB-MIDI CIN handling</h2>
+	<table>
+		<tr>
+			<th>CIN</th>
+			<th>Meaning</th>
+			<th>Handler</th>
+		</tr>
+		<tr>
+			<td><code>0x02</code></td>
+			<td>Two-byte System Common, including <code>F1 xx</code></td>
+			<td><code>HandleQuarterFrame()</code></td>
+		</tr>
+		<tr>
+			<td><code>0x04</code></td>
+			<td>SysEx start/continue, three bytes</td>
+			<td rowspan="4"><code>HandleUsbMtc()</code> accumulates and
+				validates the 10-byte MTC Full Frame.</td>
+		</tr>
+		<tr>
+			<td><code>0x05</code></td>
+			<td>SysEx ends with one byte</td>
+		</tr>
+		<tr>
+			<td><code>0x06</code></td>
+			<td>SysEx ends with two bytes</td>
+		</tr>
+		<tr>
+			<td><code>0x07</code></td>
+			<td>SysEx ends with three bytes</td>
+		</tr>
+		<tr>
+			<td><code>0x0F</code></td>
+			<td>Single-byte realtime event</td>
+			<td><code>HandleSystemRealtime()</code> processes MIDI Clock.</td>
+		</tr>
+	</table>
+	<pre>04 F0 7F 7F
+04 01 01 hr
+04 mn ss ff
+05 F7 -- --
+        ↓
+F0 7F 7F 01 01 hr mn ss ff F7
+        ↓
+mtc::HandleFullFrame(hr, mn, ss, ff)</pre>
+	<h2>6. MTC output generation</h2>
+	<pre>DistributeInternal(timecode)
+          |
+          +-- type changed? --> send MTC Full Frame to enabled MIDI outputs
+          |
+          +-- CreateQuarterFrame() for initial QF piece
+          |       |
+          |       +--> DIN / AppleMIDI / USB-MIDI
+          |
+          +-- TIMER10 set to quarter-frame interval
+                      |
+               TIMER10 interrupt
+                      |
+               CreateQuarterFrame()
+                      |
+               DIN / AppleMIDI / USB-MIDI</pre>
+	<p>
+		<code>CreateQuarterFrame()</code>
+		cycles pieces 0–7.
+		<code>TIMER10</code>
+		supplies the quarter-frame timing; pieces 0 and 4 are handled at the
+		frame distribution boundary rather than sent from the timer ISR. A
+		type change resets the QF state and sends a Full Frame message to each
+		enabled MIDI output.
+	</p>
+	<p class="note">
+		The supplied
+		<code>midi.txt</code>
+		also illustrates USB transmit queue, busy state and endpoint
+		completion. Those details cannot be independently verified from the
+		attached USB driver files because the USB driver implementation was
+		not included.
+	</p>
+	<h2>7. MIDI Clock / BPM</h2>
+	<pre>DIN 0xF8 ────────┐
+RTP-MIDI Clock ──┼──► CalculateBpm(timestamp, received, bpm)
+USB CIN 0F / F8 ─┘                   |
+                            accumulate 24 deltas
+                                    |
+                           BPM = round(60,000,000
+                                      / delta_sum)
+                                    |
+                             DisplayBpm(bpm)
+
+No clock for 1,000,000 microseconds --> reset BPM state; DisplayBpm(0)</pre>
+	<p>
+		DIN and USB use
+		<code>timing::Micros()</code>
+		timestamps (DIN captured on reception); AppleMIDI uses RTP timestamp
+		multiplied by 100 for calculation and local microseconds for timeout
+		tracking. The calculation reports a changed BPM once per 24 MIDI Clock
+		intervals. A zero delta is ignored; a delta of at least one second
+		resets the accumulation.
+	</p>
+	<table>
+		<tr>
+			<th>Parameter</th>
+			<th>Value / behavior</th>
+		</tr>
+		<tr>
+			<td>MIDI Clock message</td>
+			<td><code>0xF8</code></td>
+		</tr>
+		<tr>
+			<td>Calculation window</td>
+			<td>24 intervals (one quarter note at 24 PPQN)</td>
+		</tr>
+		<tr>
+			<td>BPM formula</td>
+			<td><code>(60000000 + delta_sum / 2) / delta_sum</code> (integer
+				rounding)</td>
+		</tr>
+		<tr>
+			<td>Display timeout</td>
+			<td>1,000,000 µs without a clock</td>
+		</tr>
+		<tr>
+			<td>Configured output BPM range</td>
+			<td>8–300 BPM (<code>midi.h</code>)
+			</td>
+		</tr>
+		<tr>
+			<td>Generated clock</td>
+			<td><code>TIMER13</code> sends <code>midi::Type::kClock</code>
+				via <code>Destination::MidiSend()</code></td>
+		</tr>
+		<tr>
+			<td>Timer period register</td>
+			<td><code>CAR = ((25000 + bpm / 2) / bpm) - 1</code> with a 10
+				kHz timer base</td>
+		</tr>
+	</table>
+	<h2>8. MIDI realtime controls</h2>
+	<table>
+		<tr>
+			<th>MIDI byte</th>
+			<th>Type</th>
+			<th>Implementation</th>
+		</tr>
+		<tr>
+			<td><code>FA</code></td>
+			<td>Start</td>
+			<td>Action dispatch to <code>MidiSend(kStart)</code></td>
+		</tr>
+		<tr>
+			<td><code>FB</code></td>
+			<td>Continue</td>
+			<td>Action dispatch to <code>MidiSend(kContinue)</code></td>
+		</tr>
+		<tr>
+			<td><code>FC</code></td>
+			<td>Stop</td>
+			<td>Action dispatch to <code>MidiSend(kStop)</code></td>
+		</tr>
+		<tr>
+			<td><code>F8</code></td>
+			<td>Clock</td>
+			<td>Input BPM measurement; output generated by TIMER13</td>
+		</tr>
+		<tr>
+			<td><code>FF</code></td>
+			<td>Reset</td>
+			<td>DIN parser returns to idle</td>
+		</tr>
+	</table>
+	<p>
+		A UDP control handler accepts messages beginning with
+		<code>midi!</code>
+		, then forwards the remainder to
+		<code>ltc::actions::midi::HandleAction()</code>
+		. It recognizes start, stop, continue and BPM command prefixes defined
+		in
+		<code>ltc_commands.h</code>
+		, which was not attached; therefore their exact wire strings are not
+		reproduced here.
+	</p>
+	<h2>9. Timer overview</h2>
+	<table>
+		<tr>
+			<th>Timer</th>
+			<th>Role</th>
+			<th>Behavior</th>
+		</tr>
+		<tr>
+			<td><code>TIMER9</code></td>
+			<td>MTC input interpolation</td>
+			<td>Armed after complete QF assembly; one increment and
+				distribution on update.</td>
+		</tr>
+		<tr>
+			<td><code>TIMER10</code></td>
+			<td>MTC output QF scheduling</td>
+			<td>Quarter-frame cadence, coordinating pieces with frame
+				boundaries.</td>
+		</tr>
+		<tr>
+			<td><code>TIMER13</code></td>
+			<td>MIDI Clock output</td>
+			<td>10 kHz base, BPM-derived period, sends realtime Clock.</td>
+		</tr>
+		<tr>
+			<td><code>TIMER3</code></td>
+			<td>Core LTC frame timing</td>
+			<td>Master frame timing in LTC output implementation.</td>
+		</tr>
+		<tr>
+			<td><code>TIMER0</code></td>
+			<td>LTC waveform output</td>
+			<td>DMA-driven LTC waveform timing; not a MIDI parser timer.</td>
+		</tr>
+	</table>
+	<h2>10. AppleMIDI / RTP-MIDI</h2>
+	<p>
+		<code>AppleMidi</code>
+		implements invitation/accept/reject/end-session messages and timestamp
+		synchronization. Session establishment proceeds through control and
+		MIDI invitations, then accepts RTP-MIDI messages. An established
+		session has a 90-second timeout managed by a software timer.
+		<code>RtpMidi</code>
+		decodes the RTP command section, delta times and supported MIDI status
+		bytes, and forwards parsed
+		<code>midi::Message</code>
+		objects to
+		<code>rtpmidi::MidiMessage()</code>
+		.
+	</p>
+	<p>The RTP callback handles QF, Full Frame SysEx and Clock only
+		when the selected LTC input is AppleMIDI. The parser contains other
+		MIDI status types, but they are not thereby LTC input features.</p>
+	<h2>11. Source file map</h2>
+	<table>
+		<tr>
+			<th>File</th>
+			<th>Purpose</th>
+		</tr>
+		<tr>
+			<td><code>ltc_midi(9).cpp</code></td>
+			<td>Transport start/stop/run, DIN parser, MTC input handlers,
+				BPM measurement, realtime actions and timer ISRs.</td>
+		</tr>
+		<tr>
+			<td><code>ltc_ltc(8).cpp</code></td>
+			<td>LTC distribution and MIDI QF generation with TIMER10.</td>
+		</tr>
+		<tr>
+			<td><code>midi(1).h</code></td>
+			<td>MIDI types, message/timecode structures, baud rate and BPM
+				bounds.</td>
+		</tr>
+		<tr>
+			<td><code>ltc_input(3).h</code></td>
+			<td>Input source selection and lifecycle dispatch.</td>
+		</tr>
+		<tr>
+			<td><code>ltc_input_midi(1).h</code></td>
+			<td>DIN, AppleMIDI and USB-MIDI input declarations.</td>
+		</tr>
+		<tr>
+			<td><code>applemidi.cpp</code></td>
+			<td>AppleMIDI session and synchronization handling.</td>
+		</tr>
+		<tr>
+			<td><code>rtpmidi.cpp</code></td>
+			<td>RTP-MIDI command and message decoding.</td>
+		</tr>
+		<tr>
+			<td><code>midi_debug.h</code></td>
+			<td>Compile-time debug macros for MIDI, AppleMIDI and RTP-MIDI.</td>
+		</tr>
+		<tr>
+			<td><code>midi.txt</code></td>
+			<td>Reference flow diagrams used to organize this document.</td>
+		</tr>
+	</table>
+	<p>
+		<small>Documentation generated from the nine attached files.
+			No external libraries, stylesheets or scripts required.</small>
+	</p>
+</body>
+</html>

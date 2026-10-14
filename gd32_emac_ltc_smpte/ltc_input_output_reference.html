@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LTC SMPTE — Input / Output Reference</title>
+<style>
+* {
+	box-sizing: border-box
+}
+
+body {
+	font: 15px/1.55 system-ui, -apple-system, Segoe UI, sans-serif;
+	max-width: 1380px;
+	margin: 0 auto;
+	padding: 32px 24px;
+	color: #243044;
+	background: #f6f8fb
+}
+
+h1 {
+	margin: 0;
+	font-size: 30px
+}
+
+h2 {
+	font-size: 21px;
+	margin: 35px 0 12px
+}
+
+p {
+	max-width: 1000px
+}
+
+.sub {
+	color: #66758b;
+	margin: 4px 0 22px
+}
+
+.panel {
+	background: white;
+	border: 1px solid #dde4ed;
+	border-radius: 10px;
+	padding: 18px 20px;
+	margin: 16px 0;
+	overflow: auto
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	font-size: 13px
+}
+
+th, td {
+	border-bottom: 1px solid #e5eaf0;
+	padding: 10px 11px;
+	text-align: left;
+	vertical-align: top
+}
+
+th {
+	background: #edf2f8;
+	color: #23344c;
+	font-weight: 650
+}
+
+tr:hover td {
+	background: #f8fafc
+}
+
+.matrix th:not(:first-child), .matrix td:not(:first-child) {
+	text-align: center;
+	min-width: 72px
+}
+
+.matrix th:first-child {
+	min-width: 140px;
+	position: sticky;
+	left: 0;
+	background: #edf2f8
+}
+
+.matrix td:first-child {
+	position: sticky;
+	left: 0;
+	background: white;
+	font-weight: 650
+}
+
+.yes {
+	color: #16814a;
+	font-weight: 750
+}
+
+.no {
+	color: #ad4e29;
+	font-weight: 750
+}
+
+.caveat {
+	color: #ad761c;
+	font-weight: 750
+}
+
+.tag {
+	font-size: 12px;
+	padding: 3px 8px;
+	border-radius: 5px;
+	background: #edf2f8;
+	white-space: nowrap
+}
+
+.note {
+	border-left: 3px solid #d89b3c;
+	padding: 9px 14px;
+	background: #fff8ea;
+	margin: 16px 0
+}
+
+.legend {
+	display: flex;
+	gap: 20px;
+	flex-wrap: wrap;
+	font-size: 13px
+}
+
+.small {
+	font-size: 12px;
+	color: #64748b
+}
+
+code {
+	background: #edf2f8;
+	padding: 2px 4px;
+	border-radius: 3px
+}
+
+@media print {
+	body {
+		background: white;
+		padding: 12px
+	}
+	.panel {
+		break-inside: avoid
+	}
+	h2 {
+		break-after: avoid
+	}
+}
+</style>
+</head>
+<body>
+	<h1>LTC SMPTE — Input / Output Reference</h1>
+	<p class="sub">GD32F427RE · Standalone source-based reference · 14
+		October 2026</p>
+	<p>
+		This reference separates <strong>declared output names</strong> from
+		outputs with active start/stop handlers and outputs explicitly
+		dispatched by the common timecode distribution routine.
+	</p>
+	<h2>1. Input → Output matrix</h2>
+	<div class="panel">
+		<table class="matrix">
+			<thead>
+				<tr>
+					<th>Selected input</th>
+					<th title="LTC">LTC</th>
+					<th title="Art-Net">Art-Net</th>
+					<th title="DIN MIDI">DIN MIDI</th>
+					<th title="Apple MIDI">Apple MIDI</th>
+					<th title="USB MIDI">USB MIDI</th>
+					<th title="ETC">ETC</th>
+					<th title="NTP Server">NTP Server</th>
+					<th title="OLED">OLED</th>
+					<th title="MAX7219">MAX7219</th>
+					<th title="Pixel">Pixel</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>LTC</td>
+					<td><span class="no"
+						title="Source::Select calls Destination::Update, disabling matching output">—</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="caveat"
+						title="Start/stop handler exists, but no ETC dispatch in common Distribute()">△</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+				</tr>
+				<tr>
+					<td>Art-Net</td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="no"
+						title="Source::Select calls Destination::Update, disabling matching output">—</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="caveat"
+						title="Start/stop handler exists, but no ETC dispatch in common Distribute()">△</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+				</tr>
+				<tr>
+					<td>DIN MIDI</td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="no"
+						title="Source::Select calls Destination::Update, disabling matching output">—</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="caveat"
+						title="Start/stop handler exists, but no ETC dispatch in common Distribute()">△</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+				</tr>
+				<tr>
+					<td>TCNet</td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="caveat"
+						title="Start/stop handler exists, but no ETC dispatch in common Distribute()">△</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+				</tr>
+				<tr>
+					<td>Internal</td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="caveat"
+						title="Start/stop handler exists, but no ETC dispatch in common Distribute()">△</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+				</tr>
+				<tr>
+					<td>Apple MIDI</td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="caveat"
+						title="Start/stop handler exists, but no ETC dispatch in common Distribute()">△</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+				</tr>
+				<tr>
+					<td>USB MIDI</td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="caveat"
+						title="Start/stop handler exists, but no ETC dispatch in common Distribute()">△</span></td>
+					<td><span class="no"
+						title="Source::Select calls Destination::Update, disabling matching output">—</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+				</tr>
+				<tr>
+					<td>System-Time</td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="caveat"
+						title="Start/stop handler exists, but no ETC dispatch in common Distribute()">△</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+				</tr>
+				<tr>
+					<td>ETC</td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="caveat"
+						title="Start/stop handler exists, but no ETC dispatch in common Distribute()">△</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+					<td><span class="no"
+						title="Source::Select calls Destination::Update, disabling matching output">—</span></td>
+					<td><span class="yes"
+						title="Available when enabled and configured">✓</span></td>
+				</tr>
+			</tbody>
+		</table>
+		<p class="legend">
+			<span><span class="yes">✓</span> Available when enabled</span><span><span
+				class="no">—</span> Automatically disabled (same selected input)</span><span><span
+				class="caveat">△</span> ETC output handler present; distribution
+				unverified</span>
+		</p>
+		<p class="small">The TCNet, Internal and System-Time output enum
+			values have no start/stop entries and are intentionally omitted from
+			the matrix. Their names exist in ltc.h, but StartEnabled() marks
+			outputs without start handlers disabled. The matrix is a
+			configuration/dispatch summary, not a hardware or end-to-end
+			interoperability test.</p>
+	</div>
+	<h2>2. Input descriptions</h2>
+	<div class="panel">
+		<table>
+			<thead>
+				<tr>
+					<th>Input</th>
+					<th>Configuration name</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><strong>LTC</strong></td>
+					<td><code>ltc</code></td>
+					<td>Linear Timecode decoded from the physical LTC input
+						(TIMER2 input capture).</td>
+				</tr>
+				<tr>
+					<td><strong>Art-Net</strong></td>
+					<td><code>artnet</code></td>
+					<td>Art-Net timecode received over the network.</td>
+				</tr>
+				<tr>
+					<td><strong>DIN MIDI</strong></td>
+					<td><code>midi</code></td>
+					<td>MIDI timecode received over the DIN MIDI interface.</td>
+				</tr>
+				<tr>
+					<td><strong>TCNet</strong></td>
+					<td><code>tcnet</code></td>
+					<td>TCNet network timecode input; layer information is
+						displayed.</td>
+				</tr>
+				<tr>
+					<td><strong>Internal</strong></td>
+					<td><code>internal</code></td>
+					<td>Locally generated timecode, with transport and direction
+						controls.</td>
+				</tr>
+				<tr>
+					<td><strong>Apple MIDI</strong></td>
+					<td><code>rtp-midi</code></td>
+					<td>Network RTP-MIDI / AppleMIDI timecode input.</td>
+				</tr>
+				<tr>
+					<td><strong>USB MIDI</strong></td>
+					<td><code>usb-midi</code></td>
+					<td>Timecode received over USB MIDI.</td>
+				</tr>
+				<tr>
+					<td><strong>System-Time</strong></td>
+					<td><code>systime</code></td>
+					<td>Timecode generated from the system clock; README lists GPS
+						and NTP/PTP time synchronization.</td>
+				</tr>
+				<tr>
+					<td><strong>ETC</strong></td>
+					<td><code>etc</code></td>
+					<td>ETC protocol timecode input.</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<h2>3. Output descriptions</h2>
+	<div class="panel">
+		<table>
+			<thead>
+				<tr>
+					<th>Output</th>
+					<th>Configuration name</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><strong>LTC</strong></td>
+					<td><code>ltc</code></td>
+					<td>Physical LTC signal generated with timer and DMA.</td>
+				</tr>
+				<tr>
+					<td><strong>Art-Net</strong></td>
+					<td><code>artnet</code></td>
+					<td>Art-Net timecode transmission over the network.</td>
+				</tr>
+				<tr>
+					<td><strong>DIN MIDI</strong></td>
+					<td><code>midi</code></td>
+					<td>MIDI timecode messages on DIN MIDI.</td>
+				</tr>
+				<tr>
+					<td><strong>Apple MIDI</strong></td>
+					<td><code>rtp-midi</code></td>
+					<td>MIDI timecode sent over RTP-MIDI / AppleMIDI.</td>
+				</tr>
+				<tr>
+					<td><strong>USB MIDI</strong></td>
+					<td><code>usb-midi</code></td>
+					<td>MIDI timecode sent over USB MIDI.</td>
+				</tr>
+				<tr>
+					<td><strong>ETC</strong></td>
+					<td><code>etc</code></td>
+					<td>ETC output start/stop handlers exist; common Distribute()
+						path does not explicitly call an ETC output handler.</td>
+				</tr>
+				<tr>
+					<td><strong>NTP Server</strong></td>
+					<td><code>ntp-server</code></td>
+					<td>NTP server supplied with current timecode; starting it
+						stops the NTP client, stopping it restarts the client.</td>
+				</tr>
+				<tr>
+					<td><strong>OLED</strong></td>
+					<td><code>display-oled</code></td>
+					<td>Displays formatted timecode, timecode type, and MIDI BPM.</td>
+				</tr>
+				<tr>
+					<td><strong>MAX7219</strong></td>
+					<td><code>display-max7219</code></td>
+					<td>Shows formatted timecode on MAX7219 matrix or 7-segment
+						display.</td>
+				</tr>
+				<tr>
+					<td><strong>Pixel</strong></td>
+					<td><code>display-pixel</code></td>
+					<td>Shows formatted timecode on a pixel matrix or 7-segment
+						display.</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<h2>Implementation notes</h2>
+	<div class="panel">
+		<p>
+			<strong>Single active input:</strong>
+			<code>Source::Select()</code>
+			stops the previous input, calls
+			<code>Destination::Update(input)</code>
+			, resets timecode state, then starts the new input.
+			<code>Update()</code>
+			forces the output with the same input bit off in the current enabled
+			mask, preventing same-protocol forwarding while that input is
+			selected. A later explicit output enable may change this state.
+		</p>
+		<p>
+			<strong>Output dispatch:</strong>
+			<code>Destination::Distribute()</code>
+			explicitly calls LTC and Art-Net outputs, then
+			<code>DistributeInternal()</code>
+			handles MIDI-family timecode, NTP server, and displays. ETC has a
+			start/stop registration but is not explicitly dispatched in these
+			functions. TCNet has an input handler, but no output start/stop
+			registration.
+		</p>
+		<p>
+			<strong>System-Time:</strong>
+			<code>kSystime</code>
+			is an input source, not a registered output. The README lists GPS and
+			NTP/PTP under system-time input.
+		</p>
+		<p>
+			<strong>Default configuration:</strong> The pixel display output is
+			initially marked disabled. Other outputs are subject to start-up
+			initialization and runtime enable/disable state.
+		</p>
+		<p>
+			<strong>Supported timecode formats:</strong> Film 24 fps, EBU 25 fps,
+			DF 29.97 fps, and SMPTE 30 fps.
+		</p>
+		<p class="small">Source files: ltc.h, ltc_input.h, ltc_output.h,
+			ltc_output.cpp, ltc_timecode.h, ltc_ntpserver.cpp, README.md. This
+			page has no external dependencies.</p>
+	</div>
+</body>
+</html>
