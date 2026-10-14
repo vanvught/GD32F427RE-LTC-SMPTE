@@ -1,10 +1,6 @@
-#include "storage_index.js.h"
 #include "layout.js.h"
 #include "status_index.html.h"
 #include "index.html.h"
-#if defined (CONFIG_HTTPD_ENABLE_UPLOAD)
-#include "upload_index.js.h"
-#endif // (CONFIG_HTTPD_ENABLE_UPLOAD)
 #if defined (NODE_LTC_SMPTE)
 #include "config_etc.js.h"
 #endif // (NODE_LTC_SMPTE)
@@ -27,11 +23,10 @@
 #include "time_index.html.h"
 #endif // !defined (CONFIG_HTTP_HTML_NO_TIME)
 #include "date.js.h"
+#if !defined (CONFIG_HTTP_HTML_NO_RTC) && !defined (DISABLE_RTC)
+#include "rtc_index.js.h"
+#endif // !defined (CONFIG_HTTP_HTML_NO_RTC) && !defined (DISABLE_RTC)
 #include "common.js.h"
 #if defined (NODE_LTC_SMPTE)
 #include "config_ltcdisplays.js.h"
 #endif // (NODE_LTC_SMPTE)
-#include "storage_index.html.h"
-#if defined (CONFIG_HTTPD_ENABLE_UPLOAD)
-#include "upload_index.html.h"
-#endif // (CONFIG_HTTPD_ENABLE_UPLOAD)

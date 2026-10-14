@@ -32,10 +32,6 @@
 #include "common/utils/utils_hash.h"
 #include "http/json_infos.h"
 
-#ifdef NODE_LTC_SMPTE
-#undef NODE_LTC_SMPTE
-#endif
-
 namespace json {
 uint32_t GetList(char*, uint32_t);
 uint32_t GetVersion(char*, uint32_t);
@@ -43,19 +39,12 @@ uint32_t GetUptime(char*, uint32_t);
 
 uint32_t GetTimeofday(char*, uint32_t);
 void SetTimeofday(const char*, uint32_t);
-uint32_t ShowFileDirectory(char*, uint32_t);
 
 // Status
 namespace status {
 uint32_t Directory(char*, uint32_t);
 uint32_t Identify(char*, uint32_t);
 uint32_t Display(char*, uint32_t);
-uint32_t Dmx(char*, uint32_t);
-uint32_t Rdm(char*, uint32_t);
-uint32_t RdmQueue(char*, uint32_t);
-uint32_t ShowFile(char*, uint32_t);
-uint32_t Pixel(char*, uint32_t);
-uint32_t PixelDmx(char*, uint32_t);
 
 namespace emac {
 uint32_t Phy(char*, uint32_t);
@@ -69,18 +58,11 @@ uint32_t Directory(char*, uint32_t);
 
 namespace action {
 void Set(const char*, uint32_t);
-void SetShowFile(const char*, uint32_t);
 } // namespace action
 
 // Config
 namespace config {
 uint32_t Directory(char*, uint32_t);
-
-uint32_t GetRemoteConfig(char*, uint32_t);
-void SetRemoteConfig(const char*, uint32_t);
-
-uint32_t GetGlobal(char*, uint32_t);
-void SetGlobal(const char*, uint32_t);
 
 uint32_t GetNetwork(char*, uint32_t);
 void SetNetwork(const char*, uint32_t);
@@ -116,8 +98,6 @@ constexpr Info kFileInfos[] = {
     ENTRY(status::emac::Emac, nullptr, nullptr, "status/emac", nullptr, "Emac"),
     // Config
     ENTRY(config::Directory, nullptr, nullptr, "config/directory", nullptr, nullptr),
-    ENTRY(config::GetRemoteConfig, config::SetRemoteConfig, nullptr, "config/remote", "Remote configuration", nullptr),
-    ENTRY(config::GetGlobal, config::SetGlobal, nullptr, "config/global", "Global", nullptr),
     ENTRY(config::GetNetwork, config::SetNetwork, nullptr, "config/network", "Network", nullptr),
     // LTC
     // ENTRY(config::GetLtc, config::SetLtc, nullptr, "config/ltc", "LTC SMPTE", nullptr),
