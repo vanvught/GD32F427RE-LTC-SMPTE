@@ -23,8 +23,8 @@
  */
 
 #include <cstdint>
-#include <cstring>
 #include <cstdio>
+#include <utility>
 
 #include "common/utils/utils_string.h"
 #include "configstore.h"
@@ -43,14 +43,9 @@ uint32_t GetList(char* out_buffer, uint32_t out_buffer_size) {
 
     display_name[common::store::remoteconfig::kDisplayNameLength - 1U] = '\0';
 
-#ifdef DMXNODE_PORTS
-    constexpr uint32_t kPortCount = DMXNODE_PORTS;
-#else
     constexpr uint32_t kPortCount = 0U;
-#endif // DMXNODE_PORTS
-
-    const char* node_type = common::kUndefined;
-    const char* output_type = common::kUndefined;
+    const char* node_type = "LTC SMPTE";
+    const char* output_type = "Timecode";
 
     const int kLength = snprintf(out_buffer, out_buffer_size,
                                  "{\"list\":{\"ip\":\"" IPSTR
@@ -63,7 +58,7 @@ uint32_t GetList(char* out_buffer, uint32_t out_buffer_size) {
         return 0U;
     }
 
-    if (static_cast<uint32_t>(kLength) >= out_buffer_size) {
+    if (std::cmp_greater_equal(kLength, out_buffer_size)) {
         return out_buffer_size - 1U;
     }
 
