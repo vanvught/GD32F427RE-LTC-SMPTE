@@ -250,6 +250,10 @@ class Destination {
             artnet::Output(timecode);
         }
 
+		if (IsEnabled(::ltc::Output::kEtc)) {
+		    etc::Output(timecode);
+		}
+        
         DistributeInternal(timecode);
     }
 
