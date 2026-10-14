@@ -77,7 +77,7 @@ void DumpManagementHeader(const uint8_t* buffer) {
 
     s_timestamp_previous = management_header.time_stamp;
 }
-#endif
+#endif // DEBUG_TCNET
 
 void InputPort60000(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_ip, [[maybe_unused]] uint16_t from_port) {
     if (size < sizeof(packet::OptIn)) [[unlikely]] {
@@ -99,7 +99,7 @@ void InputPort60000(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint3
         printf("  %u %u\n", static_cast<unsigned>(opt_in.node_count), static_cast<unsigned>(opt_in.node_listener_port));
         printf("  %u %u\n", static_cast<unsigned>(opt_in.node_count), static_cast<unsigned>(opt_in.up_time));
         printf("  %.16s %.16s %d.%d.%d [%d]\n", opt_in.vendor_name, opt_in.device_name, opt_in.device_major_version, opt_in.device_minor_version, opt_in.device_bug_version, opt_in.node_count);
-#endif
+#endif // DEBUG_TCNET
     }
 }
 

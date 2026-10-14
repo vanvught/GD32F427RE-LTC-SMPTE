@@ -1,5 +1,5 @@
 /**
- * @file json_sourceparams.h
+ * @file ltcparams.h
  *
  */
 /* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
@@ -60,4 +60,4 @@ class LtcParams : public JsonParamsBase<LtcParams> {
 };
 } // namespace json::ltc
 
-#endif // INCLUDE_JSON_SOURCEPARAMS_H_
+#endif // JSON_SOURCEPARAMS_H_

@@ -1,5 +1,5 @@
 /**
- * @file json_config_source.cpp
+ * @file config_ltc.cpp
  *
  */
 /* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org

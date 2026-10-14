@@ -1,5 +1,5 @@
 /**
- * @file ltc_input_midi.cpp
+ * @file ltc_midi.cpp
  * @brief Both DIN MIDI and Apple MIDI
  *
  */

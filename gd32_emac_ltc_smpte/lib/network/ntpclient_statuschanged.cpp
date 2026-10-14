@@ -1,5 +1,5 @@
 /**
- * @file ntpclient.cpp
+ * @file ntpclient_statuschanged.cpp
  *
  */
 /* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
@@ -41,7 +41,7 @@ void StatusChanged(::ntp::Status status) {
         case ::ntp::Status::kLocked:
 #ifdef CONFIG_NET_ENABLE_PTP_NTP_CLIENT
             ::network::ptp::pps::Reset();
-#endif
+#endif // CONFIG_NET_ENABLE_PTP_NTP_CLIENT
             Display::Get()->TextStatus("NTP Client LOCKED");
             break;
 

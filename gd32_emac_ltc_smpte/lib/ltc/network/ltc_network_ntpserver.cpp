@@ -1,5 +1,5 @@
 /**
- * @file ntpserver.cpp
+ * @file ltc_network_ntpserver.cpp
  *
  */
 /* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org

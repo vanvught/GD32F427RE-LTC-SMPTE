@@ -99,10 +99,10 @@ inline constexpr Entry kCommandTable[] = {
     {.name = "dump", .function = Dump},       //
 #ifdef HAVE_TIMEOFDAY
     {.name = "date", .function = Date}, //
-#endif
+#endif // HAVE_TIMEOFDAY
 #ifndef DISABLE_RTC
     {.name = "hwclock", .function = HwClock}, //
-#endif
+#endif // DISABLE_RTC
     {.name = "ltc", .function = ltc::Ltc},             //
     {.name = "midi", .function = ltc::Midi},           //
     {.name = "gps", .function = ltc::Gps},             //

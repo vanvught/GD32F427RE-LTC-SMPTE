@@ -40,11 +40,11 @@ OF SUCH DAMAGE.
 /* USB FS/HS PHY CONFIGURATION */
 #ifdef USE_USB_FS
     #define USB_FS_CORE
-#endif /* USE_USB_FS */
+#endif // USE_USB_FS
 
 #ifdef USE_USB_HS
     #define USB_HS_CORE
-#endif /* USE_USB_HS */
+#endif // USE_USB_HS
 
 /* USB FIFO size config */
 #ifdef USB_FS_CORE
@@ -56,7 +56,7 @@ OF SUCH DAMAGE.
 
     #define USBFS_SOF_OUTPUT                        0U
     #define USBFS_LOW_POWER                         0U
-#endif /* USB_FS_CORE */
+#endif // USB_FS_CORE
 
 #ifdef USB_HS_CORE
     #define RX_FIFO_HS_SIZE                         512U
@@ -69,18 +69,18 @@ OF SUCH DAMAGE.
 
     #ifdef USE_ULPI_PHY
         #define USB_ULPI_PHY_ENABLED
-    #endif
+    #endif // USE_ULPI_PHY
 
     #ifdef USE_EMBEDDED_PHY
         #define USB_EMBEDDED_PHY_ENABLED
-    #endif
+    #endif // USE_EMBEDDED_PHY
 
 //    #define USB_HS_INTERNAL_DMA_ENABLED
 //    #define USB_HS_DEDICATED_EP1_ENABLED
 
     #define USBHS_SOF_OUTPUT                        0U
     #define USBHS_LOW_POWER                         0U
-#endif /* USB_HS_CORE */
+#endif // USB_HS_CORE
 
 /* if uncomment it, need jump to USB JP */
 //#define VBUS_SENSING_ENABLED
@@ -92,20 +92,20 @@ OF SUCH DAMAGE.
 #ifndef USB_FS_CORE
     #ifndef USB_HS_CORE
         #error  "USB_HS_CORE or USB_FS_CORE should be defined!"
-    #endif
-#endif
+    #endif // USB_HS_CORE
+#endif // USB_FS_CORE
 
 #ifndef USE_DEVICE_MODE
     #ifndef USE_HOST_MODE
         #error  "USE_DEVICE_MODE or USE_HOST_MODE should be defined!"
-    #endif
-#endif
+    #endif // USE_HOST_MODE
+#endif // USE_DEVICE_MODE
 
 #ifndef USE_USB_HS
     #ifndef USE_USB_FS
         #error  "USE_USB_HS or USE_USB_FS should be defined!"
-    #endif
-#endif
+    #endif // USE_USB_FS
+#endif // USE_USB_HS
 
 /* all variables and data structures during the transaction process should be 4-bytes aligned */
 
@@ -122,21 +122,21 @@ OF SUCH DAMAGE.
             #define __ALIGN_BEGIN
         #elif defined (__TASKING__)/* TASKING Compiler */
             #define __ALIGN_BEGIN __align(4U)
-        #endif /* __CC_ARM */
-    #endif /* __GNUC__ */
+        #endif // __CC_ARM
+    #endif // __GNUC__
 #else
     #define __ALIGN_BEGIN
     #define __ALIGN_END
-#endif /* USB_HS_INTERNAL_DMA_ENABLED */
+#endif // USB_HS_INTERNAL_DMA_ENABLED
 
 /* __packed keyword used to decrease the data type alignment to 1-byte */
 #ifdef __GNUC__       /* GNU Compiler */
     #ifdef __packed
         #undef __packed
-    #endif
+    #endif // __packed
     #define __packed
 #elif defined (__TASKING__)    /* TASKING Compiler */
     #define __packed __unaligned
-#endif /* __GNUC__ */
+#endif // __GNUC__
 
-#endif /* USB_CONF_H */
+#endif // USB_CONF_H

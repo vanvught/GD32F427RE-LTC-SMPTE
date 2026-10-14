@@ -59,7 +59,7 @@ inline constexpr uint32_t kDeviceNameLength = 16;
 
 #ifndef PACKED
 #define PACKED __attribute__((packed))
-#endif
+#endif // PACKED
 
 struct ManagementHeader {
     uint16_t node_id;                   //  0:2

@@ -52,4 +52,4 @@ OF SUCH DAMAGE.
 
 #define USB_STRING_COUNT                    4U
 
-#endif /* USBD_CONF_H */
+#endif // USBD_CONF_H

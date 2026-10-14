@@ -1,5 +1,5 @@
 /**
- * @file display_max7219.cpp
+ * @file ltc_display_max7219.cpp
  *
  */
 /* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org

@@ -105,7 +105,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_1, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,        /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,        /*iJack: Unused.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 1
 
 #if MIDI_IN_PORTS_NUM >= 2
     /******************** MIDI Adapter MIDI IN Jack Descriptor (External) ********************/
@@ -126,7 +126,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_3, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,        /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,        /*iJack: Unused.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 2
 
 #if MIDI_IN_PORTS_NUM >= 3
     /******************** MIDI Adapter MIDI IN Jack Descriptor (External) ********************/
@@ -147,7 +147,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_5, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,        /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,        /*iJack: Unused.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 3
 
 #if MIDI_IN_PORTS_NUM >= 4
     /******************** MIDI Adapter MIDI IN Jack Descriptor (External) ********************/
@@ -168,7 +168,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_7, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,        /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,        /*iJack: Unused.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 4
 
 #if MIDI_IN_PORTS_NUM >= 5
     /******************** MIDI Adapter MIDI IN Jack Descriptor (External) ********************/
@@ -189,7 +189,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_9,  /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 5
 
 #if MIDI_IN_PORTS_NUM >= 6
     /******************** MIDI Adapter MIDI IN Jack Descriptor (External) ********************/
@@ -210,7 +210,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_11, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 6
 
 #if MIDI_IN_PORTS_NUM >= 7
     /******************** MIDI Adapter MIDI IN Jack Descriptor (External) ********************/
@@ -231,7 +231,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_13, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 7
 
 #if MIDI_IN_PORTS_NUM >= 8
     /******************** MIDI Adapter MIDI IN Jack Descriptor (External) ********************/
@@ -252,7 +252,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_15, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 8
 
 #if MIDI_OUT_PORTS_NUM >= 1
     /******************** MIDI Adapter MIDI IN Jack Descriptor (Embedded) ********************/
@@ -273,7 +273,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_17, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 1
 
 #if MIDI_OUT_PORTS_NUM >= 2
     /******************** MIDI Adapter MIDI IN Jack Descriptor (Embedded) ********************/
@@ -294,7 +294,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_19, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 2
 
 #if MIDI_OUT_PORTS_NUM >= 3
     /******************** MIDI Adapter MIDI IN Jack Descriptor (Embedded) ********************/
@@ -315,7 +315,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_21, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 3
 
 #if MIDI_OUT_PORTS_NUM >= 4
     /******************** MIDI Adapter MIDI IN Jack Descriptor (Embedded) ********************/
@@ -336,7 +336,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_23, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 4
 
 #if MIDI_OUT_PORTS_NUM >= 5
     /******************** MIDI Adapter MIDI IN Jack Descriptor (Embedded) ********************/
@@ -357,7 +357,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_25, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 5
 
 #if MIDI_OUT_PORTS_NUM >= 6
     /******************** MIDI Adapter MIDI IN Jack Descriptor (Embedded) ********************/
@@ -378,7 +378,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_27, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 6
 
 #if MIDI_OUT_PORTS_NUM >= 7
     /******************** MIDI Adapter MIDI IN Jack Descriptor (Embedded) ********************/
@@ -399,7 +399,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_29, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 7
 
 #if MIDI_OUT_PORTS_NUM >= 8
     /******************** MIDI Adapter MIDI IN Jack Descriptor (Embedded) ********************/
@@ -420,7 +420,7 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_JACK_31, /*BaSourceID(1): ID of the Entity to which this Pin is connected.*/
     0x01,         /*BaSourcePin(1): Output Pin number of the Entity to which this Input Pin is connected.*/
     0x00,         /*iJack: Unused.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 8
 
     /******************** MIDI Adapter Standard Bulk OUT Endpoint Descriptor ********************/
     0x09,                   /*bLength: Size of this descriptor, in bytes*/
@@ -440,28 +440,28 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_OUT_PORTS_NUM,       /*bNumEmbMIDIJack: Number of embedded MIDI IN Jacks.*/
 #if MIDI_OUT_PORTS_NUM >= 1
     MIDI_JACK_17, /*BaAssocJackID(1): ID of the Embedded MIDI IN Jack.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 1
 #if MIDI_OUT_PORTS_NUM >= 2
     MIDI_JACK_19, /*BaAssocJackID(2): ID of the Embedded MIDI IN Jack.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 2
 #if MIDI_OUT_PORTS_NUM >= 3
     MIDI_JACK_21, /*BaAssocJackID(3): ID of the Embedded MIDI IN Jack.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 3
 #if MIDI_OUT_PORTS_NUM >= 4
     MIDI_JACK_23, /*BaAssocJackID(4): ID of the Embedded MIDI IN Jack.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 4
 #if MIDI_OUT_PORTS_NUM >= 5
     MIDI_JACK_25, /*BaAssocJackID(5): ID of the Embedded MIDI IN Jack.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 5
 #if MIDI_OUT_PORTS_NUM >= 6
     MIDI_JACK_27, /*BaAssocJackID(6): ID of the Embedded MIDI IN Jack.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 6
 #if MIDI_OUT_PORTS_NUM >= 7
     MIDI_JACK_29, /*BaAssocJackID(7): ID of the Embedded MIDI IN Jack.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 7
 #if MIDI_OUT_PORTS_NUM >= 8
     MIDI_JACK_31, /*BaAssocJackID(8): ID of the Embedded MIDI IN Jack.*/
-#endif
+#endif // MIDI_OUT_PORTS_NUM >= 8
 
     /******************** MIDI Adapter Standard Bulk IN Endpoint Descriptor ********************/
     0x09,                   /*bLength: Size of this descriptor, in bytes*/
@@ -481,28 +481,28 @@ __ALIGN_BEGIN const uint8_t kMidiConfigDesc[USB_MIDI_CONFIG_DESC_SIZE] __ALIGN_E
     MIDI_IN_PORTS_NUM,       /*bNumEmbMIDIJack: Number of embedded MIDI OUT Jacks.*/
 #if MIDI_IN_PORTS_NUM >= 1
     MIDI_JACK_2, /*BaAssocJackID(1): ID of the Embedded MIDI OUT Jack.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 1
 #if MIDI_IN_PORTS_NUM >= 2
     MIDI_JACK_4, /*BaAssocJackID(2): ID of the Embedded MIDI OUT Jack.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 2
 #if MIDI_IN_PORTS_NUM >= 3
     MIDI_JACK_6, /*BaAssocJackID(3): ID of the Embedded MIDI OUT Jack.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 3
 #if MIDI_IN_PORTS_NUM >= 4
     MIDI_JACK_8, /*BaAssocJackID(4): ID of the Embedded MIDI OUT Jack.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 4
 #if MIDI_IN_PORTS_NUM >= 5
     MIDI_JACK_10, /*BaAssocJackID(5): ID of the Embedded MIDI OUT Jack.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 5
 #if MIDI_IN_PORTS_NUM >= 6
     MIDI_JACK_12, /*BaAssocJackID(6): ID of the Embedded MIDI OUT Jack.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 6
 #if MIDI_IN_PORTS_NUM >= 7
     MIDI_JACK_14, /*BaAssocJackID(7): ID of the Embedded MIDI OUT Jack.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 7
 #if MIDI_IN_PORTS_NUM >= 8
     MIDI_JACK_16, /*BaAssocJackID(8): ID of the Embedded MIDI OUT Jack.*/
-#endif
+#endif // MIDI_IN_PORTS_NUM >= 8
 };
 
 static __ALIGN_BEGIN const usb_desc_LANGID kLangIdDesc __ALIGN_END = {

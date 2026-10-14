@@ -1,5 +1,5 @@
 /**
- * @file gps.cpp
+ * @file gnss.cpp
  *
  */
 /* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org

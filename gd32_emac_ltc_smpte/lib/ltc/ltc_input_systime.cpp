@@ -111,5 +111,5 @@ void Run() {
         printf("LTC MISSED: elapsed=%u counter=%u TIMER3=%u\n", static_cast<unsigned>(kElapsed), static_cast<unsigned>(kCounter), static_cast<unsigned>(kTimer3));
     }
 }
-#endif
+#endif // 0
 } // namespace ltc::input::systime

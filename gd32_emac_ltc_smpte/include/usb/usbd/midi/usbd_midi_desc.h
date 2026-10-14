@@ -28,11 +28,11 @@
 
 #ifndef MIDI_IN_PORTS_NUM
 #define MIDI_IN_PORTS_NUM 1
-#endif
+#endif // MIDI_IN_PORTS_NUM
 
 #ifndef MIDI_OUT_PORTS_NUM
 #define MIDI_OUT_PORTS_NUM 1
-#endif
+#endif // MIDI_OUT_PORTS_NUM
 
 #define USB_AUDIO_CLASS 0x01
 #define USB_MIDISTREAMING_SUBCLASS 0x03

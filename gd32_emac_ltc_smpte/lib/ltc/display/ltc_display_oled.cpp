@@ -1,5 +1,5 @@
 /**
- * @file display_oled.cpp
+ * @file ltc_display_oled.cpp
  *
  */
 /* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
