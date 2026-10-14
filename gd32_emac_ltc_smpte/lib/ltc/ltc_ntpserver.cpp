@@ -24,6 +24,7 @@
 */
 
 #include "ltc_debug.h"
+#include "ltc_gps.h"
 #include "ltc_ntpclient.h"
 #include "ltc_network_ntpserver.h"
 
@@ -32,6 +33,8 @@ void Start() {
     LTC_NTPSERVER_DEBUG_ENTRY();
 
     ltc::ntpclient::Stop();
+    ltc::gps::Stop();
+    
     ltc::network::ntpserver::Start();
 
     LTC_NTPSERVER_DEBUG_EXIT();
@@ -41,6 +44,7 @@ void Stop() {
     LTC_NTPSERVER_DEBUG_ENTRY();
 
     ltc::network::ntpserver::Stop();
+
     ltc::ntpclient::Start();
 
     LTC_NTPSERVER_DEBUG_EXIT();
