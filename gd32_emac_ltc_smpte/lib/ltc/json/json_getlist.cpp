@@ -26,7 +26,6 @@
 #include <cstdio>
 #include <utility>
 
-#include "common/utils/utils_string.h"
 #include "configstore.h"
 #include "configurationstore.h"
 #include "ip4/ip4_address.h"
