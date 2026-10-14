@@ -35,13 +35,12 @@ LtcParams::LtcParams() {
     ConfigStore::Instance().Copy(&store_ltc, &ConfigurationStore::ltc);
 }
 
-void LtcParams::SetSource(const char* val, uint32_t len) {
-    if (len >= ::ltc::kInputMaxNameLength) {
+void LtcParams::SetSource(std::string_view value) {
+    if (value.size() >= ::ltc::kInputMaxNameLength) {
         return;
     }
 
-    const std::string_view kSource{val, len};
-    store_ltc.source = std::to_underlying(::ltc::InputFromName(kSource));
+    store_ltc.source = std::to_underlying(::ltc::InputFromName(value));
 }
 
 void LtcParams::Store(const char* buffer, uint32_t buffer_size) {

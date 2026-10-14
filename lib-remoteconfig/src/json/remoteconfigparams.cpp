@@ -24,6 +24,7 @@
 */
 
 #include <cstdint>
+#include <algorithm>
 
 #include "json/remoteconfigparams.h"
 #include "json/remoteconfigparamsconst.h"
@@ -37,13 +38,14 @@ RemoteConfigParams::RemoteConfigParams() {
     ConfigStore::Instance().Copy(&store_remoteconfig, &ConfigurationStore::remote_config);
 }
 
-void RemoteConfigParams::SetDisplayName(const char* val, uint32_t len) {
-    len = len > (common::store::remoteconfig::kDisplayNameLength - 1) ? common::store::remoteconfig::kDisplayNameLength - 1 : len;
-    memcpy(reinterpret_cast<char*>(store_remoteconfig.display_name), val, len);
+void RemoteConfigParams::SetDisplayName(std::string_view value) {
+    constexpr std::size_t kLength = common::store::remoteconfig::kDisplayNameLength;
 
-    for (uint32_t i = len; i < common::store::remoteconfig::kDisplayNameLength; i++) {
-        store_remoteconfig.display_name[i] = '\0';
-    }
+    const auto length = std::min(value.size(), kLength - 1);
+    auto* destination = reinterpret_cast<char*>(store_remoteconfig.display_name);
+
+    memcpy(destination, value.data(), length);
+    memset(destination + length, 0, kLength - length);
 }
 
 void RemoteConfigParams::Store(const char* buffer, uint32_t buffer_size) {

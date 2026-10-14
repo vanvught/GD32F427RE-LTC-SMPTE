@@ -27,10 +27,15 @@
 #define JSON_JSON_KEY_H_
 
 #include <cstdint>
+#include <string_view>
 
 #include "common/utils/utils_hash.h"
 
 namespace json {
+
+using SimpleSetter = void (*)(std::string_view);
+using KeyedSetter = void (*)(std::string_view, std::string_view);
+
 struct SimpleKey {
     const char* name;
     uint8_t length;
@@ -50,25 +55,23 @@ struct Key {
     };
 
     union {
-        void (*set_simple)(const char*, uint32_t);
-        void (*set_keyed)(const char*, uint32_t, const char*, uint32_t);
+        SimpleSetter set_simple;
+        KeyedSetter set_keyed;
     };
 
     enum { kSimple, kKeyed } type;
 
-    [[nodiscard]] constexpr const char* GetName() const noexcept { return type == kSimple ? simple_key->name : port_key->name; }
-
-    [[nodiscard]] constexpr uint8_t GetLength() const noexcept { return type == kSimple ? simple_key->length : port_key->length; }
+    [[nodiscard]] constexpr std::string_view GetName() const noexcept { return type == kSimple ? std::string_view{simple_key->name, simple_key->length} : std::string_view{port_key->name, port_key->length}; }
 
     [[nodiscard]] constexpr uint32_t GetHash() const noexcept { return type == kSimple ? simple_key->hash : port_key->hash; }
 };
 
-constexpr Key MakeKey(void (*set)(const char*, uint32_t), const SimpleKey& simple) noexcept {
-    return Key{.simple_key = &simple, .set_simple = set, .type = Key::kSimple};
+constexpr Key MakeKey(SimpleSetter set, const SimpleKey& key) noexcept {
+    return Key{.simple_key = &key, .set_simple = set, .type = Key::kSimple};
 }
 
-constexpr Key MakeKey(void (*set)(const char*, uint32_t, const char*, uint32_t), const PortKey& port) noexcept {
-    return Key{.port_key = &port, .set_keyed = set, .type = Key::kKeyed};
+constexpr Key MakeKey(KeyedSetter set, const PortKey& key) noexcept {
+    return Key{.port_key = &key, .set_keyed = set, .type = Key::kKeyed};
 }
 
 template <std::size_t kN>

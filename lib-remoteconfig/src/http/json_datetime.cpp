@@ -39,43 +39,51 @@
 
 namespace json {
 namespace {
-void SetDate(const char* date, uint32_t date_length) {
-    if ((date_length == 20) || (date_length == 25)) {
-        struct tm tm;
-        tm.tm_year = common::Atoi(&date[0], 4) - 1900;
-        tm.tm_mon = common::Atoi(&date[5], 2) - 1;
-        tm.tm_mday = common::Atoi(&date[8], 2);
-        tm.tm_hour = common::Atoi(&date[11], 2);
-        tm.tm_min = common::Atoi(&date[14], 2);
-        tm.tm_sec = common::Atoi(&date[17], 2);
+void SetDate(std::string_view date) {
+    if (date.size() != 20 && date.size() != 25) {
+        return;
+    }
 
-        struct timeval time_val{.tv_sec = mktime(&tm), .tv_usec = 0};
+    struct tm tm{};
 
-        if (date_length == 20) {
-            assert(date[19] == 'Z');
-        } else {
-            const int32_t kSign = date[19] == '-' ? -1 : 1;
-            const auto kHours = static_cast<int8_t>(common::Atoi(&date[20], 2) * kSign);
-            const auto kMinutes = static_cast<uint8_t>(common::Atoi(&date[23], 2));
+    tm.tm_year = common::Atoi(date.data(), 4) - 1900;
+    tm.tm_mon = common::Atoi(date.data() + 5, 2) - 1;
+    tm.tm_mday = common::Atoi(date.data() + 8, 2);
+    tm.tm_hour = common::Atoi(date.data() + 11, 2);
+    tm.tm_min = common::Atoi(date.data() + 14, 2);
+    tm.tm_sec = common::Atoi(date.data() + 17, 2);
 
-            DEBUG_PRINTF("[%d]%.2d:%.2d", static_cast<int>(kSign), static_cast<int>(kHours), static_cast<int>(kMinutes));
+    struct timeval time_val{.tv_sec = mktime(&tm), .tv_usec = 0};
 
-            int32_t utc_offset;
+    if (date.size() == 20) {
+        assert(date[19] == 'Z');
+    } else {
+        const int32_t kSign = date[19] == '-' ? -1 : 1;
 
-            if (utc::ValidateOffset(kHours, kMinutes, utc_offset)) {
-                ConfigStore::Instance().GlobalUpdate(&common::store::Global::utc_offset, utc_offset);
-                global::SetUtcOffsetIfValid(kHours, kMinutes);
-            }
+        const auto kHours = static_cast<int8_t>(common::Atoi(date.data() + 20, 2) * kSign);
 
-            time_val.tv_sec = time_val.tv_sec - global::GetUtcOffset();
+        const auto kMinutes = static_cast<uint8_t>(common::Atoi(date.data() + 23, 2));
+
+        DEBUG_PRINTF("[%d]%.2d:%.2d", static_cast<int>(kSign), static_cast<int>(kHours), static_cast<int>(kMinutes));
+
+        int32_t utc_offset;
+
+        if (utc::ValidateOffset(kHours, kMinutes, utc_offset)) {
+            ConfigStore::Instance().GlobalUpdate(&common::store::Global::utc_offset, utc_offset);
+
+            global::SetUtcOffsetIfValid(kHours, kMinutes);
         }
 
-        settimeofday(&time_val, nullptr);
+        time_val.tv_sec -= global::GetUtcOffset();
     }
+
+    settimeofday(&time_val, nullptr);
 }
 
 constexpr auto kDate = json::MakeSimpleKey("date");
+
 constexpr json::Key kActionKeys[] = {json::MakeKey(SetDate, kDate)};
+
 } // namespace
 
 uint32_t GetTimeofday(char* out_buffer, uint32_t out_buffer_size) {
@@ -88,29 +96,14 @@ uint32_t GetTimeofday(char* out_buffer, uint32_t out_buffer_size) {
         global::GetUtcOffset(hours, minutes);
 
         if ((hours == 0) && (minutes == 0)) {
-            const auto kLength = static_cast<uint32_t>(snprintf(out_buffer, out_buffer_size, 
-              R"({"date":"%d-%.2d-%.2dT%.2d:%.2d:%.2dZ"})", 
-              1900 + local_time->tm_year, 
-              1 + local_time->tm_mon, 
-              local_time->tm_mday, 
-              local_time->tm_hour, 
-              local_time->tm_min, 
-              local_time->tm_sec));
+            const auto kLength = static_cast<uint32_t>(
+                snprintf(out_buffer, out_buffer_size, R"({"date":"%d-%.2d-%.2dT%.2d:%.2d:%.2dZ"})", 1900 + local_time->tm_year, 1 + local_time->tm_mon, local_time->tm_mday, local_time->tm_hour, local_time->tm_min, local_time->tm_sec));
 
             return kLength;
         }
 
-        const auto kLength = static_cast<uint32_t>(snprintf(out_buffer, out_buffer_size, 
-          R"({"date":"%d-%.2d-%.2dT%.2d:%.2d:%.2d%s%.2d:%.2u"})", 
-          1900 + local_time->tm_year, 
-          1 + local_time->tm_mon, 
-          local_time->tm_mday, 
-          local_time->tm_hour, 
-          local_time->tm_min, 
-          local_time->tm_sec,                      
-          hours > 0 ? "+" : "", 
-          static_cast<int>(hours), 
-          static_cast<unsigned int>(minutes)));
+        const auto kLength = static_cast<uint32_t>(snprintf(out_buffer, out_buffer_size, R"({"date":"%d-%.2d-%.2dT%.2d:%.2d:%.2d%s%.2d:%.2u"})", 1900 + local_time->tm_year, 1 + local_time->tm_mon, local_time->tm_mday, local_time->tm_hour,
+                                                            local_time->tm_min, local_time->tm_sec, hours > 0 ? "+" : "", static_cast<int>(hours), static_cast<unsigned int>(minutes)));
 
         return kLength;
     }

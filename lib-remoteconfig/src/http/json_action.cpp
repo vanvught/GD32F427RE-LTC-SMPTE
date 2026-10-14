@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-#include <cstdint>
+#include <string_view>
 
 #include "display.h"
 #include "board_statusled.h"
@@ -30,44 +30,50 @@
 #include "json/json_key.h"
 #include "json/json_parser.h"
 
-static void SetDisplay(const char* val, uint32_t len) {
-    if (len != 1) {
+namespace {
+void SetDisplay(std::string_view value) {
+    if (value.size() != 1) {
         return;
     }
 
-    Display::Get()->SetSleep(val[0] == '0');
+    Display::Get()->SetSleep(value[0] == '0');
 }
 
-static void SetIdentify(const char* val, uint32_t len) {
-    if (len != 1) {
+void SetIdentify(std::string_view value) {
+    if (value.size() != 1) {
         return;
     }
 
-    if (val[0] != '0') {
-        board::statusled::SetMode(board::statusled::Mode::kFast);
-    } else {
-        board::statusled::SetMode(board::statusled::Mode::kNormal);
-    }
+    board::statusled::SetMode(value[0] != '0' ? board::statusled::Mode::kFast : board::statusled::Mode::kNormal);
 }
 
 // TODO (a) Subject for deletion
-static void SetReboot(const char* val, uint32_t len) {
-    if (len != 1) {
+void SetReboot(std::string_view value) {
+    if (value.size() != 1) {
         return;
     }
-    if (val[0] != '0') {
+
+    if (value[0] != '0') {
         board::Reboot();
     }
 }
 
-static constexpr auto kDisplay = json::MakeSimpleKey("display");
-static constexpr auto kIdentify = json::MakeSimpleKey("identify");
-static constexpr auto kReboot = json::MakeSimpleKey("reboot");
+constexpr auto kDisplay = json::MakeSimpleKey("display");
+constexpr auto kIdentify = json::MakeSimpleKey("identify");
+constexpr auto kReboot = json::MakeSimpleKey("reboot");
 
-static constexpr json::Key kActionKeys[] = {json::MakeKey(SetDisplay, kDisplay), json::MakeKey(SetIdentify, kIdentify), json::MakeKey(SetReboot, kReboot)};
+constexpr json::Key kActionKeys[] = {
+    json::MakeKey(SetDisplay, kDisplay),
+    json::MakeKey(SetIdentify, kIdentify),
+    json::MakeKey(SetReboot, kReboot),
+};
+
+} // namespace
 
 namespace json::action {
-void Set(const char* buffer, uint32_t buffer_size) {
-    ParseJsonWithTable(buffer, buffer_size, kActionKeys);
+
+void Set(std::string_view buffer) {
+    ParseJsonWithTable(buffer, kActionKeys);
 }
+
 } // namespace json::action

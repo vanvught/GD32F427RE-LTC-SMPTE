@@ -32,6 +32,7 @@
 #include <cstring>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <string_view>
 
 #include "network_config.h"
 #include "network_iface.h"
@@ -54,35 +55,42 @@ NetworkParams::NetworkParams() {
     ConfigStore::Instance().Copy(&store_network, &ConfigurationStore::network);
 }
 
-void NetworkParams::SetUseStaticIp(const char* val, uint32_t len) {
-    if (len == 1) {
-        store_network.flags = common::SetFlagValue(store_network.flags, Flags::Flag::kUseStaticIp, val[0] != '0');
+void NetworkParams::SetUseStaticIp(std::string_view value) {
+    if (value.size() == 1) {
+        store_network.flags = common::SetFlagValue(store_network.flags, Flags::Flag::kUseStaticIp, value[0] != '0');
     }
 }
 
-void NetworkParams::SetIpAddress(const char* val, uint32_t len) {
-    store_network.local_ip = net::ParseIpString(val, len);
+void NetworkParams::SetIpAddress(std::string_view value) {
+    store_network.local_ip = net::ParseIpString(value);
 }
 
-void NetworkParams::SetNetMask(const char* val, uint32_t len) {
-    store_network.netmask = net::ParseIpString(val, len);
+void NetworkParams::SetNetMask(std::string_view value) {
+    store_network.netmask = net::ParseIpString(value);
 }
 
-void NetworkParams::SetDefaultGateway(const char* val, uint32_t len) {
-    store_network.gateway_ip = net::ParseIpString(val, len);
+void NetworkParams::SetDefaultGateway(std::string_view value) {
+    store_network.gateway_ip = net::ParseIpString(value);
 }
 
-void NetworkParams::SetHostname(const char* val, uint32_t len) {
-    len = len > (common::store::network::kHostnameSize - 1) ? common::store::network::kHostnameSize - 1 : len;
-    memcpy(reinterpret_cast<char*>(store_network.host_name), val, len);
+void NetworkParams::SetHostname(std::string_view value) {
+    constexpr std::size_t kSize = common::store::network::kHostnameSize;
 
-    for (uint32_t i = len; i < common::store::network::kHostnameSize - 1; i++) {
-        store_network.host_name[i] = '\0';
+    static_assert(kSize > 0);
+
+    const auto kLength = std::min(value.size(), kSize - 1);
+
+    auto* destination = reinterpret_cast<char*>(store_network.host_name);
+
+    if (kLength != 0) {
+        memcpy(destination, value.data(), kLength);
     }
+
+    memset(destination + kLength, 0, kSize - kLength);
 }
 
-void NetworkParams::SetNtpServer(const char* val, [[maybe_unused]] uint32_t len) {
-    store_network.ntp_server_ip = net::ParseIpString(val, len);
+void NetworkParams::SetNtpServer(std::string_view value) {
+    store_network.ntp_server_ip = net::ParseIpString(value);
 }
 
 void NetworkParams::Store(const char* buffer, uint32_t buffer_size) {

@@ -48,7 +48,7 @@ class LtcParams : public JsonParamsBase<LtcParams> {
     void Dump();
 
    private:
-    static void SetSource(const char* val, uint32_t len);
+    static void SetSource(std::string_view value);
 
     static constexpr json::Key kLtcKeys[] = {
         MakeKey(SetSource, LtcParamsConst::kSource), //
