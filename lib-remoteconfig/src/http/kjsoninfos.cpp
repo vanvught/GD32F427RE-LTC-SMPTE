@@ -67,20 +67,8 @@ uint32_t Directory(char*, uint32_t);
 uint32_t GetNetwork(char*, uint32_t);
 void SetNetwork(const char*, uint32_t);
 
-uint32_t GetGps(char*, uint32_t);
-void SetGps(const char*, uint32_t);
-
-uint32_t GetTcNet(char*, uint32_t);
-void SetTcNet(const char*, uint32_t);
-
 uint32_t GetLtc(char*, uint32_t);
 void SetLtc(const char*, uint32_t);
-
-uint32_t GetLtcDisplay(char*, uint32_t);
-void SetLtcDisplay(const char*, uint32_t);
-
-uint32_t GetLtcEtc(char*, uint32_t);
-void SetLtcEtc(const char*, uint32_t);
 } // namespace config
 
 #define ENTRY(get, set, del, filename_literal, config_label, status_label) MakeJsonFileInfo(get, set, del, filename_literal, Fnv1a32(filename_literal, static_cast<uint8_t>(sizeof(filename_literal) - 1)), config_label, status_label)
@@ -100,11 +88,7 @@ constexpr Info kFileInfos[] = {
     ENTRY(config::Directory, nullptr, nullptr, "config/directory", nullptr, nullptr),
     ENTRY(config::GetNetwork, config::SetNetwork, nullptr, "config/network", "Network", nullptr),
     // LTC
-    // ENTRY(config::GetLtc, config::SetLtc, nullptr, "config/ltc", "LTC SMPTE", nullptr),
-    // ENTRY(config::GetLtcDisplay, config::SetLtcDisplay, nullptr, "config/ltcdisplays", "LTC Displays", nullptr),
-    // ENTRY(config::GetGps, config::SetGps, nullptr, "config/gps", "GPS", nullptr),
-    // ENTRY(config::GetTcNet, config::SetTcNet, nullptr, "config/tcnet", "TCNet", nullptr),
-    // ENTRY(config::GetLtcEtc, config::SetLtcEtc, nullptr, "config/etc", "ETC Connect", nullptr),
+    ENTRY(config::GetLtc, config::SetLtc, nullptr, "config/ltc", "LTC SMPTE", nullptr),
 };
 
 constexpr size_t kFileInfosSize = sizeof(kFileInfos) / sizeof(kFileInfos[0]);
