@@ -32,7 +32,7 @@
 
 #if defined(CONFIG_TIME_USE_SYSTICK)
 extern volatile uint32_t gv_systick_millis;
-#elif defined(USE_FREE_RTOS)
+#elifdef USE_FREE_RTOS
 #include "FreeRTOS.h"
 #include "task.h"
 #endif // CONFIG_TIME_USE_SYSTICK
