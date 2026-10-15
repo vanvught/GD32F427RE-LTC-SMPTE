@@ -117,6 +117,8 @@ class Source : public output::Destination {
         LTC_INPUT_DEBUG_ENTRY();
 
         s_this = this;
+
+        Select(::ltc::Input::kLtc);
         DisplayInput();
 
         LTC_INPUT_DEBUG_EXIT();

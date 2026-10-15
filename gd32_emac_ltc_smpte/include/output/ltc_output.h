@@ -157,6 +157,7 @@ class Destination {
     void Update(const ::ltc::Input kInput) {
         LTC_OUTPUT_DEBUG_ENTRY();
         LTC_OUTPUT_DEBUG_PRINTF("input=%s", ::ltc::InputToName(kInput));
+
         if (kInput == ::ltc::Input::kUndefined) {
             LTC_OUTPUT_DEBUG_EXIT();
             return;
@@ -250,10 +251,10 @@ class Destination {
             artnet::Output(timecode);
         }
 
-		if (IsEnabled(::ltc::Output::kEtc)) {
-		    etc::Output(timecode);
-		}
-        
+        if (IsEnabled(::ltc::Output::kEtc)) {
+            etc::Output(timecode);
+        }
+
         DistributeInternal(timecode);
     }
 
@@ -346,7 +347,10 @@ class Destination {
         }
     }
 
-    [[nodiscard]] bool IsDisabled(::ltc::Output output) const { return (disabled_current_ & static_cast<uint16_t>(output)) == static_cast<uint16_t>(output); };
+    [[nodiscard]] bool IsDisabled(::ltc::Output output) const {
+        const auto kIsDisabled = (disabled_current_ & static_cast<uint16_t>(output)) == static_cast<uint16_t>(output);
+        return kIsDisabled;
+    };
 
     [[nodiscard]] bool IsEnabled(::ltc::Output output) const { return !IsDisabled(output); }
 

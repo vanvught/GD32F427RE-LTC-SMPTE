@@ -119,8 +119,8 @@ enum class Output : uint16_t {
     kUsbmidi = (1U << static_cast<uint16_t>(Input::kUsbmidi)),             //
     kSystime = (1U << static_cast<uint16_t>(Input::kSystime)),             //
     kEtc = (1U << static_cast<uint16_t>(Input::kEtc)),                     //
-    kNtpServer = (1U << (static_cast<uint16_t>(Input::kUndefined) + 0)),   //                                                                  //
-    kDisplayOled = (1U << (static_cast<uint16_t>(Input::kUndefined) + 1)), //                                                                          //
+    kNtpServer = (1U << (static_cast<uint16_t>(Input::kUndefined) + 0)),   //
+    kDisplayOled = (1U << (static_cast<uint16_t>(Input::kUndefined) + 1)), //
     kMaX7219 = (1U << (static_cast<uint16_t>(Input::kUndefined) + 2)),     //
     kPixel = (1U << (static_cast<uint16_t>(Input::kUndefined) + 3)),       //
     kUndefined = (1U << (static_cast<uint16_t>(Input::kUndefined) + 4)),   //
@@ -291,7 +291,6 @@ inline constexpr uint32_t kRateMaxLength = 2;
 inline constexpr uint32_t kSystimeMaxLength = kCodeMaxLength;
 inline constexpr uint32_t kMaxSeconds = (((23 * 60) + 59) * 60) + 59;
 static constexpr uint32_t kSecondsPerDay = 24U * 60U * 60U;
-
 
 namespace index {
 inline constexpr auto kHours = 0;

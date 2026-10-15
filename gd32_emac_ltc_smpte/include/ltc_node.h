@@ -45,7 +45,6 @@ class Node : input::Source {
     Node() {
         LTC_DEBUG_ENTRY();
 
-        Display::Get()->Cls();
         // NTP Server
         network::ntpserver::Init(static_cast<uint32_t>(_TIME_STAMP_YEAR_), static_cast<uint32_t>(_TIME_STAMP_MONTH_), static_cast<uint32_t>(_TIME_STAMP_DAY_));
         // GPS
@@ -62,10 +61,6 @@ class Node : input::Source {
         ltc::actions::udp::Start();
         // OSC Server
  		ltc::oscserver::Start(); 
-        // Input
-        input::Source::Select(::ltc::Input::kLtc);
-        // Output
-        output::Destination::StartEnabled();
 
         LTC_DEBUG_EXIT();
     }

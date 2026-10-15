@@ -135,8 +135,6 @@ void Timer0Config() {
 
 // TIMER3 timecode_available
 void Timer3Config() {
-    LTC_OUTPUT_DEBUG_ENTRY();
-
     rcu_periph_clock_enable(RCU_TIMER3);
     timer_deinit(TIMER3);
 
@@ -186,8 +184,6 @@ void Timer3Config() {
         printf("FPS = %u, CAR = %u [%s]\n", TimeCodeConst::kFps[index], static_cast<unsigned>(kCAR), is_needed ? "ERORR" : "Ok");
     }
 #endif // DEBUG_LTC_TIMER3
-
-    LTC_OUTPUT_DEBUG_EXIT();
 }
 
 // TIMER 10 is_midi_quarter_frame_message
@@ -251,12 +247,6 @@ Destination::Destination() {
 
     encoder::Init();
 
-    LTC_OUTPUT_DEBUG_EXIT();
-}
-
-void Destination::StartEnabled() {
-    LTC_OUTPUT_DEBUG_ENTRY();
-
     for (const auto kOutput : ::ltc::kOutputs) {
         const auto& entry = kCommandtab[kOutput];
 
@@ -272,19 +262,15 @@ void Destination::StartEnabled() {
 
     disabled_current_ = disabled_requested_;
 
-    debug::PrintBits(disabled_requested_, "disabled_requested_");
     LTC_OUTPUT_DEBUG_EXIT();
 }
 
 void Destination::SetType(::ltc::Type type) const {
-    LTC_OUTPUT_DEBUG_ENTRY();
     LTC_OUTPUT_DEBUG_PRINTF("type=%u", static_cast<unsigned>(type));
 
     Timer3SetType(static_cast<uint32_t>(type));
 
     global::timecode_running.type = static_cast<uint8_t>(type);
-
-    LTC_OUTPUT_DEBUG_EXIT();
 }
 
 ::ltc::Type Destination::Type() const {
@@ -446,10 +432,10 @@ void Destination::DistributeInternal(const ::ltc::TimeCode* timecode) {
             ::ltc::output::applemidi::Output(reinterpret_cast<const struct ::midi::Timecode*>(timecode));
         }
 
-		if (IsEnabled(::ltc::Output::kUsbmidi)) {
-		    ::ltc::output::usbmidi::Output(reinterpret_cast<const struct ::midi::Timecode*>(timecode));
-		}
-        
+        if (IsEnabled(::ltc::Output::kUsbmidi)) {
+            ::ltc::output::usbmidi::Output(reinterpret_cast<const struct ::midi::Timecode*>(timecode));
+        }
+
         if (IsEnabled(::ltc::Output::kMidi)) {
             ::ltc::output::midi::Output(reinterpret_cast<const struct ::midi::Timecode*>(timecode));
         }
@@ -474,9 +460,9 @@ void Destination::DistributeInternal(const ::ltc::TimeCode* timecode) {
         }
 
         if (IsEnabled(::ltc::Output::kUsbmidi)) {
-		    ::ltc::output::usbmidi::Output(kData);
-		}
-        
+            ::ltc::output::usbmidi::Output(kData);
+        }
+
         if (IsEnabled(::ltc::Output::kMidi)) {
             ::ltc::output::midi::Output(kData);
         }
@@ -568,10 +554,10 @@ void TIMER0_TRG_CMT_TIMER10_IRQHandler() {
             ::ltc::output::applemidi::Output(kData);
         }
 
-		if (ltc::output::Destination::Instance().IsEnabled(::ltc::Output::kUsbmidi)) {
-		    ::ltc::output::usbmidi::Output(kData);
-		}
-        
+        if (ltc::output::Destination::Instance().IsEnabled(::ltc::Output::kUsbmidi)) {
+            ::ltc::output::usbmidi::Output(kData);
+        }
+
         if (ltc::output::Destination::Instance().IsEnabled(::ltc::Output::kMidi)) {
             ::ltc::output::midi::Output(kData);
         }

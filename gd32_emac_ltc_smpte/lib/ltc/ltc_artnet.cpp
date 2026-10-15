@@ -154,9 +154,10 @@ void Start() {
 void Stop() {
     LTC_OUTPUT_DEBUG_ENTRY();
 
-    assert(handle != -1);
-    handle = network::udp::End(::artnet::kUdpPort);
-    handle = -1;
+    if (handle != -1) {
+        handle = network::udp::End(::artnet::kUdpPort);
+        handle = -1;
+    }
 
     LTC_OUTPUT_DEBUG_EXIT();
 }

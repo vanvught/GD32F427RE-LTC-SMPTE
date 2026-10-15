@@ -29,6 +29,8 @@
 #include "json/ltcparams.h"
 #include "json/ltcparamsconst.h"
 #include "input/ltc_input.h"
+#include "ltc.h"
+#include "output/ltc_output.h"
 
 namespace json::config {
 uint32_t GetLtc(char* buffer, uint32_t length) {
@@ -36,6 +38,14 @@ uint32_t GetLtc(char* buffer, uint32_t length) {
 
     return json::helpers::Serialize(buffer, length, [&](JsonDoc& doc) {
         doc[ltc::LtcParamsConst::kSource.name] = ::ltc::InputToName(kSource); //
+        uint32_t index{0};
+        for (const auto kOutput : ::ltc::kOutputs) {
+            const auto& entry = ::ltc::output::kCommandtab[kOutput];
+            if (entry.start != nullptr) {
+                doc["output_", ::ltc::kOutput[index]] = ::ltc::output::Destination::Instance().IsEnabled(kOutput) ? "Enabled" : "Disabled";
+            }
+            index++;
+        }
     });
 }
 

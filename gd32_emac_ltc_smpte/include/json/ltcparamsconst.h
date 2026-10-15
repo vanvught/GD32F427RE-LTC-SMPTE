@@ -32,7 +32,7 @@ namespace json::ltc {
 struct LtcParamsConst {
     static constexpr char kFileName[] = "ltc.json";
 
-    static constexpr auto kSource = json::MakeSimpleKey("source");
+    static constexpr auto kSource = json::MakeKey("source");
 };
 } // namespace json::ltc
 
