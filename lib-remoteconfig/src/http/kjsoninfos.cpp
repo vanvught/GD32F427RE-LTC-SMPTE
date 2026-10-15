@@ -52,10 +52,6 @@ uint32_t Emac(char*, uint32_t);
 } // namespace emac
 } // namespace status
 
-namespace storage {
-uint32_t Directory(char*, uint32_t);
-}
-
 namespace action {
 void Set(const char*, uint32_t);
 } // namespace action
@@ -78,6 +74,9 @@ constexpr Info kFileInfos[] = {
     ENTRY(GetVersion, nullptr, nullptr, "version", nullptr, nullptr),
     ENTRY(GetUptime, nullptr, nullptr, "uptime", nullptr, nullptr),
     ENTRY(GetTimeofday, SetTimeofday, nullptr, "timedate", nullptr, nullptr),
+    // Action
+    ENTRY(nullptr, action::Set, nullptr, "action", nullptr, nullptr),
+#
     // Status
     ENTRY(status::Directory, nullptr, nullptr, "status/directory", nullptr, nullptr),
     ENTRY(status::Identify, nullptr, nullptr, "status/identify", nullptr, "Identify"),

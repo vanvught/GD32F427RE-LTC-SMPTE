@@ -47,7 +47,6 @@ void SetIdentify(std::string_view value) {
     board::statusled::SetMode(value[0] != '0' ? board::statusled::Mode::kFast : board::statusled::Mode::kNormal);
 }
 
-// TODO (a) Subject for deletion
 void SetReboot(std::string_view value) {
     if (value.size() != 1) {
         return;
@@ -67,13 +66,10 @@ constexpr json::Key kActionKeys[] = {
     json::MakeKey(SetIdentify, kIdentify),
     json::MakeKey(SetReboot, kReboot),
 };
-
 } // namespace
 
 namespace json::action {
-
-void Set(std::string_view buffer) {
-    ParseJsonWithTable(buffer, kActionKeys);
+void Set(const char* buffer, uint32_t buffer_size) {
+    ParseJsonWithTable(buffer, buffer_size, kActionKeys);
 }
-
 } // namespace json::action
