@@ -26,13 +26,78 @@
 #ifndef JSON_SOURCEPARAMSCONST_H_
 #define JSON_SOURCEPARAMSCONST_H_
 
+#include <array>
+#include <string_view>
+
 #include "json/json_key.h"
+#include "output/ltc_output.h"
 
 namespace json::ltc {
+inline constexpr std::size_t kOutputKeySize = 32;
+
+consteval auto MakeOutputKeyName(std::string_view name) {
+    std::array<char, kOutputKeySize> result{};
+
+    constexpr std::string_view kPrefix = "output_";
+
+    std::size_t index = 0;
+
+    for (const char c : kPrefix) {
+        result[index++] = c;
+    }
+
+    for (const char c : name) {
+        result[index++] = c;
+    }
+
+    return result;
+}
+
+consteval auto MakeOutputKeyNames() {
+    constexpr auto kCount = ::ltc::output::kSupportedOutputs.second;
+
+    std::array<std::array<char, kOutputKeySize>, kCount> result{};
+
+    for (std::size_t i = 0; i < kCount; ++i) {
+        const auto kOutput = ::ltc::output::kSupportedOutputs.first[i];
+        result[i] = MakeOutputKeyName(::ltc::OutputToName(kOutput));
+    }
+
+    return result;
+}
+
+inline constexpr auto kOutputKeyNames = MakeOutputKeyNames();
+
+consteval auto MakeOutputKeyDefinitions() {
+    constexpr auto kCount = kOutputKeyNames.size();
+
+    std::array<json::KeyDefinition, kCount> result{};
+
+    for (std::size_t i = 0; i < kCount; ++i) {
+        const auto& name = kOutputKeyNames[i];
+
+        std::size_t length = 0;
+
+        while (name[length] != '\0') {
+            ++length;
+        }
+
+        const auto kLength = static_cast<uint8_t>(length);
+
+        result[i] = {.name = name.data(), .length = static_cast<uint8_t>(length), .hash = Fnv1a32(name.data(), kLength)};
+    }
+
+    return result;
+}
+
+inline constexpr auto kOutputKeyDefinitions = MakeOutputKeyDefinitions();
+
 struct LtcParamsConst {
     static constexpr char kFileName[] = "ltc.json";
 
     static constexpr auto kSource = json::MakeKey("source");
+
+    static constexpr auto kOutputs = kOutputKeyDefinitions;
 };
 } // namespace json::ltc
 

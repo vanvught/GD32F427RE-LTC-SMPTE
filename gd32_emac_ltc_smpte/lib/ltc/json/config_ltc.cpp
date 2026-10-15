@@ -35,16 +35,18 @@
 namespace json::config {
 uint32_t GetLtc(char* buffer, uint32_t length) {
     const auto kSource = ::ltc::input::Source::Instance().Input();
+    const auto& destination = ::ltc::output::Destination::Instance();
 
     return json::helpers::Serialize(buffer, length, [&](JsonDoc& doc) {
-        doc[ltc::LtcParamsConst::kSource.name] = ::ltc::InputToName(kSource); //
-        uint32_t index{0};
-        for (const auto kOutput : ::ltc::kOutputs) {
-            const auto& entry = ::ltc::output::kCommandtab[kOutput];
-            if (entry.start != nullptr) {
-                doc["output_", ::ltc::kOutput[index]] = ::ltc::output::Destination::Instance().IsEnabled(kOutput) ? "Enabled" : "Disabled";
-            }
-            index++;
+        doc[ltc::LtcParamsConst::kSource.name] = ::ltc::InputToName(kSource);
+
+        constexpr const auto& supported = ::ltc::output::kSupportedOutputs;
+
+        for (std::size_t i = 0; i < supported.second; ++i) {
+            const auto kOutput = supported.first[i];
+            const auto& key = ltc::LtcParamsConst::kOutputs[i];
+
+            doc[key.name] = destination.IsEnabled(kOutput) ? "Enabled" : "Disabled";
         }
     });
 }
@@ -52,5 +54,6 @@ uint32_t GetLtc(char* buffer, uint32_t length) {
 void SetLtc(const char* buffer, uint32_t buffer_size) {
     ::json::ltc::LtcParams ltc_params;
     ltc_params.Store(buffer, buffer_size);
+    ltc_params.Set();
 }
 } // namespace json::config

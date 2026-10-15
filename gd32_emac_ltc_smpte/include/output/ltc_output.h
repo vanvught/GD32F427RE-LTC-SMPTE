@@ -31,6 +31,7 @@
 #include <cstring>
 #include <bit>
 #include <utility>
+#include <array>
 #include <sys/time.h>
 
 #include "firmware/utc.h"
@@ -148,6 +149,21 @@ constexpr auto MakeCommandTable() {
 
 inline constexpr auto kCommandtab = MakeCommandTable();
 
+consteval auto MakeSupportedOutputs() {
+    std::array<Output, kOutputCount> result{};
+    std::size_t count = 0;
+
+    for (const auto kOutput : ::ltc::kOutputs) {
+        if (kCommandtab[kOutput].start != nullptr) {
+            result[count++] = kOutput;
+        }
+    }
+
+    return std::pair{result, count};
+}
+
+inline constexpr auto kSupportedOutputs = MakeSupportedOutputs();
+
 class Destination {
    public:
     Destination();
@@ -163,9 +179,9 @@ class Destination {
             return;
         }
 
-        debug::PrintBits(disabled_requested_, "disabled_requested_");
+        input_ = kInput;
 
-        const auto kOutput = static_cast<::ltc::Output>(1U << static_cast<uint16_t>(kInput));
+        const auto kOutput = static_cast<::ltc::Output>(1U << std::to_underlying(kInput));
 
         disabled_current_ = disabled_requested_;
         disabled_current_ |= static_cast<uint16_t>(kOutput);
@@ -175,8 +191,7 @@ class Destination {
         if (entry.stop != nullptr) {
             entry.stop();
         }
-
-        debug::PrintBits(disabled_current_, "disabled_current_");
+ 
         LTC_OUTPUT_DEBUG_EXIT();
     }
 
@@ -189,7 +204,10 @@ class Destination {
             return;
         }
 
-        debug::PrintBits(disabled_current_, "disabled_current_");
+        if (IsDisabled(output)) {
+            LTC_OUTPUT_DEBUG_EXIT();
+            return;
+        }
 
         const auto& entry = kCommandtab[output];
 
@@ -200,20 +218,27 @@ class Destination {
             entry.stop();
         }
 
-        debug::PrintBits(disabled_current_, "disabled_current_");
         LTC_OUTPUT_DEBUG_EXIT();
     }
 
     void Enable(::ltc::Output output) {
         LTC_OUTPUT_DEBUG_ENTRY();
-        LTC_OUTPUT_DEBUG_PRINTF("output=%s", ::ltc::OutputToName(output));
+        LTC_OUTPUT_DEBUG_PRINTF("output=%u -> %s", static_cast<unsigned>(output), ::ltc::OutputToName(output));
 
-        if (output >= ::ltc::Output::kUndefined) {
+        if ((output >= ::ltc::Output::kUndefined) || IsEnabled(output)) {
             LTC_OUTPUT_DEBUG_EXIT();
             return;
         }
 
-        debug::PrintBits(disabled_current_, "disabled_current_");
+        const auto kOutput = static_cast<::ltc::Output>(1U << std::to_underlying(input_));
+
+        if (kOutput == output) {
+            LTC_OUTPUT_DEBUG_EXIT();
+            return;
+        }
+
+		debug::PrintBits(disabled_requested_, "disabled_requested_");
+		debug::PrintBits(disabled_current_, "disabled_current_");
 
         const auto& entry = kCommandtab[output];
 
@@ -224,7 +249,9 @@ class Destination {
             entry.start();
         }
 
-        debug::PrintBits(disabled_current_, "disabled_current_");
+		debug::PrintBits(disabled_requested_, "disabled_requested_");
+		debug::PrintBits(disabled_current_, "disabled_current_");
+
         LTC_OUTPUT_DEBUG_EXIT();
     }
 
@@ -371,6 +398,8 @@ class Destination {
 
     uint16_t disabled_current_{std::to_underlying(Output::kPixel)};
     uint16_t disabled_requested_{std::to_underlying(Output::kPixel)};
+
+    ::ltc::Input input_{::ltc::Input::kUndefined};
 
     uint8_t type_previous_{static_cast<uint8_t>(::ltc::Type::kInvalid)};
     int32_t utc_offset_{0};

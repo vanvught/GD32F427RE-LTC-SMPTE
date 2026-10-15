@@ -23,6 +23,9 @@
 * THE SOFTWARE.
 */
 
+#include <array>
+#include <utility>
+
 #ifndef JSON_SOURCEPARAMS_H_
 #define JSON_SOURCEPARAMS_H_
 
@@ -31,6 +34,18 @@
 #include "json/json_params_base.h"
 
 namespace json::ltc {
+	template <std::size_t... I>
+	consteval auto MakeLtcKeys(
+	    json::SimpleSetter set_source,
+	    json::KeyedSetter set_output,
+	    std::index_sequence<I...> /*unused*/) {
+
+	    return std::array{
+	        MakeKey(set_source, LtcParamsConst::kSource),
+	        MakeKey(set_output, LtcParamsConst::kOutputs[I])...
+	    };
+	}
+
 class LtcParams : public JsonParamsBase<LtcParams> {
    public:
     LtcParams();
@@ -43,16 +58,19 @@ class LtcParams : public JsonParamsBase<LtcParams> {
 
     void Load() { JsonParamsBase::Load(LtcParamsConst::kFileName); }
     void Store(const char* buffer, uint32_t buffer_size);
+    void Set();
 
    protected:
     void Dump();
 
    private:
     static void SetSource(std::string_view value);
+    static void SetOutput(std::string_view key, std::string_view value);
 
-    static constexpr json::Key kLtcKeys[] = {
-        MakeKey(SetSource, LtcParamsConst::kSource), //
-    };
+	static constexpr auto kLtcKeys = MakeLtcKeys(
+	SetSource,
+	SetOutput,
+	std::make_index_sequence<std::size(LtcParamsConst::kOutputs)>{});
 
     inline static common::store::Ltc store_ltc;
 
