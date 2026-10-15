@@ -425,8 +425,8 @@ struct Flags {
 struct Ltc {
     uint32_t flags;
     uint8_t source;
-    uint8_t volume;
-    uint8_t disabled_outputs;
+    uint8_t reserved;
+    uint16_t disabled_outputs;
     uint8_t ntp_year;
     uint8_t ntp_month;
     uint8_t ntp_day;
@@ -445,7 +445,7 @@ struct Ltc {
     uint8_t skip_seconds;
     uint8_t reserved8;
     uint8_t reserved1[12];
-    uint8_t reserved2[2];
+    uint8_t reserved2;
     uint16_t osc_port;
     int32_t utc_offset;
     uint32_t time_code_ip;
