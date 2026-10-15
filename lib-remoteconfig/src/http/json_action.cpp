@@ -58,9 +58,9 @@ void SetReboot(std::string_view value) {
     }
 }
 
-constexpr auto kDisplay = json::MakeSimpleKey("display");
-constexpr auto kIdentify = json::MakeSimpleKey("identify");
-constexpr auto kReboot = json::MakeSimpleKey("reboot");
+constexpr auto kDisplay = json::MakeKey("display");
+constexpr auto kIdentify = json::MakeKey("identify");
+constexpr auto kReboot = json::MakeKey("reboot");
 
 constexpr json::Key kActionKeys[] = {
     json::MakeKey(SetDisplay, kDisplay),

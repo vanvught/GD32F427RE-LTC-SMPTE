@@ -33,9 +33,9 @@ namespace json {
 struct OscClientParamsConst {
     static constexpr char kFileName[] = "oscclient.json";
 
-    static constexpr auto kServerIp = json::MakeSimpleKey("server_ip");
-    static constexpr auto kPingDisable = json::MakeSimpleKey("ping_disable");
-    static constexpr auto kPingDelay = json::MakeSimpleKey("ping_delay");
+    static constexpr auto kServerIp = json::MakeKey("server_ip");
+    static constexpr auto kPingDisable = json::MakeKey("ping_disable");
+    static constexpr auto kPingDelay = json::MakeKey("ping_delay");
 
     static constexpr json::PortKey kCmd0{"cmd0", 4, Fnv1a32("cmd0", 4)};
     static constexpr json::PortKey kCmd1{"cmd1", 4, Fnv1a32("cmd1", 4)};
