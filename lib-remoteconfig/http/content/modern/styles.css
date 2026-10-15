@@ -262,3 +262,10 @@ input[type="file"] {
 	border-radius: 3px;
 	overflow: auto;
 }
+
+/* LTC configuration */
+.ltc-table { margin-top: 12px; }
+.ltc-table th:not(:first-child), .ltc-table td:not(:first-child) { width: 90px; }
+.ltc-table input[type="radio"] { cursor: pointer; accent-color: #8bb8ff; }
+.ltc-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 12px; }
+.ltc-actions #ltc_status { color: #aaa; font-size: 12px; }

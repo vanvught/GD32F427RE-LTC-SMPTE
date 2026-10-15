@@ -126,3 +126,80 @@ async function saveDataKeyForm(path, root, options = {}) {
 
     return true;
 }
+
+// LTC configuration: labels follow ltc.h kInputPretty / kOutputPretty.
+const ltcInputs = [
+    ['ltc', 'LTC'], ['artnet', 'Art-Net'], ['midi', 'DIN MIDI'],
+    ['tcnet', 'TCNet'], ['internal', 'Internal'], ['rtp-midi', 'Apple MIDI'],
+    ['usb-midi', 'USB MIDI'], ['systime', 'System-Time'], ['etc', 'ETC']
+];
+const ltcOutputLabels = {
+    'ltc': 'LTC', 'artnet': 'Art-Net', 'midi': 'DIN MIDI',
+    'tcnet': 'TCNet', 'internal': 'Internal', 'rtp-midi': 'Apple MIDI',
+    'usb-midi': 'USB MIDI', 'systime': 'System-Time', 'etc': 'ETC',
+    'ntp-server': 'NTP Server', 'display-oled': 'Display OLED',
+    'display-max7219': 'Display MAX7219', 'display-pixel': 'Display Pixel'
+};
+let ltcOutputKeys = [];
+
+async function loadLtc() {
+    const status = $('ltc_status');
+    const json = await getJSON('config/ltc');
+    if (!json) {
+        status.textContent = 'Unable to load LTC configuration.';
+        return;
+    }
+    const source = $('ltc_source');
+    source.replaceChildren();
+    for (const [value, label] of ltcInputs) {
+        source.add(new Option(label, value));
+    }
+    if (ltcInputs.some(([value]) => value === json.source)) {
+        source.value = json.source;
+    } else {
+        source.add(new Option(String(json.source ?? 'Unknown'), String(json.source ?? ''), true, true));
+    }
+
+    const tbody = $('ltc_outputs');
+    tbody.replaceChildren();
+    ltcOutputKeys = Object.keys(json).filter(key =>
+        key.startsWith('output_') &&
+        (json[key] === 'Enabled' || json[key] === 'Disabled'));
+    for (const [index, key] of ltcOutputKeys.entries()) {
+        const row = tbody.insertRow();
+        row.insertCell().textContent = ltcOutputLabels[key.slice(7)] || key.slice(7);
+        for (const value of ['Enabled', 'Disabled']) {
+            const cell = row.insertCell();
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'ltc_output_' + index;
+            radio.value = value;
+            radio.checked = json[key] === value;
+            radio.setAttribute('aria-label', (ltcOutputLabels[key.slice(7)] || key) + ': ' + value);
+            cell.appendChild(radio);
+        }
+    }
+    status.textContent = '';
+}
+
+async function saveLtc() {
+    const button = $('ltc_save');
+    const status = $('ltc_status');
+    const data = { source: $('ltc_source').value };
+    for (const [index, key] of ltcOutputKeys.entries()) {
+        const selected = document.querySelector('input[name="ltc_output_' + index + '"]:checked');
+        if (selected) data[key] = selected.value;
+    }
+    button.disabled = true;
+    status.textContent = 'Saving…';
+    try {
+        if (await postJSON('config/ltc', data)) {
+            await loadLtc();
+            if (!status.textContent) status.textContent = 'Configuration saved and reloaded.';
+        } else {
+            status.textContent = 'Save failed.';
+        }
+    } finally {
+        button.disabled = false;
+    }
+}
