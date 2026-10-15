@@ -80,7 +80,7 @@ void SetDate(std::string_view date) {
     settimeofday(&time_val, nullptr);
 }
 
-constexpr auto kDate = json::MakeSimpleKey("date");
+constexpr auto kDate = json::MakeKey("date");
 
 constexpr json::Key kActionKeys[] = {json::MakeKey(SetDate, kDate)};
 
