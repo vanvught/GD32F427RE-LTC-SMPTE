@@ -2,7 +2,7 @@
  * @file display.h
  *
  */
-/* Copyright (C) 2022-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,19 +34,6 @@ struct Defaults {
 };
 } // namespace display
 
-#ifndef CONFIG_DISPLAY_USE_CUSTOM
-#ifdef CONFIG_DISPLAY_USE_SPI
-#include "spi/display.h"
-#else
 #include "i2c/display.h"
-#endif // CONFIG_DISPLAY_USE_SPI
-#else
-#ifndef STR_HELPER
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
-#endif // STR_HELPER
-#define EXPAND(x) x
-#include STR(EXPAND(DISPLAY_USE_CUSTOM_INCLUDE)/custom/display.h)
-#endif // CONFIG_DISPLAY_USE_CUSTOM
 
 #endif // DISPLAY_H_
