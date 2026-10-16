@@ -28,14 +28,17 @@
 #include "http/html_infos.h"
 
 namespace html {
-#define ENTRY(filename_literal, label) MakeHtmlInfo(filename_literal, Fnv1a32(filename_literal, static_cast<uint8_t>(sizeof(filename_literal) - 1)), label)
+#define ENTRY(filename_literal, label) MakeHtmlInfo(filename_literal, Fnv1a32(filename_literal), label)
 
-constexpr Info kHtmlInfos[] = {ENTRY("/", "index.html"),
-                               ENTRY("/config", "index.html"),
-                               ENTRY("/status", "status/index.html"),
-                               ENTRY("/rtc", "rtc/index.html"),
-                               ENTRY("/time", "time/index.html"),
+constexpr Info kHtmlInfos[] = {
+    ENTRY("/", "index.html"),              //
+    ENTRY("/config", "index.html"),        //
+    ENTRY("/status", "status/index.html"), //
+    ENTRY("/rtc", "rtc/index.html"),       //
+    ENTRY("/time", "time/index.html"),     //
 };
+
+#undef ENTRY
 
 constexpr size_t kHtmlInfosSize = sizeof(kHtmlInfos) / sizeof(kHtmlInfos[0]);
 

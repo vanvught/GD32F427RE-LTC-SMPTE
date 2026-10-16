@@ -67,7 +67,7 @@ uint32_t GetLtc(char*, uint32_t);
 void SetLtc(const char*, uint32_t);
 } // namespace config
 
-#define ENTRY(get, set, del, filename_literal, config_label, status_label) MakeJsonFileInfo(get, set, del, filename_literal, Fnv1a32(filename_literal, static_cast<uint8_t>(sizeof(filename_literal) - 1)), config_label, status_label)
+#define ENTRY(get, set, del, filename_literal, config_label, status_label) MakeJsonFileInfo(get, set, del, filename_literal, Fnv1a32(filename_literal), config_label, status_label)
 
 constexpr Info kFileInfos[] = {
     ENTRY(GetList, nullptr, nullptr, "list", nullptr, nullptr),
@@ -89,6 +89,8 @@ constexpr Info kFileInfos[] = {
     // LTC
     ENTRY(config::GetLtc, config::SetLtc, nullptr, "config/ltc", "LTC SMPTE", nullptr),
 };
+
+#undef ENTRY
 
 constexpr size_t kFileInfosSize = sizeof(kFileInfos) / sizeof(kFileInfos[0]);
 

@@ -46,12 +46,12 @@ void SetDate(std::string_view date) {
 
     struct tm tm{};
 
-    tm.tm_year = common::Atoi(date.data(), 4) - 1900;
-    tm.tm_mon = common::Atoi(date.data() + 5, 2) - 1;
-    tm.tm_mday = common::Atoi(date.data() + 8, 2);
-    tm.tm_hour = common::Atoi(date.data() + 11, 2);
-    tm.tm_min = common::Atoi(date.data() + 14, 2);
-    tm.tm_sec = common::Atoi(date.data() + 17, 2);
+    tm.tm_year = common::Atoi(common::Slice(date, 0, 4)) - 1900;
+    tm.tm_mon = common::Atoi(common::Slice(date, 5, 2)) - 1;
+    tm.tm_mday = common::Atoi(common::Slice(date, 8, 2));
+    tm.tm_hour = common::Atoi(common::Slice(date, 11, 2));
+    tm.tm_min = common::Atoi(common::Slice(date, 14, 2));
+    tm.tm_sec = common::Atoi(common::Slice(date, 17, 2));
 
     struct timeval time_val{.tv_sec = mktime(&tm), .tv_usec = 0};
 
@@ -60,9 +60,8 @@ void SetDate(std::string_view date) {
     } else {
         const int32_t kSign = date[19] == '-' ? -1 : 1;
 
-        const auto kHours = static_cast<int8_t>(common::Atoi(date.data() + 20, 2) * kSign);
-
-        const auto kMinutes = static_cast<uint8_t>(common::Atoi(date.data() + 23, 2));
+        const auto kHours = static_cast<int8_t>(common::Atoi(common::Slice(date, 20, 2)) * kSign);
+        const auto kMinutes = static_cast<uint8_t>(common::Atoi(common::Slice(date, 23, 2)));
 
         DEBUG_PRINTF("[%d]%.2d:%.2d", static_cast<int>(kSign), static_cast<int>(kHours), static_cast<int>(kMinutes));
 

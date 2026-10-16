@@ -34,6 +34,7 @@
 #include <cstring>
 #include <dirent.h>
 #include <cassert>
+#include <string_view>
 
 #include "http/http.h"
 #include "common/utils/utils_hash.h"
@@ -314,7 +315,7 @@ static uint32_t CreateHash(const char* filename) {
     }
 
     printf("Hash name: %s ", hash_name);
-    return Fnv1a32Runtime(hash_name, kLength);
+    return Fnv1a32(std::string_view{hash_name});
 }
 
 int main(int argc, char* argv[]) { // NOLINT

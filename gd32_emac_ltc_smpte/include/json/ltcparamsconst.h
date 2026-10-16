@@ -40,6 +40,10 @@ consteval auto MakeOutputKeyName(std::string_view name) {
 
     constexpr std::string_view kPrefix = "output_";
 
+    if (kPrefix.size() + name.size() >= result.size()) {
+        __builtin_trap();
+    }
+
     std::size_t index = 0;
 
     for (const char c : kPrefix) {
@@ -75,16 +79,13 @@ consteval auto MakeOutputKeyDefinitions() {
 
     for (std::size_t i = 0; i < kCount; ++i) {
         const auto& name = kOutputKeyNames[i];
+        const std::string_view kName{name.data()};
 
-        std::size_t length = 0;
-
-        while (name[length] != '\0') {
-            ++length;
-        }
-
-        const auto kLength = static_cast<uint8_t>(length);
-
-        result[i] = {.name = name.data(), .length = static_cast<uint8_t>(length), .hash = Fnv1a32(name.data(), kLength)};
+        result[i] = {
+            .name = name.data(),
+            .length = static_cast<uint8_t>(kName.size()),
+            .hash = Fnv1a32(kName),
+        };
     }
 
     return result;

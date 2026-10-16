@@ -60,7 +60,7 @@ namespace shell {
 inline constexpr char kTooMany[] = "Too many arguments";
 
 inline std::optional<int32_t> GetValue(std::string_view text, int32_t max_value) {
-    const auto kValue = common::Atoi(text.data(), text.size());
+    const auto kValue = common::Atoi(text);
 
     if (kValue <= max_value) {
         return kValue;
