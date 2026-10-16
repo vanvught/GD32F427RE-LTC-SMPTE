@@ -34,8 +34,8 @@
 #include "firmware/debug/debug_config.h"
 #include "common/utils/utils_units.h"
 
-extern unsigned char stack_low;
-extern unsigned char _sp; // NOLINT
+extern uint8_t stack_low;
+extern uint8_t _sp; // NOLINT
 
 namespace debug::stack {
 constexpr uint32_t kMagicWord = 0xABCDABCD;

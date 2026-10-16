@@ -73,7 +73,7 @@ constexpr KeyDefinition MakeKey(const char (&name)[kN]) noexcept {
     return {
         .name = name,
         .length = static_cast<uint8_t>(kN - 1),
-        .hash = Fnv1a32(name, kN - 1),
+        .hash = Fnv1a32(std::string_view{name, kN - 1}),
     };
 }
 } // namespace json

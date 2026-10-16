@@ -27,6 +27,9 @@
 #define JSON_JSON_PARAMS_BASE_H_
 
 #include <cstdint>
+#ifndef DISABLE_FS
+#include <cstdio>
+#endif
 
 #include "json/json_debug.h"
 

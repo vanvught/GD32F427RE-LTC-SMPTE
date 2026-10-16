@@ -61,7 +61,7 @@ inline void ParseJsonWithTable(std::string_view input, const json::Key* keys, si
             break;
         }
 
-        const auto kHash = Fnv1a32Runtime(json_key.data(), static_cast<uint32_t>(json_key.size()));
+        const auto kHash = Fnv1a32(json_key);
 
         for (size_t i = 0; i < key_count; ++i) {
             const auto& key = keys[i];
