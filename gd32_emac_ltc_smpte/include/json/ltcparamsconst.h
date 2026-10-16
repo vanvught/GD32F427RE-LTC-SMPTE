@@ -46,12 +46,12 @@ consteval auto MakeOutputKeyName(std::string_view name) {
 
     std::size_t index = 0;
 
-    for (const char c : kPrefix) {
-        result[index++] = c;
+    for (const char kChar : kPrefix) {
+        result[index++] = kChar;
     }
 
-    for (const char c : name) {
-        result[index++] = c;
+    for (const char kChar : name) {
+        result[index++] = kChar;
     }
 
     return result;
@@ -95,9 +95,7 @@ inline constexpr auto kOutputKeyDefinitions = MakeOutputKeyDefinitions();
 
 struct LtcParamsConst {
     static constexpr char kFileName[] = "ltc.json";
-
     static constexpr auto kSource = json::MakeKey("source");
-
     static constexpr auto kOutputs = kOutputKeyDefinitions;
 };
 } // namespace json::ltc

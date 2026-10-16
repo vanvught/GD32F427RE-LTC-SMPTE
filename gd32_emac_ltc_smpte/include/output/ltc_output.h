@@ -191,7 +191,7 @@ class Destination {
         if (entry.stop != nullptr) {
             entry.stop();
         }
- 
+
         LTC_OUTPUT_DEBUG_EXIT();
     }
 
@@ -199,12 +199,14 @@ class Destination {
         LTC_OUTPUT_DEBUG_ENTRY();
         LTC_OUTPUT_DEBUG_PRINTF("output=%u -> %s", static_cast<unsigned>(output), ::ltc::OutputToName(output));
 
-        if (output >= ::ltc::Output::kUndefined) {
+        if ((output >= ::ltc::Output::kUndefined) || IsDisabled(output)) {
             LTC_OUTPUT_DEBUG_EXIT();
             return;
         }
 
-        if (IsDisabled(output)) {
+        const auto kOutputInput = static_cast<::ltc::Output>(1U << std::to_underlying(input_));
+
+        if (kOutputInput == output) {
             LTC_OUTPUT_DEBUG_EXIT();
             return;
         }
@@ -230,15 +232,15 @@ class Destination {
             return;
         }
 
-        const auto kOutput = static_cast<::ltc::Output>(1U << std::to_underlying(input_));
+        const auto kOutputInput = static_cast<::ltc::Output>(1U << std::to_underlying(input_));
 
-        if (kOutput == output) {
+        if (kOutputInput == output) {
             LTC_OUTPUT_DEBUG_EXIT();
             return;
         }
 
-		debug::PrintBits(disabled_requested_, "disabled_requested_");
-		debug::PrintBits(disabled_current_, "disabled_current_");
+        debug::PrintBits(disabled_requested_, "disabled_requested_");
+        debug::PrintBits(disabled_current_, "disabled_current_");
 
         const auto& entry = kCommandtab[output];
 
@@ -249,8 +251,8 @@ class Destination {
             entry.start();
         }
 
-		debug::PrintBits(disabled_requested_, "disabled_requested_");
-		debug::PrintBits(disabled_current_, "disabled_current_");
+        debug::PrintBits(disabled_requested_, "disabled_requested_");
+        debug::PrintBits(disabled_current_, "disabled_current_");
 
         LTC_OUTPUT_DEBUG_EXIT();
     }
