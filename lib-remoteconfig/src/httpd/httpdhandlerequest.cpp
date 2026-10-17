@@ -168,8 +168,17 @@ void HttpDeamonHandleRequest::HandleRequest(uint32_t bytes_received, char* recei
 
         request_content_type_ = http::ContentTypes::kTextHtml;
         content_ = reinterpret_cast<uint8_t*>(dynamic_content_);
-        content_size_ = static_cast<uint32_t>(snprintf(dynamic_content_, sizeof(dynamic_content_), "%u %s\n", static_cast<unsigned>(status_), status_msg));
+        const auto kLength = snprintf(dynamic_content_, sizeof(dynamic_content_), "%u %s\n", static_cast<unsigned>(status_), status_msg);
 
+
+		if (kLength < 0 || static_cast<size_t>(kLength) >= sizeof(dynamic_content_)) {
+		    network::tcp::Abort(connection_handle_);
+		    // Reset request state before returning.
+		    return;
+		}
+
+		content_size_ = static_cast<uint32_t>(kLength);
+        
         const auto kHeaderLength =
             static_cast<uint32_t>(snprintf(receive_buffer_, network::tcp::kTcpDataMss,
                                            "HTTP/1.1 %u %s\r\n"
