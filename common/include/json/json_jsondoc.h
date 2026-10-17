@@ -77,26 +77,30 @@ class JsonDoc {
 
     // Supports one nested object within the root object.
     void BeginObject(std::string_view key) noexcept {
-        if (ended_ || depth_ != 0U || overflow_) {
+        if (ended_ || depth_ >= kMaxDepth - 1U || overflow_) {
             overflow_ = true;
             return;
         }
+
         BeginField(key, {});
         Append('{');
+
         if (!overflow_) {
-            depth_ = 1U;
-            first_field_[1] = true;
+            ++depth_;
+            first_field_[depth_] = true;
         }
     }
 
     void EndObject() noexcept {
-        if (ended_ || depth_ != 1U || overflow_) {
+        if (ended_ || depth_ == 0U || overflow_) {
             overflow_ = true;
             return;
         }
+
         Append('}');
+
         if (!overflow_) {
-            depth_ = 0U;
+            --depth_;
         }
     }
 
@@ -157,7 +161,9 @@ class JsonDoc {
             } else {
                 Append(static_cast<char>(c));
             }
-            if (overflow_) return;
+            if (overflow_) {
+                return;
+            }
         }
     }
 
@@ -194,12 +200,14 @@ class JsonDoc {
         Append(std::string_view{p, static_cast<std::size_t>(digits + sizeof(digits) - p)});
     }
 
+    static constexpr uint32_t kMaxDepth = 4;
+
     std::span<char> buffer_;
     std::size_t pos_{0};
-    bool first_field_[2]{true, true};
-    uint32_t depth_{0};
     bool ended_{false};
     bool overflow_{false};
+    bool first_field_[kMaxDepth]{true};
+    uint32_t depth_{0};
 };
 
 #endif // JSON_JSON_JSONDOC_H_
