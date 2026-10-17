@@ -369,10 +369,12 @@ class Destination {
     }
 
     void RunOutput() const {
-        if (global::updates_per_second > 10) {
-            board::statusled::SetMode(board::statusled::Mode::kData);
-        } else {
-            board::statusled::SetMode(board::statusled::Mode::kNormal);
+        if (board::statusled::GetMode() != board::statusled::Mode::kFast) {
+            if (global::updates_per_second > 10) {
+                board::statusled::SetMode(board::statusled::Mode::kData);
+            } else {
+                board::statusled::SetMode(board::statusled::Mode::kNormal);
+            }
         }
     }
 

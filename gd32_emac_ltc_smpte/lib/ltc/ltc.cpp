@@ -31,6 +31,7 @@
 
 #include "ltc.h"
 #include "gd32.h" // IWYU pragma: keep
+#include "common/utils/utils_string.h"
 
 namespace ltc::global {
 volatile uint32_t updates_per_second;
@@ -53,25 +54,12 @@ void TIMER6_IRQHandler() {
 }
 
 namespace ltc {
-namespace {
-void Itoa(uint32_t value, char* buffer) {
-    auto* pointer = buffer;
+void ConvertToString(const TimeCode* ltc_timecode, char* timecode) {
+    using common::Append2;
 
-    if (value == 0) {
-        *pointer++ = '0';
-        *pointer = '0';
-        return;
-    }
-
-    *pointer++ = static_cast<char>('0' + (value / 10U));
-    *pointer = static_cast<char>('0' + (value % 10U));
-}
-} // namespace
-
-void ConvertToString(const struct ltc::TimeCode* ltc_timecode, char* timecode) {
-    Itoa(ltc_timecode->hours, &timecode[ltc::timecode::index::kHours]);
-    Itoa(ltc_timecode->minutes, &timecode[ltc::timecode::index::kMinutes]);
-    Itoa(ltc_timecode->seconds, &timecode[ltc::timecode::index::kSeconds]);
-    Itoa(ltc_timecode->frames, &timecode[ltc::timecode::index::kFrames]);
+    Append2(&timecode[timecode::index::kHours], ltc_timecode->hours);
+    Append2(&timecode[timecode::index::kMinutes], ltc_timecode->minutes);
+    Append2(&timecode[timecode::index::kSeconds], ltc_timecode->seconds);
+    Append2(&timecode[timecode::index::kFrames], ltc_timecode->frames);
 }
 } // namespace ltc

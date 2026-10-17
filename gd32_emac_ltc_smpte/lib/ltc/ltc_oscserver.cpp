@@ -192,9 +192,9 @@ void Input(const uint8_t* buffer, uint32_t size, [[maybe_unused]] uint32_t from_
 
     std::string_view request{char_buffer, static_cast<size_t>(end - char_buffer)};
 
-    if (!request.starts_with(path)) {
-        return;
-    }
+	if (!request.starts_with(std::string_view{path, path_length})) {
+	    return;
+	}
 
     request.remove_prefix(path_length);
 
@@ -319,7 +319,15 @@ void Start() {
 
     is_started = true;
 
-    path_length = static_cast<uint32_t>(snprintf(path, sizeof(path), "/%s/tc/", network::iface::HostName()));
+    const std::string_view kHostname{network::iface::HostName()};
+    assert(kHostname.size() + 6 <= sizeof(path));
+
+    path[0] = '/';
+    std::memcpy(path + 1, kHostname.data(), kHostname.size());
+    std::memcpy(path + 1 + kHostname.size(), "/tc/", sizeof("/tc/"));
+
+    path_length = static_cast<uint32_t>(kHostname.size() + 5);
+
     assert(path_length < sizeof(path));
 
     assert(handle == -1);

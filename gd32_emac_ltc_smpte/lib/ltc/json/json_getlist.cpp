@@ -23,12 +23,11 @@
  */
 
 #include <cstdint>
-#include <cstdio>
-#include <utility>
 
+#include "common/utils/utils_string.h"
 #include "configstore.h"
 #include "configurationstore.h"
-#include "ip4/ip4_address.h"
+#include "json/json_helpers.h"
 #include "network_config.h"
 
 namespace json {
@@ -43,24 +42,30 @@ uint32_t GetList(char* out_buffer, uint32_t out_buffer_size) {
     display_name[common::store::remoteconfig::kDisplayNameLength - 1U] = '\0';
 
     constexpr uint32_t kPortCount = 0U;
-    const char* node_type = "LTC SMPTE";
-    const char* output_type = "Timecode";
 
-    const int kLength = snprintf(out_buffer, out_buffer_size,
-                                 "{\"list\":{\"ip\":\"" IPSTR
-                                 "\",\"name\":\"%s\","
-                                 "\"node\":{\"type\":\"%s\","
-                                 "\"output\":{\"type\":\"%s\",\"count\":%u}}}}",
-                                 IP2STR(network::GetPrimaryIp()), reinterpret_cast<const char*>(display_name), node_type, output_type, static_cast<unsigned>(kPortCount));
+    char ip_text[16];
+    const auto kIpLength = common::IpToString(network::GetPrimaryIp(), ip_text);
 
-    if (kLength < 0) {
+    if (kIpLength >= sizeof(ip_text)) {
         return 0U;
     }
 
-    if (std::cmp_greater_equal(kLength, out_buffer_size)) {
-        return out_buffer_size - 1U;
-    }
+    return json::helpers::Serialize(out_buffer, out_buffer_size, [&](JsonDoc& doc) {
+        doc.BeginObject("list");
 
-    return static_cast<uint32_t>(kLength);
+        doc["ip"] = ip_text;
+        doc["name"] = reinterpret_cast<const char*>(display_name);
+
+        doc.BeginObject("node");
+        doc["type"] = "LTC SMPTE";
+
+        doc.BeginObject("output");
+        doc["type"] = "Timecode";
+        doc["count"] = kPortCount;
+        doc.EndObject();
+
+        doc.EndObject();
+        doc.EndObject();
+    });
 }
 } // namespace json
