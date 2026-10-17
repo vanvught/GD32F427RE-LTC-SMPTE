@@ -46,6 +46,7 @@
 #include "apps/ntpclient.h"
 #endif // HAVE_NTP_CLIENT
 #include "common/utils/utils_flags.h"
+#include "common/utils/utils_string.h"
 
 using common::store::network::Flags;
 
@@ -57,7 +58,7 @@ NetworkParams::NetworkParams() {
 
 void NetworkParams::SetUseStaticIp(std::string_view value) {
     if (value.size() == 1) {
-        store_network.flags = common::SetFlagValue(store_network.flags, Flags::Flag::kUseStaticIp, value[0] != '0');
+        store_network.flags = common::SetFlagValue(store_network.flags, Flags::Flag::kUseStaticIp, value.front() != '0');
     }
 }
 
@@ -74,19 +75,7 @@ void NetworkParams::SetDefaultGateway(std::string_view value) {
 }
 
 void NetworkParams::SetHostname(std::string_view value) {
-    constexpr std::size_t kSize = common::store::network::kHostnameSize;
-
-    static_assert(kSize > 0);
-
-    const auto kLength = std::min(value.size(), kSize - 1);
-
-    auto* destination = reinterpret_cast<char*>(store_network.host_name);
-
-    if (kLength != 0) {
-        memcpy(destination, value.data(), kLength);
-    }
-
-    memset(destination + kLength, 0, kSize - kLength);
+    common::CopyString(store_network.host_name, value);
 }
 
 void NetworkParams::SetNtpServer(std::string_view value) {
