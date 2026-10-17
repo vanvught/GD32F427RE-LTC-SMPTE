@@ -75,8 +75,37 @@ class JsonDoc {
 
     [[nodiscard]] KeyProxy operator[](std::string_view key) noexcept { return {*this, key}; }
 
+    // Supports one nested object within the root object.
+    void BeginObject(std::string_view key) noexcept {
+        if (ended_ || depth_ != 0U || overflow_) {
+            overflow_ = true;
+            return;
+        }
+        BeginField(key, {});
+        Append('{');
+        if (!overflow_) {
+            depth_ = 1U;
+            first_field_[1] = true;
+        }
+    }
+
+    void EndObject() noexcept {
+        if (ended_ || depth_ != 1U || overflow_) {
+            overflow_ = true;
+            return;
+        }
+        Append('}');
+        if (!overflow_) {
+            depth_ = 0U;
+        }
+    }
+
     void End() noexcept {
         if (ended_) {
+            return;
+        }
+        if (depth_ != 0U) {
+            overflow_ = true;
             return;
         }
         ended_ = true;
@@ -116,19 +145,35 @@ class JsonDoc {
         buffer_[pos_] = '\0';
     }
 
+    void AppendEscaped(std::string_view value) noexcept {
+        constexpr char kHex[] = "0123456789abcdef";
+        for (unsigned char c : value) {
+            if (c == '"' || c == '\\') {
+                Append('\\');
+                Append(static_cast<char>(c));
+            } else if (c < 0x20U) {
+                char escaped[] = {'\\', 'u', '0', '0', kHex[c >> 4U], kHex[c & 0x0FU]};
+                Append(std::string_view{escaped, sizeof(escaped)});
+            } else {
+                Append(static_cast<char>(c));
+            }
+            if (overflow_) return;
+        }
+    }
+
     void BeginField(std::string_view first, std::string_view second) noexcept {
         if (ended_ || overflow_) {
             overflow_ = true;
             return;
         }
-        if (!first_field_) {
+        if (!first_field_[depth_]) {
             Append(',');
         }
         Append('"');
         Append(first);
         Append(second);
         Append("\":");
-        first_field_ = false;
+        first_field_[depth_] = false;
     }
 
     void WriteStringField(std::string_view first, std::string_view second, std::string_view value) noexcept {
@@ -151,7 +196,8 @@ class JsonDoc {
 
     std::span<char> buffer_;
     std::size_t pos_{0};
-    bool first_field_{true};
+    bool first_field_[2]{true, true};
+    uint32_t depth_{0};
     bool ended_{false};
     bool overflow_{false};
 };
