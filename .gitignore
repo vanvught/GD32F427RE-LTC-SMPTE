@@ -75,3 +75,4 @@ Testing/
 *.elf
 
 /gd32_emac_ltc_smpte/html
+*.map
