@@ -1,0 +1,209 @@
+/**
+ * emac.cpp
+ *
+ */
+/* Copyright (C) 2021-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+
+#include "common/utils/utils_string.h"
+#include "emac_counters.h"
+#include "emac/emac_phy.h"
+#ifdef CONFIG_NET_ENABLE_PTP
+#ifndef DISABLE_RTC
+#include "hwclock.h"
+#endif // DISABLE_RTC
+#endif // CONFIG_NET_ENABLE_PTP
+#include "emac/emac_debug.h"
+#include "gd32.h" // IWYU pragma: keep
+#include "common/utils/utils_print.h"
+
+extern void EnetGpioConfig();
+extern enet_descriptors_struct txdesc_tab[ENET_TXBUF_NUM];
+extern void MacAddress(uint8_t paddr[]);
+
+#ifdef CONFIG_NET_ENABLE_PTP
+#include "gd32_ptp.h"
+enet_descriptors_struct ptp_rxdesc_tab[ENET_RXBUF_NUM] __attribute__((aligned(4)));
+enet_descriptors_struct ptp_txdesc_tab[ENET_TXBUF_NUM] __attribute__((aligned(4)));
+#endif // CONFIG_NET_ENABLE_PTP
+
+namespace emac::eth::globals {
+extern uint32_t sent;
+extern uint32_t received;
+} // namespace emac::eth::globals
+
+/*
+ * Public function
+ */
+namespace emac {
+void __attribute__((cold)) Config() {
+    EMAC_DEBUG_ENTRY();
+#if (PHY_TYPE == LAN8700)
+    puts("LAN8700");
+#elif (PHY_TYPE == DP83848)
+    puts("DP83848");
+#elif (PHY_TYPE == RTL8201F)
+    puts("RTL8201F");
+#else
+#error PHY_TYPE is not set
+#endif // (PHY_TYPE == LAN8700)
+
+    EnetGpioConfig();
+
+    rcu_periph_clock_enable(RCU_ENET);
+    rcu_periph_clock_enable(RCU_ENETTX);
+    rcu_periph_clock_enable(RCU_ENETRX);
+
+    enet_deinit(ENETx);
+    enet_software_reset(ENETx);
+
+    if (!emac::phy::Config(PHY_ADDRESS)) {
+        ERROR("emac::phy::Config(PHY_ADDRESS)");
+    }
+
+    EMAC_DEBUG_EXIT();
+}
+
+void AdjustLink(emac::phy::Status phy_status) {
+    EMAC_DEBUG_ENTRY();
+
+    printf("Link %s, %d, %s\n", phy_status.link == emac::phy::Link::kStateUp ? "Up" : "Down", phy_status.speed == emac::phy::Speed::kSpeed10 ? 10 : 100, phy_status.duplex == emac::phy::Duplex::kDuplexHalf ? "HALF" : "FULL");
+
+#ifdef DEBUG_EMAC
+    {
+        uint16_t phy_value;
+#ifdef GD32H7XX
+        ErrStatus phy_state = enet_phy_write_read(ENETx, ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BCR, &phy_value);
+#else
+        ErrStatus phy_state = enet_phy_write_read(ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BCR, &phy_value);
+#endif // GD32H7XX
+        printf("BCR: %.4x %s\n", phy_value, common::IsSuccess(phy_state == SUCCESS));
+#ifdef GD32H7XX
+        enet_phy_write_read(ENETx, ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BSR, &phy_value);
+        phy_state = enet_phy_write_read(ENETx, ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BSR, &phy_value);
+#else
+        enet_phy_write_read(ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BSR, &phy_value);
+        phy_state = enet_phy_write_read(ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BSR, &phy_value);
+#endif // GD32H7XX
+        printf("BSR: %.4x %s\n", phy_value & (PHY_AUTONEGO_COMPLETE | PHY_LINKED_STATUS | PHY_JABBER_DETECTION), common::IsSuccess(phy_state == SUCCESS));
+    }
+#endif // DEBUG_EMAC
+
+    enet_mediamode_enum mediamode = ENET_10M_HALFDUPLEX;
+
+    if (phy_status.speed == emac::phy::Speed::kSpeed100) {
+        if (phy_status.duplex == emac::phy::Duplex::kDuplexFull) {
+            mediamode = ENET_100M_FULLDUPLEX;
+        } else {
+            mediamode = ENET_100M_HALFDUPLEX;
+        }
+    } else if (phy_status.duplex == emac::phy::Duplex::kDuplexFull) {
+        mediamode = ENET_10M_FULLDUPLEX;
+    }
+
+#ifdef GD32H7XX
+    [[maybe_unused]] const auto kEnetInitStatus = enet_init(ENETx, mediamode, ENET_AUTOCHECKSUM_DROP_FAILFRAMES, ENET_RECEIVEALL);
+#else
+    [[maybe_unused]] const auto kEnetInitStatus = enet_init(mediamode, ENET_AUTOCHECKSUM_DROP_FAILFRAMES, ENET_RECEIVEALL);
+#endif // GD32H7XX
+
+    EMAC_DEBUG_PRINTF("kEnetInitStatus=%s", common::IsSuccess(kEnetInitStatus == SUCCESS));
+
+#ifdef DEBUG_EMAC
+    {
+        uint16_t phy_value;
+#ifdef GD32H7XX
+        ErrStatus phy_state = enet_phy_write_read(ENETx, ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BCR, &phy_value);
+#else
+        ErrStatus phy_state = enet_phy_write_read(ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BCR, &phy_value);
+#endif // GD32H7XX
+        printf("BCR: %.4x %s\n", phy_value, common::IsSuccess(phy_state == SUCCESS));
+#ifdef GD32H7XX
+        enet_phy_write_read(ENETx, ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BSR, &phy_value);
+        phy_state = enet_phy_write_read(ENETx, ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BSR, &phy_value);
+#else
+        enet_phy_write_read(ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BSR, &phy_value);
+        phy_state = enet_phy_write_read(ENET_PHY_READ, PHY_ADDRESS, PHY_REG_BSR, &phy_value);
+#endif // GD32H7XX
+        printf("BSR: %.4x %s\n", phy_value & (PHY_AUTONEGO_COMPLETE | PHY_LINKED_STATUS | PHY_JABBER_DETECTION), common::IsSuccess(phy_state == SUCCESS));
+    }
+#endif // DEBUG_EMAC
+    EMAC_DEBUG_EXIT();
+}
+
+void __attribute__((cold)) Start(uint8_t mac_address[], emac::phy::Link& link) {
+    EMAC_DEBUG_ENTRY();
+    EMAC_DEBUG_PRINTF("ENET_RXBUF_NUM=%u, ENET_TXBUF_NUM=%u", ENET_RXBUF_NUM, ENET_TXBUF_NUM);
+
+    emac::phy::Status phy_status;
+    emac::phy::Start(PHY_ADDRESS, phy_status);
+
+    link = phy_status.link;
+
+    if ((phy_status.link == emac::phy::Link::kStateUp) && phy_status.autonegotiation) {
+        AdjustLink(phy_status);
+    }
+
+    MacAddress(mac_address);
+
+#ifdef GD32H7XX
+    enet_mac_address_set(ENETx, ENET_MAC_ADDRESS0, mac_address);
+#ifdef CONFIG_NET_ENABLE_PTP
+    enet_ptp_normal_descriptors_chain_init(ENETx, ENET_DMA_TX, ptp_txdesc_tab);
+    enet_ptp_normal_descriptors_chain_init(ENETx, ENET_DMA_RX, ptp_rxdesc_tab);
+#else
+    enet_descriptors_chain_init(ENETx, ENET_DMA_TX);
+    enet_descriptors_chain_init(ENETx, ENET_DMA_RX);
+#endif // CONFIG_NET_ENABLE_PTP
+#else
+    enet_mac_address_set(ENET_MAC_ADDRESS0, mac_address);
+#ifdef CONFIG_NET_ENABLE_PTP
+    enet_ptp_normal_descriptors_chain_init(ENET_DMA_TX, ptp_txdesc_tab);
+    enet_ptp_normal_descriptors_chain_init(ENET_DMA_RX, ptp_rxdesc_tab);
+#else
+    enet_descriptors_chain_init(ENET_DMA_TX);
+    enet_descriptors_chain_init(ENET_DMA_RX);
+#endif // CONFIG_NET_ENABLE_PTP
+#endif // GD32H7XX
+
+    for (uint32_t i = 0; i < ENET_TXBUF_NUM; i++) {
+        enet_transmit_checksum_config(&txdesc_tab[i], ENET_CHECKSUM_TCPUDPICMP_FULL);
+    }
+
+#ifdef CONFIG_NET_ENABLE_PTP
+    Gd32PtpStart();
+#ifndef DISABLE_RTC
+    // Set the System Clock from the Hardware Clock
+    HwClock::Get()->HcToSys();
+#endif // DISABLE_RTC
+#endif // CONFIG_NET_ENABLE_PTP
+
+    enet_enable(ENETx);
+
+    memset(&emac::eth::globals::counter, 0, sizeof(emac::eth::globals::Counters));
+
+    EMAC_DEBUG_EXIT();
+}
+} // namespace emac
