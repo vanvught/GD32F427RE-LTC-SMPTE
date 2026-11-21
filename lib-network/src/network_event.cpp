@@ -1,0 +1,71 @@
+#ifndef DISPLAY_UDF
+/**
+ * @file network_event.cpp
+ *
+ */
+/* Copyright (C) 2025 by Arjan van Vught mailto:info@gd32-dmx.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+#include <cstdint>
+
+#include "display.h"
+#include "network.h"
+#include "ip4/ip4_address.h"
+#include "network_display.h"
+#ifndef NO_EMAC
+#include "emac/emac.h"
+#endif // NO_EMAC
+
+#ifndef CONFIG_DISPLAY_LINE_IP
+static constexpr uint32_t LINE_IP = 2;
+#else
+static constexpr uint32_t LINE_IP = CONFIG_DISPLAY_LINE_IP;
+#endif // CONFIG_DISPLAY_LINE_IP
+
+namespace network::event {
+void __attribute__((weak)) Ipv4AddressChanged() {
+#ifndef NO_EMAC
+    Display::Get()->ClearLine(LINE_IP);
+    Display::Get()->Printf(LINE_IP, "" IPSTR "/%d %c", IP2STR(network::GetPrimaryIp()), network::GetNetmaskCIDR(), network::iface::AddressingMode());
+#endif // NO_EMAC
+}
+
+void __attribute__((weak)) Ipv4NetmaskChanged() {
+#ifndef NO_EMAC
+    Ipv4AddressChanged();
+#endif // NO_EMAC
+}
+
+void __attribute__((weak)) Ipv4GatewayChanged() {}
+
+void __attribute__((weak)) LinkUp() {
+#ifndef NO_EMAC
+    emac::display::Status(true);
+#endif // NO_EMAC
+}
+
+void __attribute__((weak)) LinkDown() {
+#ifndef NO_EMAC
+    emac::display::Status(false);
+#endif // NO_EMAC
+}
+} // namespace network::event
+#endif // DISPLAY_UDF

@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta content="width=device-width,initial-scale=1" name="viewport" />
+<title>TCNet Configuration and Timecode — Firmware Review</title>
+<style>
+:root {
+	color-scheme: light;
+	--ink: #172536;
+	--muted: #536477;
+	--line: #d9e1e9;
+	--accent: #176b91;
+	--bg: #f5f8fb
+}
+
+* {
+	box-sizing: border-box
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--ink);
+	font: 15px/1.65 system-ui, -apple-system, Segoe UI, sans-serif
+}
+
+main {
+	max-width: 1050px;
+	margin: auto;
+	padding: 28px 24px 80px
+}
+
+header {
+	border-bottom: 3px solid var(--accent);
+	padding-bottom: 15px
+}
+
+h1 {
+	font-size: 29px;
+	margin: 0
+}
+
+h2 {
+	font-size: 22px;
+	border-bottom: 1px solid var(--line);
+	padding-bottom: 7px;
+	margin-top: 36px
+}
+
+h3 {
+	font-size: 17px;
+	margin: 22px 0 6px
+}
+
+p {
+	margin: 8px 0 14px
+}
+
+.sub, .small {
+	color: var(--muted)
+}
+
+nav {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin: 22px 0
+}
+
+nav a {
+	border: 1px solid var(--line);
+	border-radius: 5px;
+	background: white;
+	padding: 5px 12px;
+	text-decoration: none;
+	color: var(--accent)
+}
+
+section {
+	background: white;
+	padding: 18px 23px 22px;
+	border: 1px solid var(--line);
+	border-radius: 7px;
+	margin: 22px 0
+}
+
+code, pre {
+	font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+	font-size: 13px
+}
+
+code {
+	background: #edf3f7;
+	padding: 2px 4px;
+	border-radius: 3px
+}
+
+pre {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	background: #152536;
+	color: #eaf4fa;
+	border-radius: 5px;
+	padding: 15px;
+	line-height: 1.5
+}
+
+pre code {
+	background: none;
+	color: inherit;
+	padding: 0
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+	margin: 13px 0
+}
+
+th, td {
+	text-align: left;
+	padding: 8px 10px;
+	border: 1px solid var(--line);
+	vertical-align: top
+}
+
+th {
+	background: #eaf1f6
+}
+
+.note {
+	border-left: 4px solid #b87a1a;
+	background: #fff7e9;
+	padding: 10px 14px;
+	margin: 15px 0
+}
+
+.ok {
+	border-left: 4px solid #237b68;
+	background: #eaf8f3;
+	padding: 10px 14px;
+	margin: 15px 0
+}
+
+.tag {
+	display: inline-block;
+	border-radius: 3px;
+	background: #e7f1f6;
+	color: #15516d;
+	font-size: 12px;
+	padding: 2px 7px;
+	margin-right: 6px
+}
+
+a {
+	color: #12628c
+}
+
+footer {
+	color: var(--muted);
+	font-size: 13px;
+	margin-top: 25px
+}
+
+@media print {
+	body {
+		background: white
+	}
+	main {
+		max-width: none
+	}
+	section {
+		break-inside: avoid
+	}
+	nav {
+		display: none
+	}
+}
+</style>
+</head>
+<body>
+	<main>
+		<header>
+			<h1>TCNet configuration — API, timecode and review</h1>
+			<p class="sub">Updated 12 October 2026 · Source-based
+				implementation review · Standalone HTML</p>
+		</header>
+		<nav>
+			<a href="#overview">Overview</a><a href="#name">Node name</a><a
+				href="#layer">Layer</a><a href="#mode">Timecode source</a><a
+				href="#fps">Frame rate</a><a href="#commands">UDP / Shell / OSC</a><a
+				href="#findings">Review findings</a>
+		</nav>
+		<section id="overview">
+			<h2>1. Receiver overview and defaults</h2>
+			<p>The firmware acts as a TCNet receiver: UDP 60000 accepts
+				management traffic; UDP 60001 accepts Time packets (message type
+				254). An Opt-IN broadcast is sent every 1000 ms to UDP 60000.
+				Firmware controls are separate from the TCNet wire protocol.</p>
+			<table>
+				<tr>
+					<th>Setting</th>
+					<th>Initialized value</th>
+					<th>Purpose</th>
+				</tr>
+				<tr>
+					<td>Node name</td>
+					<td><code>AvV</code></td>
+					<td>8-byte Opt-IN identification field</td>
+				</tr>
+				<tr>
+					<td>Layer</td>
+					<td><code>kLayerM</code></td>
+					<td>Chooses layer-specific time fields</td>
+				</tr>
+				<tr>
+					<td>Use embedded timecode</td>
+					<td><code>false</code></td>
+					<td>False: milliseconds; true: six-byte SMPTE timecode</td>
+				</tr>
+				<tr>
+					<td>Conversion type</td>
+					<td><code>kSmpte30Fps</code></td>
+					<td>Default nominal 30 fps for millisecond mode</td>
+				</tr>
+			</table>
+			<p>
+				<code>Init()</code>
+				sets these defaults, and is called on first
+				<code>Start()</code>
+				. Subsequent Start/Stop cycles retain settings.
+				<code>Start()</code>
+				registers UDP listeners and the periodic Opt-IN timer;
+				<code>Stop()</code>
+				closes the listeners and deletes the timer.
+			</p>
+		</section>
+		<section id="name">
+			<h2>2. Node name — fixed-width wire field</h2>
+			<p>
+				<code>SetNodeName(const char*)</code>
+				writes all eight bytes of
+				<code>management_header.node_name</code>
+				. It fills the field with spaces, then copies up to eight bytes of
+				the supplied name. No NUL terminator is reserved in the wire field.
+			</p>
+			<pre>
+				<code>assert(node_name != nullptr);
+auto* destination = packet_opt_in.management_header.node_name;
+memset(destination, ' ', sizeof(packet_opt_in.management_header.node_name));
+const auto length = strnlen(node_name, sizeof(packet_opt_in.management_header.node_name));
+memcpy(destination, node_name, length);</code>
+			</pre>
+			<p>
+				<code>NodeName()</code>
+				returns an eight-character
+				<code>std::string_view</code>
+				(including trailing spaces).
+				<code>Print()</code>
+				uses
+				<code>%.8s</code>
+				. <strong>Precondition:</strong> the pointer must be non-null and
+				readable;
+				<code>assert</code>
+				is not a runtime guard when
+				<code>NDEBUG</code>
+				is defined. No node-name control command is exposed in the supplied
+				action dispatcher.
+			</p>
+		</section>
+		<section id="layer">
+			<h2>3. Layer selection and offsets</h2>
+			<p>
+				<code>SetLayer()</code>
+				rejects values at or beyond
+				<code>kLayerUndefined</code>
+				, then computes offsets from
+				<code>offsetof(packet::Time, L1Time)</code>
+				and
+				<code>offsetof(packet::Time, L1TimeCode)</code>
+				.
+			</p>
+			<table>
+				<tr>
+					<th>Layer</th>
+					<th>Index</th>
+					<th>Milliseconds offset</th>
+					<th>Embedded timecode offset</th>
+				</tr>
+				<tr>
+					<td>1</td>
+					<td>0</td>
+					<td>24</td>
+					<td>106</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>1</td>
+					<td>28</td>
+					<td>112</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td>2</td>
+					<td>32</td>
+					<td>118</td>
+				</tr>
+				<tr>
+					<td>4</td>
+					<td>3</td>
+					<td>36</td>
+					<td>124</td>
+				</tr>
+				<tr>
+					<td>A</td>
+					<td>4</td>
+					<td>40</td>
+					<td>130</td>
+				</tr>
+				<tr>
+					<td>B</td>
+					<td>5</td>
+					<td>44</td>
+					<td>136</td>
+				</tr>
+				<tr>
+					<td>M</td>
+					<td>6</td>
+					<td>48</td>
+					<td>142</td>
+				</tr>
+				<tr>
+					<td>C</td>
+					<td>7</td>
+					<td>52</td>
+					<td>148</td>
+				</tr>
+			</table>
+			<p>
+				The eight millisecond fields are 32-bit; embedded timecode fields
+				are six bytes:
+				<code>smpte_mode, state, hours, minutes, seconds, frames</code>
+				. Both are selected using the same layer index. This table describes
+				the packed structure supplied in
+				<code>tcnet_packet.h</code>
+				.
+			</p>
+		</section>
+		<section id="mode">
+			<h2>4. Two receive paths and SMPTE mode fallback</h2>
+			<table>
+				<tr>
+					<th>Setting</th>
+					<th>Source</th>
+					<th>Processing</th>
+				</tr>
+				<tr>
+					<td><code>SetUseTimeCode(true)</code></td>
+					<td>Selected layer's six-byte embedded timecode</td>
+					<td>Copies HH:MM:SS:FF; chooses SMPTE type from layer mode or
+						packet-level fallback</td>
+				</tr>
+				<tr>
+					<td><code>SetUseTimeCode(false)</code></td>
+					<td>Selected layer's 32-bit millisecond value</td>
+					<td><code>memcpy</code>, modulo 86,400,000, split into
+						HH:MM:SS and fractional frame using <code>kFps</code></td>
+				</tr>
+			</table>
+			<h3>Current embedded-mode precedence</h3>
+			<pre>
+				<code>auto smpte_mode = lx_tc-&gt;smpte_mode;
+if (smpte_mode &lt; 24) {
+    smpte_mode = packet_time.SMPTEMode;
+}
+// 24 -&gt; Film; 25 -&gt; EBU; 29 -&gt; DF; 30 -&gt; SMPTE;
+// all other values -&gt; SMPTE 30 fps.</code>
+			</pre>
+			<p>
+				<strong>What this means:</strong> values
+				<code>0..23</code>
+				in the layer's
+				<code>smpte_mode</code>
+				are treated by this implementation as a signal to consult the
+				packet-wide
+				<code>SMPTEMode</code>
+				at offset 105. This is a code-level fallback rule, not a verified
+				statement about the TCNet specification's meaning of values below
+				24.
+			</p>
+			<p>
+				<strong>Important distinction:</strong> the subsequent
+				<code>switch</code>
+				maps any mode other than 24, 25 or 29 to 30 fps, including
+				unrecognized values above 30 and an invalid packet-wide fallback.
+				<code>IsValid(timecode)</code>
+				cannot detect the original invalid mode because it sees the
+				already-normalized type 3.
+			</p>
+			<h3>Documentation recommendation</h3>
+			<pre>
+				<code>// Compatibility policy: a layer SMPTE mode below 24 uses
+// the packet-wide SMPTEMode field as a fallback.
+// Accepted modes: 24, 25, 29, 30.
+// Unknown modes currently default to 30 fps.
+// Confirm these fallback semantics against the TCNet specification
+// and actual transmitter behavior before changing them.</code>
+			</pre>
+			<p>
+				Document the <em>reason</em> for the
+				<code>&lt; 24</code>
+				threshold once it is established (e.g., transmitter compatibility or
+				a defined protocol sentinel). Until then, mark it as implementation
+				behavior rather than a normative protocol requirement.
+			</p>
+		</section>
+		<section id="fps">
+			<h2>5. Frame-rate selection and validation</h2>
+			<table>
+				<tr>
+					<th>Type</th>
+					<th>Numeric value</th>
+					<th>Control argument</th>
+					<th>Nominal frames per second</th>
+				</tr>
+				<tr>
+					<td>Film</td>
+					<td>0</td>
+					<td>24</td>
+					<td>24</td>
+				</tr>
+				<tr>
+					<td>EBU</td>
+					<td>1</td>
+					<td>25</td>
+					<td>25</td>
+				</tr>
+				<tr>
+					<td>Drop-frame</td>
+					<td>2</td>
+					<td>29</td>
+					<td>30 frame labels (29.97 real rate)</td>
+				</tr>
+				<tr>
+					<td>SMPTE</td>
+					<td>3</td>
+					<td>30</td>
+					<td>30</td>
+				</tr>
+			</table>
+			<p>
+				<code>kFps[] = {24,25,30,30}</code>
+				, matching the supplied
+				<code>TimeCodeConst::kFps</code>
+				. A compile-time assertion checks the array length against the last
+				valid enum.
+				<code>SetTimeCodeType()</code>
+				rejects enum values above
+				<code>kSmpte30Fps</code>
+				, avoiding out-of-range lookup in normal initialized operation.
+			</p>
+			<p>
+				<code>IsValid()</code>
+				rejects hours ≥24, minutes/seconds ≥60, types ≥4, frames ≥ nominal
+				fps, and DF frame labels 00/01 at second zero of non-tenth minutes.
+				The receive callback validates <em>before</em> updating the
+				previous-timecode cache and distributing.
+			</p>
+			<p>
+				<strong>Limitation:</strong> millisecond conversion uses
+				<code>floor(fractional_ms * 30 / 1000)</code>
+				for DF, but does not generate drop-frame numbering or correct 29.97
+				elapsed-time mapping. Applying
+				<code>IsValid()</code>
+				may therefore discard generated DF timecodes at the start of
+				non-tenth minutes. Embedded timecode is the preferable DF source
+				until a dedicated converter exists.
+				<code>ltc::timecode::Decrement()</code>
+				also contains an unfinished drop-frame handling comment in the
+				supplied LTC header.
+			</p>
+		</section>
+		<section id="commands">
+			<h2>6. Firmware control paths</h2>
+			<p>
+				Three paths reach the TCNet action setters. The exact shared
+				action-prefix values are defined in
+				<code>ltc_commands.h</code>
+				, which was not among these attachments, so they are shown
+				symbolically rather than guessed.
+			</p>
+			<table>
+				<tr>
+					<th>Transport</th>
+					<th>Routing established by source</th>
+					<th>TCNet actions</th>
+				</tr>
+				<tr>
+					<td>Firmware UDP</td>
+					<td>UDP callback accepts <code>tcnet!</code>, then passes the
+						remainder to <code>ltc::actions::tcnet::HandleAction()</code></td>
+					<td><code>kLayer</code>, <code>kType</code>, <code>kTimecode</code></td>
+				</tr>
+				<tr>
+					<td>Shell</td>
+					<td><code>shell::ltc::TCNet(args)</code> requires two tokens,
+						forwards <code>args[1]</code> to <code>HandleAction()</code></td>
+					<td>Same shared actions</td>
+				</tr>
+				<tr>
+					<td>OSC</td>
+					<td>Path prefix <code>/&lt;hostname&gt;/tc/</code>, then <code>tcnet/layer/</code>,
+						<code>tcnet/type/</code> or <code>tcnet/timecode/</code></td>
+					<td>Dedicated setters called directly</td>
+				</tr>
+			</table>
+			<p>
+				Layer accepts one of
+				<code>1 2 3 4 a b m c</code>
+				(case-insensitive through
+				<code>LayerFromChar</code>
+				). Type accepts two characters parsed as 24, 25, 29 or 30. Timecode
+				mode accepts exactly one character: lowercase
+				<code>y</code>
+				enables embedded mode; any other single character disables it. The
+				latter is not strict y/n validation.
+			</p>
+			<p>
+				TCNet wire traffic uses UDP 60000 and 60001. Firmware-specific
+				control commands are separate; the UDP control port number is
+				declared in the unattached
+				<code>ltc_udp_port.h</code>
+				and is not reverified here. OSC uses its own configured UDP
+				listener.
+			</p>
+		</section>
+		<section id="findings">
+			<h2>7. Updated code review — 12 October 2026</h2>
+			<table>
+				<tr>
+					<th>Priority</th>
+					<th>Status</th>
+					<th>Finding and advice</th>
+				</tr>
+				<tr>
+					<td>Medium</td>
+					<td>Document / verify</td>
+					<td><strong>Layer SMPTE mode fallback:</strong> <code>smpte_mode
+							&lt; 24</code> selects packet-wide <code>SMPTEMode</code>. Document why,
+						and whether it is specified behavior or transmitter compatibility.</td>
+				</tr>
+				<tr>
+					<td>Medium</td>
+					<td>Open</td>
+					<td><strong>Unknown SMPTE mode:</strong> the <code>switch</code>
+						maps all unrecognized values to 30 fps. Decide whether this is an
+						intentional compatibility fallback or should reject the packet. <code>IsValid()</code>
+						does not catch it after mapping.</td>
+				</tr>
+				<tr>
+					<td>Medium</td>
+					<td>Open</td>
+					<td><strong>DF conversion:</strong> millisecond path is
+						nominal 30 fps, not complete 29.97 DF conversion; the validity
+						check can reject generated labels near minute boundaries.</td>
+				</tr>
+				<tr>
+					<td>Medium</td>
+					<td>Open</td>
+					<td><strong>Embedded state:</strong> the selected layer's <code>state</code>
+						byte is ignored; check its semantics before rejecting
+						stopped/inactive sources.</td>
+				</tr>
+				<tr>
+					<td>Medium</td>
+					<td>Verify</td>
+					<td><strong>Unicast advertisement:</strong> Opt-IN advertises
+						listener port 65023, while this module starts only 60000 and
+						60001. Confirm an external listener or change advertised behavior.</td>
+				</tr>
+				<tr>
+					<td>Low</td>
+					<td>Open</td>
+					<td><strong>Wire representation:</strong> millisecond <code>memcpy</code>
+						preserves host byte order; confirm TCNet's defined endian format.
+						Incoming buffers are also reinterpreted as packed structures, a
+						portability consideration.</td>
+				</tr>
+				<tr>
+					<td>Low</td>
+					<td>Reviewed — stack preferred</td>
+					<td>Pointer lifetime: Destination::Distribute() invokes LTC,
+						Art-Net and DistributeInternal() directly. The LTC output encodes
+						to its DMA buffers and DistributeInternal() uses the pointer
+						within the call. No retention is visible in these implementations.
+						Keep the five-byte local object; static storage is unnecessary and
+						risks overwriting a frame if processing ever becomes deferred.
+						Full verification of other callees (Art-Net, NTP, external MIDI
+						implementations) requires their definitions.</td>
+				</tr>
+			</table>
+			<h3>Suggested receiver policy comment</h3>
+			<pre>
+				<code>// Layer-specific SMPTE mode has precedence when &gt;= 24.
+// For values below 24, consult the packet-wide SMPTEMode.
+// Unknown resulting modes currently map to SMPTE 30 fps.
+// This is the existing compatibility behavior; protocol intent
+// and handling of malformed modes require confirmation.</code>
+			</pre>
+			<p>
+				<strong>Review scope:</strong> static inspection of supplied source
+				files only; no compiler run, packet capture, hardware validation, or
+				external specification verification. The earlier HTML's warnings
+				about absent range checks, unsafe node-name truncation, and missing
+				Shell/OSC evidence were outdated and are corrected here.
+			</p>
+		</section>
+		<section id="pointer-lifetime">
+			<h2>8. TCNet timecode pointer lifetime — reviewed 12 October
+				2026</h2>
+			<p>
+				<strong>Recommendation:</strong> retain the local
+				<code>ltc::TimeCode</code>
+				in
+				<code>tcnet::Handle()</code>
+				. A five-byte stack object remains alive for the entire synchronous
+				<code>Distribute()</code>
+				invocation. Using
+				<code>static</code>
+				does not establish correct asynchronous ownership: a later packet
+				could overwrite the same object while a consumer is still using it.
+			</p>
+			<pre>
+				<code>void Handle(const tcnet::Timecode* timecode_tcnet) {
+    ltc::TimeCode timecode;
+    std::memcpy(&amp;timecode, &amp;timecode_tcnet-&gt;frames, sizeof(timecode));
+    // Callees must consume or copy data before returning; do not retain pointer.
+    ltc::output::Destination::Instance().Distribute(&amp;timecode);
+}</code>
+			</pre>
+			<h3>Call-path evidence</h3>
+			<table>
+				<tr>
+					<th>Function / output</th>
+					<th>Observed behavior</th>
+					<th>Lifetime assessment</th>
+				</tr>
+				<tr>
+					<td><code>Destination::Distribute()</code></td>
+					<td>Calls enabled LTC output, enabled Art-Net output, then <code>DistributeInternal()</code>
+						inline.
+					</td>
+					<td>No pointer saved in the dispatcher.</td>
+				</tr>
+				<tr>
+					<td><code>ltc::output::ltc::Output()</code></td>
+					<td>Calls <code>encoder::SetTimeCode&lt;false&gt;()</code>,
+						encodes into selected DMA buffer, adjusts timer.
+					</td>
+					<td>The shown code does not retain the caller pointer; encoder
+						internals were not provided.</td>
+				</tr>
+				<tr>
+					<td><code>Destination::DistributeInternal()</code></td>
+					<td>Uses fields for timer/MIDI, NTP and display operations;
+						formats timecode into owned <code>timecode_</code> text.
+					</td>
+					<td>No retained pointer visible in this function; delegated
+						callees need separate review.</td>
+				</tr>
+				<tr>
+					<td>USB MIDI inline output</td>
+					<td>Builds a local USB MIDI packet and calls <code>usbmidi::Send()</code>.
+					</td>
+					<td>Original timecode pointer is not retained by the inline
+						wrapper; USB send internals not supplied.</td>
+				</tr>
+				<tr>
+					<td>Art-Net, ETC, native MIDI, RTP-MIDI, NTP</td>
+					<td>Headers or wrappers supplied, but not all final output
+						implementations.</td>
+					<td>Do not claim end-to-end proof of no retained pointers
+						without inspecting these implementations.</td>
+				</tr>
+			</table>
+			<h3>Recommended API contract</h3>
+			<p>
+				Document
+				<code>Distribute(const ltc::TimeCode*)</code>
+				as a borrowed pointer valid only for the duration of the call. Every
+				output must read or copy the timecode before returning; asynchronous
+				DMA/network work must own its data. A reference-based API (
+				<code>const ltc::TimeCode&amp;</code>
+				) can make borrowing clearer but does not by itself prevent
+				retention.
+			</p>
+			<p>
+				<strong>Additional observation:</strong>
+				<code>DistributeInternal()</code>
+				still reinterprets
+				<code>ltc::TimeCode*</code>
+				as
+				<code>midi::Timecode*</code>
+				in MIDI branches. This is a separate aliasing/layout review item,
+				not a stack-lifetime issue.
+			</p>
+		</section>
+		<section>
+			<h2>9. Source files and verification boundaries</h2>
+			<p>Original TCNet review sources were supplemented with
+				ltc_ltc(6).cpp, ltc_output(4).h, ltc_output_artnet.h,
+				ltc_output_etc.h, ltc_output_ltc.h, ltc_output_midi(1).h and TCNet
+				V3.5.1B specification. The dispatcher and DistributeInternal() are
+				now available for review; some downstream output implementations and
+				encoder internals remain outside the supplied sources.</p>
+			<p>The packed TCNet packet header labels its source as
+				specification V3.3.3 (2019). The previous HTML references V3.5.1B
+				(2022); neither specification text was included in the current
+				upload. Protocol interpretations are therefore identified as
+				assumptions or implementation policy rather than independently
+				verified specification requirements.</p>
+		</section>
+		<footer>Technical reference generated from the supplied
+			sources. Protocol requirements and implementation observations are
+			distinguished throughout.</footer>
+	</main>
+</body>
+</html>

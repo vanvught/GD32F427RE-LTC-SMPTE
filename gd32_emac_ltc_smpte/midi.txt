@@ -1,0 +1,206 @@
+ DIN MIDI             AppleMIDI              USB-MIDI
+    │                     │                     │
+    └─────────────────────┼─────────────────────┘
+                          ▼
+                    MTC decoder
+                          │
+              QF pieces 0 ... 7
+                          │
+                    piece 7 complete
+                          ▼
+                 timecode_running
+                    /           \
+                   /             \
+          Distribute()         Timer9
+                                  │
+                           one frame later
+                                  │
+                             Increment()
+                                  │
+                             Distribute()
+                             
+                             
+DIN USART
+F1 → next byte
+       │
+       │
+AppleMIDI callback
+type=F1 + data
+       │
+       │
+USB-MIDI
+02 F1 xx --
+       │
+       ▼
+ltc::input::mtc::HandleQuarterFrame(xx)
+       │
+       ├── assemble pieces 0..7
+       ├── update timecode_running
+       ├── Distribute()
+       └── Timer9Set()
+
+
+CIN 4 -> 3 MIDI bytes, SysEx start/continue
+CIN 5 -> SysEx ends with 1 byte
+CIN 6 -> SysEx ends with 2 bytes
+CIN 7 -> SysEx ends with 3 bytes
+
+
+             DIN              Apple/RTP            USB
+              │                   │                  │
+          byte parser        MIDI parser        CIN decoder
+              │                   │                  │
+              ├──── QF ───────────┼──────────────────┤
+              │                   │                  │
+              └──────────────┐    │    ┌─────────────┘
+                             ▼    ▼    ▼
+                      mtc::HandleQuarterFrame()
+                             │
+                        QF assembly
+                             │
+                     Timer9 interpolation
+
+
+DIN SysEx ─────┐
+               │
+Apple SysEx ───┼── transport-specific validation
+               │
+USB SysEx ─────┘
+               │
+               ▼
+      mtc::HandleFullFrame(
+          hours, minutes,
+          seconds, frames)
+               │
+               ▼
+          Distribute()
+          
+          
+USB-MIDI framing
+04 F0 7F 7F
+04 01 01 hr
+04 mn ss ff
+05 F7 -- --
+       │
+       ▼
+F0 7F 7F 01 01 hr mn ss ff F7
+       │
+       ▼
+mtc::HandleFullFrame(hr, mn, ss, ff)
+
+complete timecode frames
+        │
+        │  Distribute()
+        ▼
+  CreateQuarterFrame()
+        │
+        ├──────────── TIMER10 ────────────┐
+        │                                 │
+        ▼                                 ▼
+      QF piece                         QF piece
+        │                                 │
+        ▼                                 ▼
+ DIN / AppleMIDI                    DIN / AppleMIDI
+ 
+ 
+
+                   MTC generator
+                       │
+              ┌────────┴────────┐
+              │                 │
+        Full Frame              QF
+              │                 │
+      on type/start etc.    every ¼ frame
+              │                 │
+       ┌──────┼──────┐   ┌──────┼──────┐
+       ▼      ▼      ▼   ▼      ▼      ▼
+      DIN    RTP    USB DIN    RTP    USB
+      
+TIMER10 ISR                         main loop
+     │                                  │
+ Enqueue QF                             │
+     │                                  │
+     └──────────── queue ───────────────►│
+                                        │
+                                  KickNextIn()
+                                        │
+                                  usbd_ep_send()
+                                        │
+                                        ▼
+                                    USB hardware
+                                        │
+                                   USBFS IRQ
+                                        │
+                                    MidiIn()
+                                        │
+                                OnPacketSent()
+                                        │
+                                  KickNextIn()
+                                  
+ TIMER ISR               USB ISR                main
+   │                        │                     │
+ Enqueue                 complete                 │
+   │                        │                     │
+   │                     Pop()                    │
+   │                   busy=false                 │
+   │                        │                     │
+   └───────────── queue/state ───────────────► Run()
+                                                  │
+                                             KickNextIn()
+                                                  │
+                                             usbd_ep_send()
+                                             
+                                             
+                 LTC timecode
+                      │
+                MTC QF generator
+                      │
+             TIMER10 ¼-frame timing
+                      │
+        ┌─────────────┼─────────────┐
+        ▼             ▼             ▼
+     MIDI DIN     AppleMIDI      USB-MIDI
+        │             │             │
+      UART          RTP          TX queue
+                                    │
+                               Bulk IN EP
+                               
+TIMER10 ISR
+    │
+    └─ usbmidi::Send()
+          ├─ Enqueue()       ← copies 4 bytes
+          │
+          └─ KickNextIn()
+                │
+                ├─ busy? → return
+                │
+                └─ idle → usbd_ep_send()
+
+USBFS ISR
+    │
+    └─ MidiIn()
+          ├─ OnPacketSent()
+          ├─ tx_busy = false
+          └─ KickNextIn()
+          
+Enqueue QF
+    ↓
+KickNextIn
+    ↓
+start immediately
+
+Enqueue QF
+    ↓
+KickNextIn
+    ↓
+tx_busy == true
+    ↓
+return
+
+             later USB completion
+                       ↓
+                 OnPacketSent
+                       ↓
+                 KickNextIn
+                       ↓
+                 next packet

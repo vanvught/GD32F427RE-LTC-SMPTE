@@ -1,0 +1,208 @@
+/**
+ * @file display.cpp
+ *
+ */
+/* Copyright (C) 2017-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+#include <cstdint>
+#include <cassert>
+
+#include "display.h"
+#include "display_debug.h"
+#include "displayset.h"
+#include "i2c/ssd1306.h"
+#ifdef CONFIG_DISPLAY_ENABLE_SSD1311
+#include "i2c/ssd1311.h"
+#endif // CONFIG_DISPLAY_ENABLE_SSD1311
+#ifdef CONFIG_DISPLAY_ENABLE_HD44780
+#include "i2c/hd44780.h"
+#endif // CONFIG_DISPLAY_ENABLE_HD44780
+#include "i2c.h"
+#include "gpio.h"
+#include "firmware/debug/debug_debug.h"
+
+namespace display::timeout {
+void irq_init();
+static void GpioInit() {
+#ifdef DISPLAYTIMEOUT_GPIO
+    gpio::Fsel(DISPLAYTIMEOUT_GPIO, gpio::Select::kInput);
+    gpio::SetPud(DISPLAYTIMEOUT_GPIO, gpio::Pull::kUp);
+    irq_init();
+#endif // DISPLAYTIMEOUT_GPIO
+}
+} // namespace display::timeout
+
+Display::Display() {
+	DISPLAY_DEBUG_ENTRY();
+    assert(s_this == nullptr);
+    s_this = this;
+
+#ifdef CONFIG_DISPLAY_ENABLE_SSD1311
+    Detect(display::Type::kSsd1311);
+#endif // CONFIG_DISPLAY_ENABLE_SSD1311
+
+    if (lcd_display_ == nullptr) {
+        Detect(display::Type::kSsd1306);
+    }
+
+    if (lcd_display_ != nullptr) {
+        display::timeout::GpioInit();
+    }
+
+    PrintInfo();
+	DISPLAY_DEBUG_EXIT();
+}
+
+Display::Display(uint32_t rows) {
+	DISPLAY_DEBUG_ENTRY();
+	DISPLAY_DEBUG_PRINTF("rows=%u", rows);
+	
+    assert(s_this == nullptr);
+    s_this = this;
+
+    Detect(rows);
+
+    if (lcd_display_ != nullptr) {
+        display::timeout::GpioInit();
+    }
+
+    PrintInfo();
+	DISPLAY_DEBUG_EXIT();
+}
+
+Display::Display(display::Type type) : type_(type) {
+    assert(s_this == nullptr);
+    s_this = this;
+
+    Detect(type);
+
+    if (lcd_display_ != nullptr) {
+        display::timeout::GpioInit();
+    }
+
+    PrintInfo();
+}
+
+void Display::Detect(display::Type display_type) {
+	DISPLAY_DEBUG_ENTRY();
+	DISPLAY_DEBUG_PRINTF("type=%u", static_cast<uint32_t>(display_type));
+	
+    switch (display_type) {
+#ifdef CONFIG_DISPLAY_ENABLE_HD44780
+        case display::Type::kPcf8574T1602:
+            lcd_display_ = new Hd44780(16, 2);
+            assert(lcd_display_ != nullptr);
+            break;
+        case display::Type::kPcf8574T2004:
+            lcd_display_ = new Hd44780(20, 4);
+            assert(lcd_display_ != nullptr);
+            break;
+#endif // CONFIG_DISPLAY_ENABLE_HD44780
+#ifdef CONFIG_DISPLAY_ENABLE_SSD1311
+        case display::Type::kSsd1311:
+            lcd_display_ = new Ssd1311;
+            assert(lcd_display_ != nullptr);
+            break;
+#endif // CONFIG_DISPLAY_ENABLE_SSD1311
+        case display::Type::kSsd1306:
+            lcd_display_ = new Ssd1306(OledPanel::k128x648Rows);
+            assert(lcd_display_ != nullptr);
+            break;
+        case display::Type::kUnknown:
+            type_ = display::Type::kUnknown;
+            /* no break */
+        default:
+            break;
+    }
+
+    if (lcd_display_ != nullptr) {
+        if (!lcd_display_->Start()) {
+            delete lcd_display_;
+            lcd_display_ = nullptr;
+            type_ = display::Type::kUnknown;
+        } else {
+            lcd_display_->Cls();
+        }
+    }
+
+    if (lcd_display_ == nullptr) {
+        sleep_timeout_ = 0;
+    }
+	
+	DISPLAY_DEBUG_EXIT();
+}
+
+void Display::Detect(uint32_t rows) {
+    if (i2c::IsConnected(OLED_I2C_ADDRESS_DEFAULT)) {
+        if (rows <= 4) {
+#ifdef CONFIG_DISPLAY_ENABLE_SSD1311
+            lcd_display_ = new Ssd1311;
+            assert(lcd_display_ != nullptr);
+
+            if (lcd_display_->Start()) {
+                type_ = display::Type::kSsd1311;
+                Printf(1, "SSD1311");
+            } else
+#endif // CONFIG_DISPLAY_ENABLE_SSD1311
+            {
+                lcd_display_ = new Ssd1306(OledPanel::k128x644Rows);
+                assert(lcd_display_ != nullptr);
+            }
+        } else {
+            lcd_display_ = new Ssd1306(OledPanel::k128x648Rows);
+            assert(lcd_display_ != nullptr);
+        }
+
+        if (lcd_display_->Start()) {
+            type_ = display::Type::kSsd1306;
+            Printf(1, "SSD1306");
+        }
+    }
+#ifdef CONFIG_DISPLAY_ENABLE_HD44780
+    else if (i2c::IsConnected(hd44780::pcf8574t::kTC2004Address)) {
+        lcd_display_ = new Hd44780(hd44780::pcf8574t::kTC2004Address, 20, 4);
+        assert(lcd_display_ != nullptr);
+
+        if (lcd_display_->Start()) {
+            type_ = display::Type::kPcf8574T2004;
+            Printf(1, "TC2004_PCF8574T");
+        }
+    } else if (i2c::IsConnected(hd44780::pcf8574t::kTC1602Address)) {
+        lcd_display_ = new Hd44780(hd44780::pcf8574t::kTC1602Address, 16, 2);
+        assert(lcd_display_ != nullptr);
+
+        if (lcd_display_->Start()) {
+            type_ = display::Type::kPcf8574T1602;
+            Printf(1, "TC1602_PCF8574T");
+        }
+    }
+#endif // CONFIG_DISPLAY_ENABLE_HD44780
+
+    if (lcd_display_ == nullptr) {
+        sleep_timeout_ = 0;
+    }
+}
+
+#undef DISPLAY_DEBUG_ENTRY
+#undef DISPLAY_DEBUG_EXIT
+#undef DISPLAY_DEBUG_PRINTF
+#undef DISPLAY_DEBUG_PUTS

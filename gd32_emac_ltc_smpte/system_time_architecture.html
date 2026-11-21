@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>System Time Architecture — RTC, GPS and NTP/PTP</title>
+<style>
+body {
+	font: 15px/1.6 system-ui, Arial, sans-serif;
+	max-width: 1080px;
+	margin: 35px auto;
+	padding: 0 22px;
+	color: #202833
+}
+
+h1, h2 {
+	color: #173a59
+}
+
+h2 {
+	border-bottom: 1px solid #ccd6df;
+	padding-bottom: 6px
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	margin: 16px 0
+}
+
+th, td {
+	border: 1px solid #cbd4dd;
+	padding: 9px;
+	text-align: left;
+	vertical-align: top
+}
+
+th {
+	background: #eef3f7
+}
+
+pre {
+	background: #f3f6f9;
+	padding: 18px;
+	overflow: auto;
+	line-height: 1.45
+}
+
+code {
+	background: #eef1f4;
+	padding: 1px 4px
+}
+
+.note {
+	border-left: 4px solid #c58b20;
+	padding: 10px 15px;
+	background: #fff8e9
+}
+
+.ok {
+	border-left: 4px solid #338365;
+	padding: 10px 15px;
+	background: #f1faf5
+}
+
+small {
+	color: #566472
+}
+</style>
+</head>
+<body>
+	<h1>System Time Architecture</h1>
+	<p>Firmware source review · RTC, GPS/GNSS PPS, NTP client using
+		Ethernet PTP hardware, and NTP server output.</p>
+	<h2>1. Architecture overview</h2>
+	<pre> RTC / shell clock commands (initial time / manual setting)
+                     │
+ GPS GNSS time + 1 PPS ───────┐
+                             ├──► system clock / gettimeofday()
+ NTP client (PTP timestamps) ─┘             │
+        │                                   ├──► System-time LTC input
+        └──► Ethernet PTP clock ────────────┘       │
+                  │                                └──► timecode::Sync / Set
+                  └──► PTP second interrupt                  │
+                                                             ▼
+                                                 LTC Destination::Distribute()
+                                                 (LTC, MIDI, Art-Net, etc.)
+
+ NTP server output: independently enabled output; enabling it stops
+ the NTP client, but DOES NOT itself stop GPS.</pre>
+	<p>
+		The RTC and shell command implementations are <strong>not
+			included</strong> in the supplied files. Their startup and command behavior
+		therefore cannot be independently verified from this attachment set.
+		GPS and PTP-NTP flows below are supported by implementation code.
+	</p>
+	<h2>2. Three sources of time</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Source</th>
+				<th>Trigger / operation</th>
+				<th>What is verified</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>RTC / shell</td>
+				<td>Boot initialization; manual shell commands</td>
+				<td>Requested architecture, but RTC boot initialization and
+					shell handlers were not supplied. Exact precedence and persistence
+					cannot be confirmed.</td>
+			</tr>
+			<tr>
+				<td>GPS / GNSS</td>
+				<td>GNSS receiver obtains date/time; rising PPS GPIO interrupt</td>
+				<td><code>ltc::gps::Start()</code> starts receiver, PPS EXTI
+					and UDP GPS control. PPS ISR calls <code>settimeofday()</code> with
+					<code>LocalSeconds()+1</code>, then the LTC synchronization
+					callback.</td>
+			</tr>
+			<tr>
+				<td>NTP client / PTP</td>
+				<td>Network NTP replies, hardware timestamp processing</td>
+				<td>PTP-backed client computes an offset, calls <code>Gd32PtpUpdateTime()</code>,
+					reads PTP time and calls <code>ptp::systime::TimeUpdated()</code>
+					unless disabled at compile time. This is an NTP client using PTP
+					hardware timestamps, not proof of a separate IEEE 1588 network
+					slave.
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<h2>3. GPS and NTP client arbitration</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Action</th>
+				<th>GPS</th>
+				<th>NTP client</th>
+				<th>Explanation</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>GPS Start</td>
+				<td>Starts</td>
+				<td>Stops</td>
+				<td><code>ltc::gps::Start()</code> explicitly calls <code>ltc::ntpclient::Stop()</code>.</td>
+			</tr>
+			<tr>
+				<td>GPS Stop, NTP server disabled</td>
+				<td>Stops</td>
+				<td>Starts</td>
+				<td>GPS Stop checks <code>Destination::IsDisabled(kNtpServer)</code>
+					before restarting client.
+				</td>
+			</tr>
+			<tr>
+				<td>GPS Stop, NTP server enabled</td>
+				<td>Stops</td>
+				<td>Remains stopped</td>
+				<td>The conditional restart is skipped.</td>
+			</tr>
+			<tr>
+				<td>NTP client Start while GPS running</td>
+				<td>Runs</td>
+				<td>Does not start</td>
+				<td><code>ltc::ntpclient::Start()</code> immediately returns if
+					<code>gps::IsRunning()</code>.</td>
+			</tr>
+		</tbody>
+	</table>
+	<h2>4. NTP server enabled: verified behavior</h2>
+	<div class="note">
+		<strong>Important correction:</strong> The statement “when NTP server
+		is enabled, GPS and NTP client are not running” is <strong>not
+			fully supported</strong> by the provided code. The NTP client is explicitly
+		stopped; GPS is not stopped by the server Start path.
+	</div>
+	<pre>ltc::ntpserver::Start():
+    ltc::ntpclient::Stop();
+    ltc::network::ntpserver::Start();
+
+// No ltc::gps::Stop() call in this function.</pre>
+	<p>
+		Enabling the NTP server through
+		<code>Destination::Enable(kNtpServer)</code>
+		invokes that Start callback. GPS may remain active if it was already
+		running; its PPS interrupt may continue to update system time. The
+		network NTP server implementation itself is not attached, so its
+		response timestamp source cannot be independently verified.
+	</p>
+	<h2>5. NTP server disabled: verified behavior</h2>
+	<div class="ok">
+		<strong>Verified:</strong> Disabling the NTP server stops the server
+		and <em>attempts</em> to restart the NTP client. Whether the client
+		actually starts depends on GPS state, compile-time configuration and
+		client/server configuration.
+	</div>
+	<pre>Destination::Disable(kNtpServer)
+  └─ ntpserver::Stop()
+       ├─ ltc::network::ntpserver::Stop()
+       └─ ltc::ntpclient::Start()
+            ├─ if GPS IsRunning(): return (no NTP client)
+            └─ otherwise:
+                 ├─ standard NTP client: Stop(false), Start()
+                 └─ PTP-backed NTP client: Stop(false), Start()
+                    (selected by CONFIG_NET_ENABLE_* macros)</pre>
+	<table>
+		<thead>
+			<tr>
+				<th>Situation after disabling NTP server</th>
+				<th>Result</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>GPS running</td>
+				<td>GPS remains time source; NTP client Start returns without
+					starting.</td>
+			</tr>
+			<tr>
+				<td>GPS stopped; PTP NTP client compiled and server IP
+					configured</td>
+				<td>PTP-backed NTP client is restarted and attempts network
+					synchronization.</td>
+			</tr>
+			<tr>
+				<td>GPS stopped; no configured NTP server IP</td>
+				<td>PTP NTP client Start sets status <code>Stopped</code>; it
+					cannot begin polling.
+				</td>
+			</tr>
+			<tr>
+				<td>Client implementation excluded at compile time</td>
+				<td>No corresponding network client starts.</td>
+			</tr>
+		</tbody>
+	</table>
+	<h2>6. System time to LTC timecode</h2>
+	<p>
+		<code>ltc::input::systime::Start()</code>
+		selects SMPTE when the output type is unknown, reads local time via
+		<code>ltc::timecode::LocalTime()</code>
+		and initializes the timecode with
+		<code>ltc::timecode::Set()</code>
+		. In
+		<code>Run()</code>
+		, changes in
+		<code>timecode_counter</code>
+		cause the current timecode to be distributed, then incremented. The
+		code reports missed increments if the elapsed counter differs from
+		one.
+	</p>
+	<p>
+		GPS PPS invokes
+		<code>network::apps::ntpclient::systime::TimeUpdated()</code>
+		; standard NTP uses the same callback, while PTP-backed NTP uses
+		<code>network::apps::ntpclient::ptp::systime::TimeUpdated()</code>
+		. Both call
+		<code>ltc::timecode::Sync()</code>
+		<strong>only when</strong> the selected LTC input is
+		<code>Input::kSystime</code>
+		. The Ethernet PTP second interrupt also calls Sync under the same
+		selection condition. The selected LTC input is separate from the
+		system-clock synchronization source.
+	</p>
+	<h2>7. Ethernet PTP second interrupt</h2>
+	<p>
+		<code>network::event::Ipv4AddressChanged()</code>
+		invokes
+		<code>network::ptp::pps::Start()</code>
+		, which schedules a hardware PTP timestamp interrupt.
+		<code>ENET_IRQHandler()</code>
+		reschedules the next second and synchronizes LTC timecode when the
+		system-time LTC input is selected.
+		<code>ntpclient::StatusChanged(kLocked)</code>
+		resets the PTP second trigger when the PTP-backed client is
+		configured.
+	</p>
+	<h2>8. State transition summary</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Event</th>
+				<th>Consequence</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Start GPS</td>
+				<td>Stop NTP client; activate GNSS receiver and PPS ISR.</td>
+			</tr>
+			<tr>
+				<td>Stop GPS</td>
+				<td>Deactivate GPS; restart NTP client only if NTP server
+					output is disabled.</td>
+			</tr>
+			<tr>
+				<td>Enable NTP server</td>
+				<td>Stop NTP client; start NTP server; GPS state unchanged.</td>
+			</tr>
+			<tr>
+				<td>Disable NTP server</td>
+				<td>Stop NTP server; request NTP client start, which is vetoed
+					while GPS runs.</td>
+			</tr>
+			<tr>
+				<td>Select LTC system-time input</td>
+				<td>Initialize LTC timecode from local clock; accept
+					clock-to-timecode sync callbacks.</td>
+			</tr>
+		</tbody>
+	</table>
+	<h2>9. Review observations and limitations</h2>
+	<ol>
+		<li><strong>GPS exclusion is not symmetrical.</strong> NTP client
+			Start checks GPS, but NTP server Start does not stop GPS. If server
+			mode must exclude GPS, add an explicit policy and stop GPS
+			deliberately; beware that GPS Stop may restart the client depending
+			on the server enabled flag.</li>
+		<li><strong>Server disable is conditional.</strong> It does not
+			guarantee a running NTP client. GPS, build flags and missing server
+			IP can prevent that.</li>
+		<li><strong>Server implementation missing.</strong> The <code>ltc::network::ntpserver::Start/Stop</code>
+			internals, actual NTP replies, and their time source cannot be
+			audited.</li>
+		<li><strong>RTC and shell missing.</strong> To verify boot RTC
+			restore, <code>hwclock</code> commands and exact clock updates,
+			review their implementations and startup wiring.</li>
+		<li><strong>Possible state issue to test.</strong> The PTP client
+			<code>Stop(true)</code> sets Disabled, while its <code>Start()</code>
+			returns when Disabled; the wrapper first calls <code>Stop(false)</code>.
+			Confirm the state transitions in a live test when disabling NTP
+			server, particularly whether Disabled is cleared before Start.</li>
+		<li><strong>Time domains.</strong> GPS PPS writes <code>settimeofday()</code>;
+			PTP NTP client adjusts Ethernet PTP hardware time. Confirm
+			system-clock/PTP-clock coupling in the underlying clock
+			implementation before claiming they are identical.</li>
+	</ol>
+	<h2>10. Source files reviewed</h2>
+	<p>
+		<small>ltc_gps(5).cpp; gnss.cpp; ltc_ntpserver(2).cpp;
+			ltc_ntpclient(1).cpp; ntpclient.cpp; ntpclient_statuschanged.cpp;
+			ntp_ptp_systime_updated.cpp; ntp_systime_updated.cpp;
+			network_ptp_pps.cpp; network_event.cpp; ltc_input_systime(6).cpp;
+			ltc_input_systime.h; ltc_input(4).h; ltc_output(6).h; ltc(6).cpp;
+			ltc_ltc(9).cpp; ltc_ptp(1).cpp.</small>
+	</p>
+</body>
+</html>
